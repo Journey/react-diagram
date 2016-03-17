@@ -1,0 +1,11 @@
+{
+    "key":"",
+    "source":{
+	"key":"",
+	"position":"top/right/bottom/left"
+    },
+    "target":{
+	"key":"",
+	"position":"top/right/bottom/left"
+    }
+}

@@ -1,0 +1,20 @@
+"use strict";
+var view = require("../../app/js/pallet.jsx");
+var data = require("../data/rawdata");
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import TestUtils from 'react-addons-test-utils';
+
+describe("Pallet View Test",()=>{
+    it("test dom structure",()=>{
+	var Pallet = view.Pallet;
+	var oPalletModel = data.oPalletModel;
+	var palletView = TestUtils.renderIntoDocument(
+		<Pallet model={oPalletModel}></Pallet>
+	);
+
+	var aGroups = TestUtils.scryRenderedDOMComponentsWithClass(palletView,"pallet-group");
+	expect(aGroups.length).toBe(2);
+    });
+});

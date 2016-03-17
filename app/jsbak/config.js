@@ -1,0 +1,3 @@
+const ElementsConfig = {};
+
+export{ElementsConfig};

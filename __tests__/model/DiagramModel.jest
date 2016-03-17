@@ -1,0 +1,51 @@
+jest.dontMock('../../app/js/DiagramModel');
+var dm = require('../../app/js/DiagramModel');
+
+describe("DiagramItemModel Test",()=>{
+  var typeId = "typeId";
+  var statusId= "statusId";
+  var xPosition = 10;
+  var yPosition = 10;
+  var width = 100;
+  var height = 50;
+  it("constructor test", ()=>{
+    var model = new dm.DiagramItemModel(typeId,statusId,xPosition,yPosition,width,height);
+    expect(model.typeId).toBe(typeId);
+    expect(model.statusId).toBe(statusId);
+    expect(model.xPosition).toBe(xPosition);
+    expect(model.yPosition).toBe(yPosition);
+    expect(model.width).toBe(width);
+    expect(model.height).toBe(height);
+  });
+  it("static method: getInstanceFromObject",()=>{
+    var obj = {
+      typeId:typeId,
+      statusId:statusId,
+      xPosition: xPosition,
+      yPosition: yPosition,
+      width: width,
+      height: height
+    };
+    var model = dm.DiagramItemModel.getInstanceFromObject(obj);
+    expect(model.typeId).toBe(typeId);
+    expect(model.statusId).toBe(statusId);
+    expect(model.xPosition).toBe(xPosition);
+    expect(model.yPosition).toBe(yPosition);
+    expect(model.width).toBe(width);
+    expect(model.height).toBe(height);
+  });
+  it("test invalide parameters",()=>{
+    spyOn(console,"assert");
+    new dm.DiagramItemModel(undefined,undefined,-1,-1,'a',0);
+    
+    expect(console.assert.calls.allArgs()).toEqual([
+      [false,"DiagramModel.constructor invalide type undefined"],
+      [false,"DiagramModel.constructor invalide status undefined"],
+      [false,"DiagramModel.constructor invalide x position -1"],
+      [false,"DiagramModel.constructor invalide y position -1"],
+      [false,"DiagramModel.constructor invalide width a"],
+      [false,"DiagramModel.constructor invalide height 0"]
+    ]);
+    //expect(console.assert).toHaveBeenCalledWidth(false,"DiagramModel.constructor invalide type undefined");
+  })
+});

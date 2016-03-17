@@ -1,0 +1,48 @@
+*[draggable=true]{
+    -moz-user-select:none;
+    -khtml-user-drag: element;
+    -webkit-user-drag: element;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    cursor: move;
+}
+.diagram-component{
+    display: flex;
+    flex-direction: row;
+}
+.diagram-component>div{
+    border: 1px solid #ccc;
+}
+.first-col{
+    width: 300px;
+}
+.mid-col{
+    flex-grow: 1;
+}
+.last-col{
+    width: 300px;
+}
+
+.pallet img{
+    width: 50px;
+    height: 50px;
+}
+
+.magnet-ports{
+    cursor: pointer;
+}
+
+
+/*canvas begin*/
+.ca-grids path{
+    stroke: #ccc;
+    stroke-opacity: 0.3;
+}
+.magnet-ports circle{
+    fill: #f1c40f;
+    stroke: #000;
+    opacity: 0.9;
+}
+g.link path{
+    stroke: #333;
+}

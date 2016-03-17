@@ -1,0 +1,30 @@
+*[draggable=true]{
+    -moz-user-select:none;
+    -khtml-user-drag: element;
+    -webkit-user-drag: element;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    cursor: move;
+}
+.diagram-component{
+    display: flex;
+    flex-direction: row;
+}
+.diagram-component>div{
+    border: 1px solid #ccc;
+}
+.first-col{
+    width: 300px;
+}
+.mid-col{
+    flex-grow: 1;
+}
+.last-col{
+    width: 300px;
+}
+
+/*canvas begin*/
+.ca-grids path{
+    stroke: #aaa;
+    stroke-opacity: 0.3;
+}

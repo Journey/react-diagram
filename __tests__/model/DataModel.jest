@@ -1,0 +1,25 @@
+"use strict";
+jest.dontMock('../../app/js/DataModel');
+const model = require('../../app/js/DataModel');
+//var model = import {DataModel} from ('../../app/js/DataModel');
+
+describe("DataModel Test",()=>{
+  it("must use Map as the constructor", ()=>{
+    spyOn(console,"assert");
+    var ins = new model.DataModel({});
+    expect(console.assert).toHaveBeenCalledWith(false,"DataModel:constructor need a Map type as parameter");
+  });
+  it("Constructor test",()=>{
+    var map = new Map();
+    map.set("key","value");
+    var ins = new model.DataModel(map);
+    expect(ins.data).toBe(map);
+  });
+  it("set data should throw an Error",()=>{
+    var map = new Map();
+    var ins = new model.DataModel(map);
+    expect(()=>{
+      ins.data = "lala";
+    }).toThrowError("DataModel:- you can not set value to groupData");
+  });
+});
