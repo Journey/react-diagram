@@ -150,7 +150,6 @@ export const Position = (() => {
 	    let mistake = _positionRelativeToElement(event,element,window,document);
 	    _mistake.x = mistake.x;
 	    _mistake.y = mistake.y;
-	    console.log(_mistake);
 	},
 	correctElementPosition: (oPosition) => {
 	    var realX = oPosition.x - _mistake.x;
@@ -226,6 +225,9 @@ export const StoreHelper = (() =>{
 	 */
 	setStore: (oStore) => {
 	    _store = oStore;
+	},
+	getSvgProperties: ()=>{
+	    return _getSvgProperties();
 	},
 	getPalletElementInfoById:(iPalletelementid) => {
 	    var aGroups = _getPallets();

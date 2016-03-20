@@ -21236,8 +21236,15 @@
 	var UPDATE_LINES = exports.UPDATE_LINES = "Update lines";
 	var REMOVE_LINES = exports.REMOVE_LINES = "Remove Lines";
 	var ADD_LINE = exports.ADD_LINE = "Add Line";
+	var SELECT_CANVAS = exports.SELECT_CANVAS = "Select canva";
 
-	var UPDATE_SVG_PROPERTIES = exports.UPDATE_SVG_PROPERTIES = "Update Svg Properties";
+	var SAVE_SVG_PROPERTIES = exports.SAVE_SVG_PROPERTIES = "Save SVG Properties";
+	var SAVE_ELEMENT_PROPERTIES = exports.SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
+	var ADD_MEASURE_POINT = exports.ADD_MEASURE_POINT = "Add Measure Point Properties";
+	var REMOVE_MEASURE_POINT = exports.REMOVE_MEASURE_POINT = "Remove Measure Point Properties";
+
+	var CANVAS = exports.CANVAS = "Canvas";
+	var COMMON_ELEMENT = exports.COMMON_ELEMENT = "Common element which contains measure point info";
 
 /***/ },
 /* 182 */
@@ -21450,7 +21457,6 @@
 				var mistake = _positionRelativeToElement(event, element, window, document);
 				_mistake.x = mistake.x;
 				_mistake.y = mistake.y;
-				console.log(_mistake);
 			},
 			correctElementPosition: function correctElementPosition(oPosition) {
 				var realX = oPosition.x - _mistake.x;
@@ -21527,6 +21533,9 @@
 	   */
 			setStore: function setStore(oStore) {
 				_store = oStore;
+			},
+			getSvgProperties: function getSvgProperties() {
+				return _getSvgProperties();
 			},
 			getPalletElementInfoById: function getPalletElementInfoById(iPalletelementid) {
 				var aGroups = _getPallets();
@@ -21618,7 +21627,7 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-				value: true
+	   value: true
 	});
 	exports.links = exports.elements = exports.svgProperties = undefined;
 
@@ -21629,17 +21638,17 @@
 	var _Utility = __webpack_require__(183);
 
 	function _defineProperty(obj, key, value) {
-				if (key in obj) {
-							Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
-				} else {
-							obj[key] = value;
-				}return obj;
+	   if (key in obj) {
+	      Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+	   } else {
+	      obj[key] = value;
+	   }return obj;
 	}
 
 	var _defaultProperties = {
-				width: 700,
-				height: 700,
-				gridSize: 20
+	   width: 700,
+	   height: 700,
+	   gridSize: 20
 	};
 	/**
 	 * The States for the whole canvas
@@ -21648,22 +21657,22 @@
 	 * @returns {} 
 	 */
 	var svgProperties = function svgProperties() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _defaultProperties : arguments[0];
-				var action = arguments[1];
+	   var state = arguments.length <= 0 || arguments[0] === undefined ? _defaultProperties : arguments[0];
+	   var action = arguments[1];
 
-				var newState;
-				switch (action.type) {
-							case _consts.UPDATE_SVG_PROPERTIES:
-										newState = Object.assign({}, state, {
-													width: action.width,
-													height: action.height,
-													gridSize: action.gridSize
-										});
-										break;
-							default:
-										newState = state;
-				}
-				return newState;
+	   var newState;
+	   switch (action.type) {
+	      case _consts.SAVE_SVG_PROPERTIES:
+	         newState = Object.assign({}, state, {
+	            width: action.width,
+	            height: action.height,
+	            gridSize: action.gridSize
+	         });
+	         break;
+	      default:
+	         newState = state;
+	   }
+	   return newState;
 	};
 	/**
 	 * the elements of the canvas
@@ -21672,34 +21681,34 @@
 	 * @returns {} 
 	 */
 	var elements = function elements() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-				var action = arguments[1];
+	   var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	   var action = arguments[1];
 
-				var newState = void 0;
-				switch (action.type) {
-							case _consts.ADD_ELEMENT:
-										var key = (0, _Utility.generateUUID)();
-										var element = _Utility.StoreHelper.getPalletElementInfoById(action.id);
-										var newElement = Object.assign({}, element, { key: key, x: action.x, y: action.y });
-										newState = Object.assign({}, state);
-										newState[key] = newElement;
-										break;
-							case _consts.MOVE_ELEMENT:
-										var currentElement = state[action.id];
-										var updatedElement = Object.assign({}, currentElement, {
-													x: action.x,
-													y: action.y
-										});
-										var wrapElement = _defineProperty({}, action.id, updatedElement);
-										newState = Object.assign({}, state, wrapElement);
-										break;
-							case _consts.REMOVE_ELEMENT:
-										newState = state;
-										break;
-							default:
-										newState = state;
-				}
-				return newState;
+	   var newState = void 0;
+	   switch (action.type) {
+	      case _consts.ADD_ELEMENT:
+	         var key = (0, _Utility.generateUUID)();
+	         var element = _Utility.StoreHelper.getPalletElementInfoById(action.id);
+	         var newElement = Object.assign({}, element, { key: key, x: action.x, y: action.y });
+	         newState = Object.assign({}, state);
+	         newState[key] = newElement;
+	         break;
+	      case _consts.MOVE_ELEMENT:
+	         var currentElement = state[action.id];
+	         var updatedElement = Object.assign({}, currentElement, {
+	            x: action.x,
+	            y: action.y
+	         });
+	         var wrapElement = _defineProperty({}, action.id, updatedElement);
+	         newState = Object.assign({}, state, wrapElement);
+	         break;
+	      case _consts.REMOVE_ELEMENT:
+	         newState = state;
+	         break;
+	      default:
+	         newState = state;
+	   }
+	   return newState;
 	};
 	/**
 	 * the links which connected the elements
@@ -21708,30 +21717,30 @@
 	 * @returns {} 
 	 */
 	var links = function links() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-				var action = arguments[1];
+	   var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	   var action = arguments[1];
 
-				switch (action.type) {
-							case _consts.UPDATE_LINES:
-										//todo update lines which related to the element
-										var aRefLinks = _Utility.StoreHelper.getRefLinksByElementKey(action.id);
-										var oUpdatedLinks = _Utility.StoreHelper.getUpdatedLinks(aRefLinks);
-										return Object.assign({}, state, oUpdatedLinks);
-										break;
-							case _consts.ADD_LINE:
-										var key = (0, _Utility.generateUUID)();
-										var startPoint = _Utility.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
-										var endPoint = _Utility.StoreHelper.getPortPosition(action.endPort.elementKey, action.endPort.position);
-										var path = _Utility.LineHelper.getPath(startPoint, endPoint);
-										return Object.assign({}, state, _defineProperty({}, key, {
-													key: key,
-													startPort: action.startPort,
-													endPort: action.endPort,
-													path: path
-										}));
-										break;
-				}
-				return state;
+	   switch (action.type) {
+	      case _consts.UPDATE_LINES:
+	         //todo update lines which related to the element
+	         var aRefLinks = _Utility.StoreHelper.getRefLinksByElementKey(action.id);
+	         var oUpdatedLinks = _Utility.StoreHelper.getUpdatedLinks(aRefLinks);
+	         return Object.assign({}, state, oUpdatedLinks);
+	         break;
+	      case _consts.ADD_LINE:
+	         var key = (0, _Utility.generateUUID)();
+	         var startPoint = _Utility.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
+	         var endPoint = _Utility.StoreHelper.getPortPosition(action.endPort.elementKey, action.endPort.position);
+	         var path = _Utility.LineHelper.getPath(startPoint, endPoint);
+	         return Object.assign({}, state, _defineProperty({}, key, {
+	            key: key,
+	            startPort: action.startPort,
+	            endPort: action.endPort,
+	            path: path
+	         }));
+	         break;
+	   }
+	   return state;
 	};
 	exports.svgProperties = svgProperties;
 	exports.elements = elements;
@@ -21739,15 +21748,111 @@
 
 /***/ },
 /* 185 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+				value: true
 	});
-	var properties = function properties(state, action) {
-	    return {};
+
+	var _Utility = __webpack_require__(183);
+
+	var _consts = __webpack_require__(181);
+
+	function _defineProperty(obj, key, value) {
+				if (key in obj) {
+							Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+				} else {
+							obj[key] = value;
+				}return obj;
+	}
+
+	function _toConsumableArray(arr) {
+				if (Array.isArray(arr)) {
+							for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+										arr2[i] = arr[i];
+							}return arr2;
+				} else {
+							return Array.from(arr);
+				}
+	}
+
+	var _getDefaultDeviceInfo = function _getDefaultDeviceInfo() {
+				return {
+							name: "",
+							serialNumber: ""
+				};
+	};
+
+	var _getDefaultMeasurePointInfo = function _getDefaultMeasurePointInfo() {
+				return {
+							name: "",
+							identifier: "",
+							type: "1"
+				};
+	};
+
+	//{selectedProperties:{},properties:{}}
+	var properties = function properties() {
+				var state = arguments.length <= 0 || arguments[0] === undefined ? { type: _consts.CANVAS, selectedProperties: {}, properties: {} } : arguments[0];
+				var action = arguments[1];
+
+				var selectedProperties = null;
+				switch (action.type) {
+							case _consts.SELECT_CANVAS:
+										selectedProperties = {
+													width: action.width,
+													height: action.height,
+													gridSize: action.gridSize
+										};
+										return Object.assign({}, state, { selectedProperties: selectedProperties, type: _consts.CANVAS });
+										break;
+							case _consts.SELECT_ELEMENT:
+										selectedProperties = state.properties[action.id];
+										if (selectedProperties) {
+													var newDeviceInfo = Object.assign(selectedProperties.deviceInfo);
+													var newMeasurePointInfos = selectedProperties.measurePointInfos.map(function (info) {
+																return Object.assign({}, info);
+													});
+													selectedProperties = {
+																key: action.id,
+																deviceInfo: newDeviceInfo,
+																measurePointInfos: newMeasurePointInfos
+													};
+										} else {
+													selectedProperties = {
+																key: action.id,
+																deviceInfo: _getDefaultDeviceInfo(),
+																measurePointInfos: [_getDefaultMeasurePointInfo()]
+													};
+										}
+										return Object.assign({}, state, { selectedProperties: selectedProperties, type: _consts.COMMON_ELEMENT });
+										break;
+							case _consts.ADD_MEASURE_POINT:
+										selectedProperties = state.selectedProperties;
+										var measurePointInfos = selectedProperties.measurePointInfos;
+										selectedProperties = Object.assign({}, selectedProperties, {
+													measurePointInfos: [_getDefaultMeasurePointInfo()].concat(_toConsumableArray(measurePointInfos))
+										});
+										return Object.assign({}, state, { selectedProperties: selectedProperties });
+										break;
+							case _consts.REMOVE_MEASURE_POINT:
+										selectedProperties = state.selectedProperties;
+										measurePointInfos = selectedProperties.measurePointInfos;
+										selectedProperties = Object.assign({}, selectedProperties, {
+													measurePointInfos: [].concat(_toConsumableArray(measurePointInfos.slice(0, action.index)), _toConsumableArray(measurePointInfos.slice(action.index + 1, measurePointInfos.length)))
+										});
+										return Object.assign({}, state, { selectedProperties: selectedProperties });
+										break;
+							case _consts.SAVE_ELEMENT_PROPERTIES:
+										var properties = Object.assign({}, state.properties, _defineProperty({}, action.properties.key, action.properties));
+										return Object.assign({}, state, { properties: properties });
+										break;
+							default:
+										return state;
+										break;
+				}
 	};
 	exports.default = properties;
 
@@ -21957,7 +22062,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.propertyAction = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectElement = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.propertyAction = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(181);
 
@@ -22044,6 +22149,51 @@
 	    };
 	};
 
+	var selectElement = exports.selectElement = function selectElement(elementId) {
+	    return {
+	        type: _consts.SELECT_ELEMENT,
+	        id: elementId
+	    };
+	};
+
+	var selectCanvas = exports.selectCanvas = function selectCanvas(width, height, gridSize) {
+	    return {
+	        type: _consts.SELECT_CANVAS,
+	        width: width,
+	        height: height,
+	        gridSize: gridSize
+	    };
+	};
+
+	var saveSvgProperties = exports.saveSvgProperties = function saveSvgProperties(width, height, gridSize) {
+	    return {
+	        type: _consts.SAVE_SVG_PROPERTIES,
+	        width: width,
+	        height: height,
+	        gridSize: gridSize
+	    };
+	};
+
+	var saveElementProperties = exports.saveElementProperties = function saveElementProperties(newProperties) {
+	    return {
+	        type: _consts.SAVE_ELEMENT_PROPERTIES,
+	        properties: newProperties
+	    };
+	};
+
+	var addMeasurePoint = exports.addMeasurePoint = function addMeasurePoint() {
+	    return {
+	        type: _consts.ADD_MEASURE_POINT
+	    };
+	};
+
+	var removeMeasurePoint = exports.removeMeasurePoint = function removeMeasurePoint(index) {
+	    return {
+	        type: _consts.REMOVE_MEASURE_POINT,
+	        index: index
+	    };
+	};
+
 /***/ },
 /* 190 */
 /***/ function(module, exports, __webpack_require__) {
@@ -22051,7 +22201,7 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+					value: true
 	});
 
 	var _reactRedux = __webpack_require__(159);
@@ -22060,119 +22210,137 @@
 
 	var _Canvas2 = _interopRequireDefault(_Canvas);
 
-	var _actions = __webpack_require__(189);
-
 	var _Utility = __webpack_require__(183);
+
+	var _actions = __webpack_require__(189);
 
 	var _consts = __webpack_require__(181);
 
 	function _interopRequireDefault(obj) {
-		return obj && obj.__esModule ? obj : { default: obj };
+					return obj && obj.__esModule ? obj : { default: obj };
 	}
 
 	var mapStateToProps = function mapStateToProps(state) {
-		return {
-			width: state.svgProperties.width,
-			height: state.svgProperties.height,
-			gridSize: state.svgProperties.gridSize,
-			elements: state.elements,
-			links: state.links,
-			properties: state.properties
-		};
+					return {
+									width: state.svgProperties.width,
+									height: state.svgProperties.height,
+									gridSize: state.svgProperties.gridSize,
+									elements: state.elements,
+									links: state.links,
+									properties: state.properties
+					};
 	};
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
-		return {
-			/**
-	   * add/move element, will be triggered when add an element by drop the element from the pallet,
-	   * or move an canvas element
-	   * 1. add an element - 
-	   * 2. move an element - 
-	   * @param {} evt
-	   */
-			onDrop: function onDrop(evt) {
-				evt.preventDefault();
-				var svgElement = evt.target;
-				//make sure get the svg element
-				if (!!svgElement.ownerSVGElement) {
-					//in case drag element with litter movement.
-					svgElement = svgElement.ownerSVGElement;
-				}
-				var position = _Utility.Position.getMousePostionRelativeToElement(evt, svgElement, window, document);
-				position = _Utility.Position.correctElementPosition(position);
-				var oContext = (0, _Utility.getDragContextObject)(evt);
-				switch (oContext.type) {
-					case _consts.TYPE_PALLETELEMENT:
-						dispatch((0, _actions.addElement)(oContext.id, position.x, position.y));
-						break;
-					case _consts.TYPE_CANVASELEMENT:
-						dispatch((0, _actions.moveElement)(oContext.id, position.x, position.y));
-						setTimeout(function () {
-							dispatch((0, _actions.updateLines)(oContext.id));
-						}, 100);
-						break;
-				}
-				evt.preventDefault();
-				evt.dataTransfer.clearData();
-			},
-			/**
-	   * todo:: remove an element
-	   * @param {} evt
-	   */
-			removeElement: function removeElement(evt) {
-				dispatch((0, _actions.removeElement)(evt.id));
-			},
-			/**
-	   * drag an element over the canvas area
-	   * @param {} evt
-	   */
-			dragOver: function dragOver(evt) {
-				evt.preventDefault();
-				evt.dataTransfer.dropEffect = "move";
-			},
-			/**
-	   * drag an elements
-	   * @param {} evt
-	   */
-			dragElementStart: function dragElementStart(evt) {
-				var key = evt.target.getAttribute("data-key");
-				(0, _Utility.setDragContext)(evt, _consts.TYPE_CANVASELEMENT, key);
-				evt.dataTransfer.dropEffect = "copy";
-				evt.dataTransfer.effectAllowed = "copyMove";
-				_Utility.Position.logElementMistake(evt, evt.target, window, document);
-			},
-			/**
-	   * todo::double click on an element
-	   * @param {} evt
-	   */
-			dbclick: function dbclick(evt) {},
-			/**
-	   * log the port&owenr element info when mousedown on an port, currently used to draw line
-	   * @param {} event
-	   */
-			onPortMouseDown: function onPortMouseDown(event) {
-				var target = event.target;
-				var ownerKey = target.getAttribute("data-owner-key");
-				var portPosition = target.getAttribute("data-position");
-				_Utility.LineHelper.logStartInfo(ownerKey, portPosition);
-			},
-			/**
-	   * log the port&owner element info when mouseup on an port. if it is the same port with the 
-	   * port triggered onPortMouseDown, then do nothing; otherwise drawline
-	   * @param {} event
-	   */
-			onPortMouseUp: function onPortMouseUp(event) {
-				var target = event.target;
-				var ownerKey = target.getAttribute("data-owner-key");
-				var portPosition = target.getAttribute("data-position");
-				var startInfo = _Utility.LineHelper.getStartInfo();
-				var endInfo = _Utility.LineHelper.portInfo(ownerKey, portPosition);
-				if (_Utility.LineHelper.isSamePort(startInfo, endInfo)) {
-					_Utility.LineHelper.clearStartInfo();
-				} else {
-					dispatch((0, _actions.addLine)(startInfo, endInfo));
-				}
-			}
-		};
+					return {
+									/**
+	         * add/move element, will be triggered when add an element by drop the element from the pallet,
+	         * or move an canvas element
+	         * 1. add an element - 
+	         * 2. move an element - 
+	         * @param {} evt
+	         */
+									onDrop: function onDrop(evt) {
+													var svgElement = evt.currentTarget;
+													var position = _Utility.Position.getMousePostionRelativeToElement(evt, svgElement, window, document);
+													position = _Utility.Position.correctElementPosition(position);
+													var oContext = (0, _Utility.getDragContextObject)(evt);
+													switch (oContext.type) {
+																	case _consts.TYPE_PALLETELEMENT:
+																					dispatch((0, _actions.addElement)(oContext.id, position.x, position.y));
+																					break;
+																	case _consts.TYPE_CANVASELEMENT:
+																					dispatch((0, _actions.moveElement)(oContext.id, position.x, position.y));
+																					setTimeout(function () {
+																									dispatch((0, _actions.updateLines)(oContext.id));
+																					}, 100);
+																					break;
+													}
+													evt.preventDefault();
+													//todo:: throw eorro on firefox
+													//evt.dataTransfer.clearData();
+									},
+									onDragEnd: function onDragEnd(evt) {
+													evt.preventDefault();
+									},
+									/**
+	         * todo:: remove an element
+	         * @param {} evt
+	         */
+									removeElement: function removeElement(evt) {
+													dispatch((0, _actions.removeElement)(evt.id));
+									},
+									/**
+	         * drag an element over the canvas area
+	         * @param {} evt
+	         */
+									dragOver: function dragOver(evt) {
+													evt.dataTransfer.dropEffect = "move";
+													evt.preventDefault();
+									},
+									/**
+	         * drag an elements
+	         * @param {} evt
+	         */
+									dragElementStart: function dragElementStart(evt) {
+													var key = evt.currentTarget.getAttribute("data-key");
+													(0, _Utility.setDragContext)(evt, _consts.TYPE_CANVASELEMENT, key);
+													evt.dataTransfer.dropEffect = "copy";
+													evt.dataTransfer.effectAllowed = "copyMove";
+													_Utility.Position.logElementMistake(evt, evt.target, window, document);
+									},
+									/**
+	         * todo::double click on an elements
+	         * @param {} evt
+	         */
+									dbClickElement: function dbClickElement(evt) {
+													var key = evt.currentTarget.getAttribute("data-key");
+													dispatch((0, _actions.selectElement)(key));
+													evt.preventDefault();
+													evt.stopPropagation();
+									},
+									/**
+	         * dbclick on the blan area, will trigger the whole canvas selected
+	         * @param {} evt
+	         */
+									dbClickCanvas: function dbClickCanvas(evt) {
+													var _StoreHelper$getSvgPr = _Utility.StoreHelper.getSvgProperties();
+
+													var width = _StoreHelper$getSvgPr.width;
+													var height = _StoreHelper$getSvgPr.height;
+													var gridSize = _StoreHelper$getSvgPr.gridSize;
+
+													dispatch((0, _actions.selectCanvas)(width, height, gridSize));
+													evt.preventDefault();
+													evt.stopPropagation();
+									},
+									/**
+	         * log the port&owenr element info when mousedown on an port, currently used to draw line
+	         * @param {} event
+	         */
+									onPortMouseDown: function onPortMouseDown(event) {
+													var target = event.target;
+													var ownerKey = target.getAttribute("data-owner-key");
+													var portPosition = target.getAttribute("data-position");
+													_Utility.LineHelper.logStartInfo(ownerKey, portPosition);
+									},
+									/**
+	         * log the port&owner element info when mouseup on an port. if it is the same port with the 
+	         * port triggered onPortMouseDown, then do nothing; otherwise drawline
+	         * @param {} event
+	         */
+									onPortMouseUp: function onPortMouseUp(event) {
+													var target = event.target;
+													var ownerKey = target.getAttribute("data-owner-key");
+													var portPosition = target.getAttribute("data-position");
+													var startInfo = _Utility.LineHelper.getStartInfo();
+													var endInfo = _Utility.LineHelper.portInfo(ownerKey, portPosition);
+													if (_Utility.LineHelper.isSamePort(startInfo, endInfo)) {
+																	_Utility.LineHelper.clearStartInfo();
+													} else {
+																	dispatch((0, _actions.addLine)(startInfo, endInfo));
+													}
+									}
+					};
 	};
 
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Canvas2.default);
@@ -22225,6 +22393,7 @@
 	  var dragElementStart = _ref2.dragElementStart;
 	  var onPortMouseUp = _ref2.onPortMouseUp;
 	  var onPortMouseDown = _ref2.onPortMouseDown;
+	  var dbClick = _ref2.dbClick;
 	  var midHorizontal = width / 2;
 	  var midVertical = height / 2;
 	  var top = { x: midHorizontal, y: 0 };
@@ -22234,10 +22403,10 @@
 
 	  return _react2.default.createElement(
 	    "g",
-	    { onDoubleClick: dbclick, className: "ca-element", transform: "translate(" + x + "," + y + ")" },
+	    { className: "ca-element", transform: "translate(" + x + "," + y + ")" },
 	    _react2.default.createElement(
 	      "g",
-	      { draggable: "true", onDragStart: dragElementStart, "data-key": id },
+	      { draggable: "true", onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
 	      _react2.default.createElement(
 	        "g",
 	        { className: "ca-border" },
@@ -22282,7 +22451,7 @@
 	    { className: "canvas" },
 	    _react2.default.createElement(
 	      "svg",
-	      { width: data.width, height: data.height, onDrop: data.onDrop, onDragOver: data.dragOver },
+	      { width: data.width, height: data.height, onDrop: data.onDrop, onDragOver: data.dragOver, onDragEnd: data.onDragEnd, onDoubleClick: data.dbClickCanvas },
 	      _react2.default.createElement(
 	        "g",
 	        { className: "links" },
@@ -22296,7 +22465,7 @@
 	        { className: "elements" },
 	        Object.keys(data.elements).map(function (key) {
 	          var properties = data.elements[key];
-	          return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbclick: data.dbclick, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown }));
+	          return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown }));
 	        })
 	      )
 	    )
@@ -22312,7 +22481,7 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+					value: true
 	});
 
 	var _reactRedux = __webpack_require__(159);
@@ -22323,19 +22492,82 @@
 
 	var _actions = __webpack_require__(189);
 
+	var _consts = __webpack_require__(181);
+
 	function _interopRequireDefault(obj) {
-	    return obj && obj.__esModule ? obj : { default: obj };
+					return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	function _getSVGPropertiesByEvent(event) {
+					var containerElement = event.currentTarget.parentElement.parentElement;
+					var widthEle = containerElement.querySelector("input[name=width]");
+					var heightEle = containerElement.querySelector("input[name=height]");
+					var gridSizeEle = containerElement.querySelector("input[name=gridSize]");
+					return {
+									width: widthEle.value,
+									height: heightEle.value,
+									gridSize: gridSizeEle.value
+					};
+	}
+
+	function _getCommonElementPropertiesByEvent(event) {
+					var containerElement = event.currentTarget.parentElement.parentElement;
+					var propertyElement = containerElement.querySelector("div.pro-deviceInfo");
+					var measurePointInfos = containerElement.querySelector("div.measure-info");
+					var key = propertyElement.getAttribute("data-element-key");
+					var measureInfoElements = measurePointInfos.querySelectorAll("div.measure-template");
+					var deviceInfo = {
+									name: propertyElement.querySelector("input[name=name]").value,
+									identifier: propertyElement.querySelector("input[name=identifier]").value
+					};
+					var measurePointInfoObject = Array.prototype.map.call(measureInfoElements, function (infoElement) {
+									var name = infoElement.querySelector("input[name=name]").value;
+									var identifier = infoElement.querySelector("input[name=identifier]").value;
+									var type = infoElement.querySelector("select").value;
+									return { name: name, identifier: identifier, type: type };
+					});
+					return { key: key, deviceInfo: deviceInfo, measurePointInfos: measurePointInfoObject };
 	}
 
 	var mapStateToProps = function mapStateToProps(state) {
-	    return {};
+					return Object.assign({}, state.properties);
 	};
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
-	    return {
-	        onTest: function onTest(evt) {
-	            dispatch((0, _actions.propertyAction)(evt.id));
-	        }
-	    };
+					return {
+									onSave: function onSave(evt) {
+													//todo:: collect all properties
+													//1. for canvas - width, height gridsize
+													//2. for element - width,height/id/name/binding info
+													var type = evt.currentTarget.getAttribute("data-selected-type");
+													switch (type) {
+																	case _consts.CANVAS:
+																					//collect svg properties
+
+																					var _getSVGPropertiesByEv = _getSVGPropertiesByEvent(evt);
+
+																					var width = _getSVGPropertiesByEv.width;
+																					var height = _getSVGPropertiesByEv.height;
+																					var gridSize = _getSVGPropertiesByEv.gridSize;
+
+																					dispatch((0, _actions.saveSvgProperties)(width, height, gridSize));
+																					break;
+																	case _consts.COMMON_ELEMENT:
+																					//collect element properties
+																					var elementProperties = _getCommonElementPropertiesByEvent(evt);
+																					console.log(elementProperties);
+																					dispatch((0, _actions.saveElementProperties)(elementProperties));
+																					break;
+													}
+									},
+									onAddMeasurePoint: function onAddMeasurePoint() {
+													dispatch((0, _actions.addMeasurePoint)());
+									},
+									onRemoveMeasurePoint: function onRemoveMeasurePoint(event) {
+													//todo:: get the index of the measure
+													var index = event.currentTarget.getAttribute("data-index");
+													dispatch((0, _actions.removeMeasurePoint)(index));
+									}
+					};
 	};
 
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Property2.default);
@@ -22344,23 +22576,254 @@
 /* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _consts = __webpack_require__(181);
+
+	var _Utility = __webpack_require__(183);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Property = function Property() {
+	var SVGProperties = function SVGProperties(_ref) {
+	  var width = _ref.width;
+	  var height = _ref.height;
+	  var gridSize = _ref.gridSize;
+
 	  return _react2.default.createElement(
-	    'div',
+	    "div",
 	    null,
-	    'this is property'
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "宽度"
+	      ),
+	      _react2.default.createElement("input", { type: "number", name: "width", defaultValue: width })
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "高度"
+	      ),
+	      _react2.default.createElement("input", { type: "number", name: "height", defaultValue: height })
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "网格大小"
+	      ),
+	      _react2.default.createElement("input", { type: "number", name: "gridSize", step: "5", min: "10", max: "100", defaultValue: gridSize })
+	    )
+	  );
+	};
+	var MeasureInfo = function MeasureInfo(_ref2) {
+	  var name = _ref2.name;
+	  var identifier = _ref2.identifier;
+	  var type = _ref2.type;
+	  var onRemoveMeasurePoint = _ref2.onRemoveMeasurePoint;
+	  var index = _ref2.index;
+
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "measure-template" },
+	    _react2.default.createElement(
+	      "div",
+	      { className: "measure-remove", style: { display: index == 0 ? "none" : "block" } },
+	      _react2.default.createElement(
+	        "button",
+	        { onClick: onRemoveMeasurePoint, "data-index": index },
+	        "删除"
+	      )
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      null,
+	      _react2.default.createElement(
+	        "div",
+	        { className: "pro-row" },
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "名称"
+	        ),
+	        _react2.default.createElement("input", { type: "text", name: "name", defaultValue: name })
+	      ),
+	      _react2.default.createElement(
+	        "div",
+	        { className: "pro-row" },
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "编号"
+	        ),
+	        _react2.default.createElement("input", { type: "text", name: "identifier", defaultValue: identifier })
+	      ),
+	      _react2.default.createElement(
+	        "div",
+	        { className: "pro-row" },
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "类型"
+	        ),
+	        _react2.default.createElement(
+	          "select",
+	          { name: "type", defaultValue: type },
+	          _react2.default.createElement(
+	            "option",
+	            { value: "1" },
+	            "遥测"
+	          ),
+	          _react2.default.createElement(
+	            "option",
+	            { value: "2" },
+	            "遥信"
+	          ),
+	          _react2.default.createElement(
+	            "option",
+	            { value: "3" },
+	            "遥控"
+	          ),
+	          _react2.default.createElement(
+	            "option",
+	            { value: "4" },
+	            "遥调"
+	          )
+	        )
+	      )
+	    )
+	  );
+	};
+	var CommonElement = function CommonElement(_ref3) {
+	  var elementKey = _ref3.elementKey;
+	  var deviceInfo = _ref3.deviceInfo;
+	  var measurePointInfos = _ref3.measurePointInfos;
+	  var onAddMeasurePoint = _ref3.onAddMeasurePoint;
+	  var onRemoveMeasurePoint = _ref3.onRemoveMeasurePoint;
+
+
+	  return _react2.default.createElement(
+	    "div",
+	    null,
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-deviceInfo", "data-element-key": elementKey },
+	      _react2.default.createElement(
+	        "div",
+	        { className: "pro-header" },
+	        "设备"
+	      ),
+	      _react2.default.createElement(
+	        "div",
+	        { className: "pro-row" },
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "名称"
+	        ),
+	        _react2.default.createElement("input", { type: "text", name: "name", defaultValue: deviceInfo.name })
+	      ),
+	      _react2.default.createElement(
+	        "div",
+	        { className: "pro-row" },
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "编号"
+	        ),
+	        _react2.default.createElement("input", { type: "text", name: "identifier", defaultValue: deviceInfo.identifier })
+	      )
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "measure-info" },
+	      _react2.default.createElement(
+	        "div",
+	        { className: "pro-header" },
+	        _react2.default.createElement(
+	          "span",
+	          null,
+	          "测点"
+	        ),
+	        " ",
+	        _react2.default.createElement(
+	          "button",
+	          { type: "button", onClick: onAddMeasurePoint },
+	          "+"
+	        ),
+	        " "
+	      ),
+	      measurePointInfos.map(function (oBinding, index) {
+	        return _react2.default.createElement(MeasureInfo, _extends({}, oBinding, { key: (0, _Utility.generateUUID)(), index: index, onRemoveMeasurePoint: onRemoveMeasurePoint }));
+	      })
+	    )
+	  );
+	};
+	var TextProperties = function TextProperties(key, text) {
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "pro-text" },
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "文字"
+	      ),
+	      _react2.default.createElement("input", { type: "text", value: text })
+	    )
+	  );
+	};
+	var PropertyFactory = function PropertyFactory(state) {
+	  switch (state.type) {
+	    case _consts.CANVAS:
+	      return _react2.default.createElement(SVGProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties));
+	      break;
+	    case _consts.COMMON_ELEMENT:
+	      return _react2.default.createElement(CommonElement, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties, { onAddMeasurePoint: state.onAddMeasurePoint, onRemoveMeasurePoint: state.onRemoveMeasurePoint }));
+	      break;
+	    default:
+	      return _react2.default.createElement(
+	        "div",
+	        null,
+	        "empty"
+	      );
+	  }
+	};
+	var Property = function Property(state) {
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "pro-area" },
+	    _react2.default.createElement("div", null),
+	    _react2.default.createElement(
+	      "div",
+	      null,
+	      PropertyFactory(state),
+	      _react2.default.createElement(
+	        "div",
+	        { className: "align-center" },
+	        _react2.default.createElement("input", { type: "button", onClick: state.onSave, "data-key": state.key, "data-selected-type": state.type, value: "保存" })
+	      )
+	    )
 	  );
 	};
 

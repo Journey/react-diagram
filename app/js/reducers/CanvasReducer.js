@@ -5,7 +5,8 @@ import {
     REMOVE_ELEMENT,
     MOVE_ELEMENT,
     ADD_LINE,
-    UPDATE_LINES
+    UPDATE_LINES,
+    SAVE_SVG_PROPERTIES
 } from "../consts";
 import {generateUUID, StoreHelper, LineHelper} from "../Utility";
 let _defaultProperties = {
@@ -22,7 +23,7 @@ let _defaultProperties = {
 const svgProperties = (state=_defaultProperties, action) => {
     var newState;
     switch(action.type){
-    case UPDATE_SVG_PROPERTIES:
+    case SAVE_SVG_PROPERTIES:
 	newState = Object.assign({},state,{
 	    width: action.width,
 	    height: action.height,

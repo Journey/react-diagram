@@ -1,6 +1,16 @@
 import {connect} from 'react-redux';
 import Canvas from "../components/Canvas.jsx";
-import {addElement,moveElement,removeElement, clearSelection, addLine, updateLines} from "../actions";
+import {StoreHelper} from "../Utility";
+import {
+    addElement,
+    moveElement,
+    removeElement,
+    clearSelection,
+    addLine,
+    updateLines,
+    selectElement,
+    selectCanvas
+} from "../actions";
 import {
     generateUUID,
     getRelativePosition,
@@ -31,12 +41,7 @@ const mapDispatchtoProps = (dispatch) => {
 	 * @param {} evt
 	 */
 	onDrop: (evt) => {
-	    evt.preventDefault();
-	    let svgElement = evt.target;
-	    //make sure get the svg element
-	    if(!!svgElement.ownerSVGElement){//in case drag element with litter movement.
-		svgElement = svgElement.ownerSVGElement;
-	    }
+	    let svgElement = evt.currentTarget;
 	    let position = Position.getMousePostionRelativeToElement(evt,svgElement,window,document);
 	    position = Position.correctElementPosition(position);
 	    let oContext = getDragContextObject(evt);
@@ -52,7 +57,11 @@ const mapDispatchtoProps = (dispatch) => {
 		break;
 	    }
 	    evt.preventDefault();
-	    evt.dataTransfer.clearData();
+	    //todo:: throw eorro on firefox
+	    //evt.dataTransfer.clearData();
+	},
+	onDragEnd: (evt) => {
+	    evt.preventDefault();  
 	},
 	/**
 	 * todo:: remove an element
@@ -66,26 +75,39 @@ const mapDispatchtoProps = (dispatch) => {
 	 * @param {} evt
 	 */
 	dragOver: (evt) => {
-	    evt.preventDefault();
 	    evt.dataTransfer.dropEffect = "move";
+	    evt.preventDefault();
 	},
 	/**
 	 * drag an elements
 	 * @param {} evt
 	 */
 	dragElementStart: (evt) =>{
-	    var key = evt.target.getAttribute("data-key");
+	    var key = evt.currentTarget.getAttribute("data-key");
 	    setDragContext(evt,TYPE_CANVASELEMENT,key);
 	    evt.dataTransfer.dropEffect = "copy";
 	    evt.dataTransfer.effectAllowed = "copyMove";
 	    Position.logElementMistake(evt,evt.target,window,document);
 	},
 	/**
-	 * todo::double click on an element
+	 * todo::double click on an elements
 	 * @param {} evt
 	 */
-	dbclick: (evt) => {
-	    
+	dbClickElement: (evt) => {
+	    var key = evt.currentTarget.getAttribute("data-key");
+	    dispatch(selectElement(key));
+	    evt.preventDefault();
+	    evt.stopPropagation();
+	},
+	/**
+	 * dbclick on the blan area, will trigger the whole canvas selected
+	 * @param {} evt
+	 */
+	dbClickCanvas: (evt) => {
+	    let{width,height,gridSize} = StoreHelper.getSvgProperties();
+	    dispatch(selectCanvas(width,height,gridSize));
+	    evt.preventDefault();
+	    evt.stopPropagation();
 	},
 	/**
 	 * log the port&owenr element info when mousedown on an port, currently used to draw line

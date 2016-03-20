@@ -5,7 +5,13 @@ import {
     CLEAR_SELECTION,
     CANVAS_ELEMENT_DRAG_START,
     ADD_LINE,
-    UPDATE_LINES
+    UPDATE_LINES,
+    SELECT_ELEMENT,
+    SELECT_CANVAS,
+    SAVE_SVG_PROPERTIES,
+    SAVE_ELEMENT_PROPERTIES,
+    ADD_MEASURE_POINT,
+    REMOVE_MEASURE_POINT
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -89,3 +95,49 @@ export const updateLines = (elementId) => {
 	id: elementId
     };
 };
+
+export const selectElement = (elementId) => {
+    return {
+	type: SELECT_ELEMENT,
+	id: elementId
+    };
+};
+
+export const selectCanvas = (width,height,gridSize) => {
+    return {
+	type: SELECT_CANVAS,
+	width: width,
+	height: height,
+	gridSize: gridSize
+    };
+};
+
+export const saveSvgProperties = (width,height,gridSize) => {
+    return {
+	type: SAVE_SVG_PROPERTIES,
+	width,
+	height,
+	gridSize
+    };
+};
+
+export const saveElementProperties = (newProperties) => {
+    return {
+	type: SAVE_ELEMENT_PROPERTIES,
+	properties: newProperties
+    };
+};
+
+export const addMeasurePoint = () => {
+    return {
+	type: ADD_MEASURE_POINT
+    };
+};
+
+export const removeMeasurePoint = (index) => {
+    return {
+	type: REMOVE_MEASURE_POINT,
+	index: index
+    };
+};
+

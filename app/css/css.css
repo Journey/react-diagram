@@ -46,3 +46,26 @@
 g.link path{
     stroke: #333;
 }
+/*property area*/
+.measure-remove{
+    text-align: right;
+}
+.pro-area{
+    padding: 6px;
+}
+.pro-area .align-center{
+    text-align: center;
+}
+.pro-area label{
+    padding: 6px 8px;
+}
+.pro-area input,.pro-area select{
+    padding: 6px;
+}
+.pro-area .pro-row{
+    margin: 8px 6px;
+}
+.pro-area .pro-header{
+    font-size: 16px;
+    font-weight: 800;
+}

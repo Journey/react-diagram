@@ -8,7 +8,7 @@ const MagnetPorts = ({x,y,ownerKey,position,onPortMouseDown,onPortMouseUp}) => {
     </g>
   );
 };
-const Element = ({id,typeId,image,x,y,width,height,dbclick,dragElementStart,onPortMouseUp,onPortMouseDown}) => {
+const Element = ({id,typeId,image,x,y,width,height,dbclick,dragElementStart,onPortMouseUp,onPortMouseDown,dbClick}) => {
   let [midHorizontal, midVertical] = [width/2, height/2];
   let [top,right,bottom,left] = [
     {x: midHorizontal,y:0},
@@ -17,8 +17,8 @@ const Element = ({id,typeId,image,x,y,width,height,dbclick,dragElementStart,onPo
     {x: 0, y:midVertical}
   ];
   return (
-    <g onDoubleClick={dbclick} className="ca-element" transform={`translate(${x},${y})`} >
-      <g draggable="true" onDragStart={dragElementStart} data-key={id}>
+    <g className="ca-element" transform={`translate(${x},${y})`} >
+      <g draggable="true" onDoubleClick={dbClick} onDragStart={dragElementStart} data-key={id}>
 	<g className="ca-border">
 	  <rect width={width} height={height}></rect>
 	</g>
@@ -53,7 +53,7 @@ const Operator = (data) => {
 }
 const Canvas = (data) =>(
   <div className="canvas">
-    <svg width={data.width} height={data.height} onDrop={data.onDrop} onDragOver={data.dragOver}>
+    <svg width={data.width} height={data.height} onDrop={data.onDrop} onDragOver={data.dragOver} onDragEnd={data.onDragEnd} onDoubleClick={data.dbClickCanvas}>
       <g className="links">
 	{
 	  Object.keys(data.links).map(key =>{
@@ -66,7 +66,7 @@ const Canvas = (data) =>(
       {
 	Object.keys(data.elements).map( (key) =>{
 	  let properties= data.elements[key];
-	  return <Element {...properties} id={properties.key} dbclick={data.dbclick} dragElementStart={data.dragElementStart} onPortMouseUp={data.onPortMouseUp} onPortMouseDown={data.onPortMouseDown}/>
+	  return <Element {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} onPortMouseUp={data.onPortMouseUp} onPortMouseDown={data.onPortMouseDown}/>
 	})
       }
       </g>

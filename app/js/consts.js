@@ -21,5 +21,12 @@ export const SELECT_ELEMENT="Select Element";
 export const UPDATE_LINES = "Update lines";
 export const REMOVE_LINES = "Remove Lines";
 export const ADD_LINE = "Add Line";
+export const SELECT_CANVAS="Select canva";
 
-export const UPDATE_SVG_PROPERTIES = "Update Svg Properties";
+export const SAVE_SVG_PROPERTIES = "Save SVG Properties";
+export const SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
+export const ADD_MEASURE_POINT = "Add Measure Point Properties";
+export const REMOVE_MEASURE_POINT = "Remove Measure Point Properties";
+
+export const CANVAS = "Canvas";
+export const COMMON_ELEMENT="Common element which contains measure point info";
