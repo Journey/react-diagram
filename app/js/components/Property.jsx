@@ -6,11 +6,11 @@ const SVGProperties = ({width,height,gridSize}) =>{
   <div>
     <div className="pro-row">
       <label>宽度</label>
-      <input type="number" name="width" defaultValue={width} />
+      <input type="number" name="width" min="200" defaultValue={width} />
     </div>
     <div className="pro-row">
       <label>高度</label>
-      <input type="number" name="height" defaultValue={height} />
+      <input type="number" name="height" min="200" defaultValue={height} />
     </div>
     <div className="pro-row">
       <label>网格大小</label>

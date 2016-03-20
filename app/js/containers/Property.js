@@ -35,6 +35,12 @@ function _getCommonElementPropertiesByEvent(event){
 }
 
 const mapStateToProps = (state) => {
+    let properties = state.properties;
+    if(properties.type === CANVAS ) {
+	return Object.assign({},state.properties,{
+	    selectedProperties: state.svgProperties
+	});
+    }
     return Object.assign({},state.properties);
 };
 const mapDispatchtoProps = (dispatch) => {

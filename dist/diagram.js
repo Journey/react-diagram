@@ -22545,6 +22545,12 @@
 	}
 
 	var mapStateToProps = function mapStateToProps(state) {
+					var properties = state.properties;
+					if (properties.type === _consts.CANVAS) {
+									return Object.assign({}, state.properties, {
+													selectedProperties: state.svgProperties
+									});
+					}
 					return Object.assign({}, state.properties);
 	};
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
@@ -22632,7 +22638,7 @@
 	        null,
 	        "宽度"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "width", defaultValue: width })
+	      _react2.default.createElement("input", { type: "number", name: "width", min: "200", defaultValue: width })
 	    ),
 	    _react2.default.createElement(
 	      "div",
@@ -22642,7 +22648,7 @@
 	        null,
 	        "高度"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "height", defaultValue: height })
+	      _react2.default.createElement("input", { type: "number", name: "height", min: "200", defaultValue: height })
 	    ),
 	    _react2.default.createElement(
 	      "div",
