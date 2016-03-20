@@ -27,6 +27,6 @@ export const SAVE_SVG_PROPERTIES = "Save SVG Properties";
 export const SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
 export const ADD_MEASURE_POINT = "Add Measure Point Properties";
 export const REMOVE_MEASURE_POINT = "Remove Measure Point Properties";
-
+export const SAVE_MEASURE_POINT_VALUE="Save Measure point value when changed";
 export const CANVAS = "Canvas";
 export const COMMON_ELEMENT="Common element which contains measure point info";

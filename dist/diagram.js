@@ -21242,7 +21242,7 @@
 	var SAVE_ELEMENT_PROPERTIES = exports.SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
 	var ADD_MEASURE_POINT = exports.ADD_MEASURE_POINT = "Add Measure Point Properties";
 	var REMOVE_MEASURE_POINT = exports.REMOVE_MEASURE_POINT = "Remove Measure Point Properties";
-
+	var SAVE_MEASURE_POINT_VALUE = exports.SAVE_MEASURE_POINT_VALUE = "Save Measure point value when changed";
 	var CANVAS = exports.CANVAS = "Canvas";
 	var COMMON_ELEMENT = exports.COMMON_ELEMENT = "Common element which contains measure point info";
 
@@ -21849,6 +21849,12 @@
 										var properties = Object.assign({}, state.properties, _defineProperty({}, action.properties.key, action.properties));
 										return Object.assign({}, state, { properties: properties });
 										break;
+							case _consts.SAVE_MEASURE_POINT_VALUE:
+										//todo:: update it the state directly with side effect.
+										measurePointInfos = state.selectedProperties.measurePointInfos;
+										measurePointInfos[action.index][action.key] = action.value;
+										return state;
+										break;
 							default:
 										return state;
 										break;
@@ -22062,7 +22068,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectElement = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.propertyAction = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectElement = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.propertyAction = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(181);
 
@@ -22191,6 +22197,15 @@
 	    return {
 	        type: _consts.REMOVE_MEASURE_POINT,
 	        index: index
+	    };
+	};
+
+	var saveMeasurePointValue = exports.saveMeasurePointValue = function saveMeasurePointValue(index, key, value) {
+	    return {
+	        type: _consts.SAVE_MEASURE_POINT_VALUE,
+	        index: index,
+	        key: key,
+	        value: value
 	    };
 	};
 
@@ -22566,6 +22581,13 @@
 													//todo:: get the index of the measure
 													var index = event.currentTarget.getAttribute("data-index");
 													dispatch((0, _actions.removeMeasurePoint)(index));
+									},
+									onMeasurePointValueChange: function onMeasurePointValueChange(event) {
+													var target = event.currentTarget;
+													var index = target.getAttribute("data-index");
+													var key = target.getAttribute("name");
+													var value = target.value;
+													dispatch((0, _actions.saveMeasurePointValue)(index, key, value));
 									}
 					};
 	};
@@ -22640,13 +22662,14 @@
 	  var type = _ref2.type;
 	  var onRemoveMeasurePoint = _ref2.onRemoveMeasurePoint;
 	  var index = _ref2.index;
+	  var onMeasurePointValueChange = _ref2.onMeasurePointValueChange;
 
 	  return _react2.default.createElement(
 	    "div",
 	    { className: "measure-template" },
 	    _react2.default.createElement(
 	      "div",
-	      { className: "measure-remove", style: { display: index == 0 ? "none" : "block" } },
+	      { className: "measure-remove", style: { display: "block" } },
 	      _react2.default.createElement(
 	        "button",
 	        { onClick: onRemoveMeasurePoint, "data-index": index },
@@ -22664,7 +22687,7 @@
 	          null,
 	          "名称"
 	        ),
-	        _react2.default.createElement("input", { type: "text", name: "name", defaultValue: name })
+	        _react2.default.createElement("input", { type: "text", name: "name", defaultValue: name, "data-index": index, onChange: onMeasurePointValueChange })
 	      ),
 	      _react2.default.createElement(
 	        "div",
@@ -22674,7 +22697,7 @@
 	          null,
 	          "编号"
 	        ),
-	        _react2.default.createElement("input", { type: "text", name: "identifier", defaultValue: identifier })
+	        _react2.default.createElement("input", { type: "text", name: "identifier", defaultValue: identifier, "data-index": index, onChange: onMeasurePointValueChange })
 	      ),
 	      _react2.default.createElement(
 	        "div",
@@ -22686,7 +22709,7 @@
 	        ),
 	        _react2.default.createElement(
 	          "select",
-	          { name: "type", defaultValue: type },
+	          { name: "type", defaultValue: type, "data-index": index, onChange: onMeasurePointValueChange },
 	          _react2.default.createElement(
 	            "option",
 	            { value: "1" },
@@ -22718,6 +22741,7 @@
 	  var measurePointInfos = _ref3.measurePointInfos;
 	  var onAddMeasurePoint = _ref3.onAddMeasurePoint;
 	  var onRemoveMeasurePoint = _ref3.onRemoveMeasurePoint;
+	  var onMeasurePointValueChange = _ref3.onMeasurePointValueChange;
 
 
 	  return _react2.default.createElement(
@@ -22772,7 +22796,7 @@
 	        " "
 	      ),
 	      measurePointInfos.map(function (oBinding, index) {
-	        return _react2.default.createElement(MeasureInfo, _extends({}, oBinding, { key: (0, _Utility.generateUUID)(), index: index, onRemoveMeasurePoint: onRemoveMeasurePoint }));
+	        return _react2.default.createElement(MeasureInfo, _extends({}, oBinding, { key: (0, _Utility.generateUUID)(), index: index, onRemoveMeasurePoint: onRemoveMeasurePoint, onMeasurePointValueChange: onMeasurePointValueChange }));
 	      })
 	    )
 	  );
@@ -22799,7 +22823,7 @@
 	      return _react2.default.createElement(SVGProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties));
 	      break;
 	    case _consts.COMMON_ELEMENT:
-	      return _react2.default.createElement(CommonElement, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties, { onAddMeasurePoint: state.onAddMeasurePoint, onRemoveMeasurePoint: state.onRemoveMeasurePoint }));
+	      return _react2.default.createElement(CommonElement, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties, { onAddMeasurePoint: state.onAddMeasurePoint, onRemoveMeasurePoint: state.onRemoveMeasurePoint, onMeasurePointValueChange: state.onMeasurePointValueChange }));
 	      break;
 	    default:
 	      return _react2.default.createElement(

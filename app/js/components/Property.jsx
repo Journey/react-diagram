@@ -19,24 +19,24 @@ const SVGProperties = ({width,height,gridSize}) =>{
   </div>
     );
 };
-const MeasureInfo = ({name,identifier,type,onRemoveMeasurePoint,index}) => {
+const MeasureInfo = ({name,identifier,type,onRemoveMeasurePoint,index,onMeasurePointValueChange}) => {
   return (
     <div className="measure-template">
-      <div className="measure-remove" style={{display: index==0?"none":"block"}}>
+      <div className="measure-remove" style={{display: "block"}}>
 	<button onClick={onRemoveMeasurePoint} data-index={index}>删除</button>
       </div>
       <div>
 	<div className="pro-row">
 	  <label>名称</label>
-	  <input type="text" name="name" defaultValue={name}/>
+	  <input type="text" name="name" defaultValue={name} data-index={index} onChange={onMeasurePointValueChange}/>
 	</div>
 	<div className="pro-row">
 	  <label>编号</label>
-	  <input type="text" name="identifier" defaultValue={identifier} />
+	  <input type="text" name="identifier" defaultValue={identifier} data-index={index} onChange={onMeasurePointValueChange} />
 	</div>
 	<div className="pro-row">
 	  <label>类型</label>
-	  <select name="type" defaultValue={type}>
+	  <select name="type" defaultValue={type} data-index={index} onChange={onMeasurePointValueChange}>
 	    <option value="1">遥测</option>
 	    <option value="2">遥信</option>
 	    <option value="3">遥控</option>
@@ -47,7 +47,7 @@ const MeasureInfo = ({name,identifier,type,onRemoveMeasurePoint,index}) => {
     </div>
   );
 };
-const CommonElement = ({elementKey, deviceInfo, measurePointInfos, onAddMeasurePoint, onRemoveMeasurePoint}) => {
+const CommonElement = ({elementKey, deviceInfo, measurePointInfos, onAddMeasurePoint, onRemoveMeasurePoint,onMeasurePointValueChange}) => {
 
   return (
     <div>
@@ -67,7 +67,7 @@ const CommonElement = ({elementKey, deviceInfo, measurePointInfos, onAddMeasureP
 	{
 	  measurePointInfos.map((oBinding,index) => {
 	    return (
-	      <MeasureInfo {...oBinding} key={generateUUID()} index={index} onRemoveMeasurePoint={onRemoveMeasurePoint}/>
+	      <MeasureInfo {...oBinding} key={generateUUID()} index={index} onRemoveMeasurePoint={onRemoveMeasurePoint} onMeasurePointValueChange={onMeasurePointValueChange}/>
 	    )
 	  })
 	}
@@ -94,7 +94,7 @@ const PropertyFactory = (state) => {
       break;
     case COMMON_ELEMENT:
       return (
-	<CommonElement key={generateUUID()} elementKey={state.selectedProperties.key} {...state.selectedProperties} onAddMeasurePoint={state.onAddMeasurePoint} onRemoveMeasurePoint={state.onRemoveMeasurePoint}></CommonElement>
+	<CommonElement key={generateUUID()} elementKey={state.selectedProperties.key} {...state.selectedProperties} onAddMeasurePoint={state.onAddMeasurePoint} onRemoveMeasurePoint={state.onRemoveMeasurePoint} onMeasurePointValueChange={state.onMeasurePointValueChange}></CommonElement>
       )
       break;
     default:

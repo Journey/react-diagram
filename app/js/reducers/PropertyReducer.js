@@ -6,7 +6,8 @@ import {
     SELECT_CANVAS,
     CANVAS,
     COMMON_ELEMENT,
-    SAVE_ELEMENT_PROPERTIES
+    SAVE_ELEMENT_PROPERTIES,
+    SAVE_MEASURE_POINT_VALUE
 } from "../consts";
 
 const _getDefaultDeviceInfo = () =>{
@@ -76,6 +77,12 @@ const properties = (state={type:CANVAS,selectedProperties:{},properties:{}},acti
     case SAVE_ELEMENT_PROPERTIES:
 	let properties = Object.assign({},state.properties,{[action.properties.key]:action.properties});
 	return Object.assign({},state,{properties: properties});
+	break;
+    case SAVE_MEASURE_POINT_VALUE:
+	//todo:: update it the state directly with side effect.
+	measurePointInfos = state.selectedProperties.measurePointInfos;
+	measurePointInfos[action.index][action.key] = action.value;
+	return state;
 	break;
     default:
 	return state;

@@ -10,6 +10,7 @@ import {
     SELECT_CANVAS,
     SAVE_SVG_PROPERTIES,
     SAVE_ELEMENT_PROPERTIES,
+    SAVE_MEASURE_POINT_VALUE,
     ADD_MEASURE_POINT,
     REMOVE_MEASURE_POINT
 } from "./consts";
@@ -141,3 +142,11 @@ export const removeMeasurePoint = (index) => {
     };
 };
 
+export const saveMeasurePointValue = (index,key,value) => {
+    return {
+	type: SAVE_MEASURE_POINT_VALUE,
+	index: index,
+	key: key,
+	value: value
+    };
+};

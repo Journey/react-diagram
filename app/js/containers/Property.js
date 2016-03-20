@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import Property from "../components/Property.jsx";
-import {saveSvgProperties, saveElementProperties, addMeasurePoint,removeMeasurePoint} from "../actions";
+import {saveSvgProperties, saveElementProperties, addMeasurePoint,removeMeasurePoint,saveMeasurePointValue} from "../actions";
 import {CANVAS,COMMON_ELEMENT} from "../consts";
 
 function _getSVGPropertiesByEvent(event){
@@ -65,6 +65,13 @@ const mapDispatchtoProps = (dispatch) => {
 	    //todo:: get the index of the measure
 	    let index = event.currentTarget.getAttribute("data-index");
 	    dispatch(removeMeasurePoint(index));
+	},
+	onMeasurePointValueChange: (event) => {
+	    let target = event.currentTarget;
+	    let index = target.getAttribute("data-index");
+	    let key = target.getAttribute("name");
+	    let value = target.value;
+	    dispatch(saveMeasurePointValue(index,key,value));
 	}
     };
 };
