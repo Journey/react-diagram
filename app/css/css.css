@@ -69,3 +69,10 @@ g.link path{
     font-size: 16px;
     font-weight: 800;
 }
+.operator-hightlight{
+    stroke: #ffb7b7;
+    fill: none;
+}
+.operator-del{
+    cursor: pointer;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import {POSITION_TOP,POSITION_RIGHT,POSITION_BOTTOM,POSITION_LEFT} from "../consts";
-import {LineHelper} from "../Utility";
+import {LineHelper,generateUUID} from "../Utility";
 const MagnetPorts = ({x,y,ownerKey,position,onPortMouseDown,onPortMouseUp}) => {
   return (
     <g draggable="false">
@@ -20,7 +20,7 @@ const Element = ({id,typeId,image,x,y,width,height,dbclick,dragElementStart,onPo
     <g className="ca-element" transform={`translate(${x},${y})`} >
       <g draggable="true" onDoubleClick={dbClick} onDragStart={dragElementStart} data-key={id}>
 	<g className="ca-border">
-	  <rect width={width} height={height}></rect>
+	  <rect width={width+2} height={height+2}></rect>
 	</g>
 	<g className="ca-img">
 	  <image x="0" y="0" height={height} width={width} xlinkHref={image}></image>
@@ -42,12 +42,13 @@ const Link = ({path}) => {
     </g>
   )
 };
-const Operator = (data) => {
+const Operator = ({id,x,y,width,height,onRemoveClick}) => {
   return (
-    <g className="operator">
+    <g className="operator" transform={`translate(${x-2},${y-2})`}>
       <g className="operator-del">
+	<text data-element-key={id} onClick={onRemoveClick} x={width/2} y="-5"  textAnchor="middle">删除</text>
       </g>
-      <rect className="operator-hightlight"/>
+      <rect className="operator-hightlight" width={width+4} height={height+4}/>
     </g>
   )
 }
@@ -70,6 +71,7 @@ const Canvas = (data) =>(
 	})
       }
       </g>
+      <Operator key={generateUUID()} {...data.operator} onRemoveClick={data.removeElement}></Operator>
     </svg>
   </div>
 );

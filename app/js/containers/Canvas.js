@@ -5,6 +5,7 @@ import {
     addElement,
     moveElement,
     removeElement,
+    removeLines,
     clearSelection,
     addLine,
     updateLines,
@@ -28,7 +29,8 @@ const mapStateToProps = (state) => {
 	gridSize: state.svgProperties.gridSize,
 	elements: state.elements,
 	links: state.links,
-	properties: state.properties
+	properties: state.properties,
+	operator: state.operator
     };
 };
 const mapDispatchtoProps = (dispatch) => {
@@ -68,7 +70,9 @@ const mapDispatchtoProps = (dispatch) => {
 	 * @param {} evt
 	 */
 	removeElement: (evt) => {
-	    dispatch(removeElement(evt.id));
+	    let key = evt.currentTarget.getAttribute("data-element-key");
+	    dispatch(removeLines(key));
+	    dispatch(removeElement(key));
 	},
 	/**
 	 * drag an element over the canvas area
@@ -95,7 +99,9 @@ const mapDispatchtoProps = (dispatch) => {
 	 */
 	dbClickElement: (evt) => {
 	    var key = evt.currentTarget.getAttribute("data-key");
-	    dispatch(selectElement(key));
+	    let elementInfo = StoreHelper.getCanvasElmentInfoById(key);
+	    let [x,y,width,height] = [elementInfo.x,elementInfo.y,elementInfo.width,elementInfo.height];
+	    dispatch(selectElement(key,x,y,width,height));
 	    evt.preventDefault();
 	    evt.stopPropagation();
 	},

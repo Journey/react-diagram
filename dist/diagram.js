@@ -21200,7 +21200,8 @@
 	   groups: _PalletReducer2.default,
 	   elements: _CanvasReducer.elements,
 	   links: _CanvasReducer.links,
-	   properties: _PropertyReducer2.default
+	   properties: _PropertyReducer2.default,
+	   operator: _CanvasReducer.operator
 	});
 	exports.default = componentReducers;
 
@@ -21627,9 +21628,9 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	   value: true
+				value: true
 	});
-	exports.links = exports.elements = exports.svgProperties = undefined;
+	exports.operator = exports.links = exports.elements = exports.svgProperties = undefined;
 
 	var _redux = __webpack_require__(165);
 
@@ -21638,17 +21639,26 @@
 	var _Utility = __webpack_require__(183);
 
 	function _defineProperty(obj, key, value) {
-	   if (key in obj) {
-	      Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
-	   } else {
-	      obj[key] = value;
-	   }return obj;
+				if (key in obj) {
+							Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+				} else {
+							obj[key] = value;
+				}return obj;
 	}
 
 	var _defaultProperties = {
-	   width: 700,
-	   height: 700,
-	   gridSize: 20
+				width: 700,
+				height: 700,
+				gridSize: 20
+	};
+	var _getDefaultOperator = function _getDefaultOperator() {
+				return {
+							id: null,
+							x: 100000,
+							y: 100000,
+							width: 10000,
+							height: 10000
+				};
 	};
 	/**
 	 * The States for the whole canvas
@@ -21657,22 +21667,22 @@
 	 * @returns {} 
 	 */
 	var svgProperties = function svgProperties() {
-	   var state = arguments.length <= 0 || arguments[0] === undefined ? _defaultProperties : arguments[0];
-	   var action = arguments[1];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _defaultProperties : arguments[0];
+				var action = arguments[1];
 
-	   var newState;
-	   switch (action.type) {
-	      case _consts.SAVE_SVG_PROPERTIES:
-	         newState = Object.assign({}, state, {
-	            width: action.width,
-	            height: action.height,
-	            gridSize: action.gridSize
-	         });
-	         break;
-	      default:
-	         newState = state;
-	   }
-	   return newState;
+				var newState;
+				switch (action.type) {
+							case _consts.SAVE_SVG_PROPERTIES:
+										newState = Object.assign({}, state, {
+													width: action.width,
+													height: action.height,
+													gridSize: action.gridSize
+										});
+										break;
+							default:
+										newState = state;
+				}
+				return newState;
 	};
 	/**
 	 * the elements of the canvas
@@ -21681,34 +21691,35 @@
 	 * @returns {} 
 	 */
 	var elements = function elements() {
-	   var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	   var action = arguments[1];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+				var action = arguments[1];
 
-	   var newState = void 0;
-	   switch (action.type) {
-	      case _consts.ADD_ELEMENT:
-	         var key = (0, _Utility.generateUUID)();
-	         var element = _Utility.StoreHelper.getPalletElementInfoById(action.id);
-	         var newElement = Object.assign({}, element, { key: key, x: action.x, y: action.y });
-	         newState = Object.assign({}, state);
-	         newState[key] = newElement;
-	         break;
-	      case _consts.MOVE_ELEMENT:
-	         var currentElement = state[action.id];
-	         var updatedElement = Object.assign({}, currentElement, {
-	            x: action.x,
-	            y: action.y
-	         });
-	         var wrapElement = _defineProperty({}, action.id, updatedElement);
-	         newState = Object.assign({}, state, wrapElement);
-	         break;
-	      case _consts.REMOVE_ELEMENT:
-	         newState = state;
-	         break;
-	      default:
-	         newState = state;
-	   }
-	   return newState;
+				var newState = void 0;
+				switch (action.type) {
+							case _consts.ADD_ELEMENT:
+										var key = (0, _Utility.generateUUID)();
+										var element = _Utility.StoreHelper.getPalletElementInfoById(action.id);
+										var newElement = Object.assign({}, element, { key: key, x: action.x, y: action.y });
+										newState = Object.assign({}, state);
+										newState[key] = newElement;
+										break;
+							case _consts.MOVE_ELEMENT:
+										var currentElement = state[action.id];
+										var updatedElement = Object.assign({}, currentElement, {
+													x: action.x,
+													y: action.y
+										});
+										var wrapElement = _defineProperty({}, action.id, updatedElement);
+										newState = Object.assign({}, state, wrapElement);
+										break;
+							case _consts.REMOVE_ELEMENT:
+										newState = Object.assign({}, state);
+										delete newState[action.id];
+										break;
+							default:
+										newState = state;
+				}
+				return newState;
 	};
 	/**
 	 * the links which connected the elements
@@ -21717,34 +21728,66 @@
 	 * @returns {} 
 	 */
 	var links = function links() {
-	   var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	   var action = arguments[1];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+				var action = arguments[1];
 
-	   switch (action.type) {
-	      case _consts.UPDATE_LINES:
-	         //todo update lines which related to the element
-	         var aRefLinks = _Utility.StoreHelper.getRefLinksByElementKey(action.id);
-	         var oUpdatedLinks = _Utility.StoreHelper.getUpdatedLinks(aRefLinks);
-	         return Object.assign({}, state, oUpdatedLinks);
-	         break;
-	      case _consts.ADD_LINE:
-	         var key = (0, _Utility.generateUUID)();
-	         var startPoint = _Utility.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
-	         var endPoint = _Utility.StoreHelper.getPortPosition(action.endPort.elementKey, action.endPort.position);
-	         var path = _Utility.LineHelper.getPath(startPoint, endPoint);
-	         return Object.assign({}, state, _defineProperty({}, key, {
-	            key: key,
-	            startPort: action.startPort,
-	            endPort: action.endPort,
-	            path: path
-	         }));
-	         break;
-	   }
-	   return state;
+				switch (action.type) {
+							case _consts.UPDATE_LINES:
+										//todo update lines which related to the element
+										var aRefLinks = _Utility.StoreHelper.getRefLinksByElementKey(action.id);
+										var oUpdatedLinks = _Utility.StoreHelper.getUpdatedLinks(aRefLinks);
+										return Object.assign({}, state, oUpdatedLinks);
+										break;
+							case _consts.REMOVE_LINES:
+										aRefLinks = _Utility.StoreHelper.getRefLinksByElementKey(action.id);
+										var newLinks = Object.assign({}, state);
+										aRefLinks.forEach(function (key) {
+													delete newLinks[key];
+										});
+										return newLinks;
+										break;
+							case _consts.ADD_LINE:
+										var key = (0, _Utility.generateUUID)();
+										var startPoint = _Utility.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
+										var endPoint = _Utility.StoreHelper.getPortPosition(action.endPort.elementKey, action.endPort.position);
+										var path = _Utility.LineHelper.getPath(startPoint, endPoint);
+										return Object.assign({}, state, _defineProperty({}, key, {
+													key: key,
+													startPort: action.startPort,
+													endPort: action.endPort,
+													path: path
+										}));
+										break;
+				}
+				return state;
+	};
+	var operator = function operator() {
+				var state = arguments.length <= 0 || arguments[0] === undefined ? { id: null, x: 10000, y: 10000, width: 10000, height: 10000 } : arguments[0];
+				var action = arguments[1];
+
+				switch (action.type) {
+							case _consts.MOVE_ELEMENT:
+							case _consts.REMOVE_ELEMENT:
+							case _consts.SELECT_CANVAS:
+										return _getDefaultOperator();
+										break;
+							case _consts.SELECT_ELEMENT:
+										return {
+													id: action.id,
+													x: action.x,
+													y: action.y,
+													width: action.width,
+													height: action.height
+										};
+										break;
+							default:
+										return state;
+				}
 	};
 	exports.svgProperties = svgProperties;
 	exports.elements = elements;
 	exports.links = links;
+	exports.operator = operator;
 
 /***/ },
 /* 185 */
@@ -22068,7 +22111,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectElement = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.propertyAction = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectElement = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.propertyAction = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(181);
 
@@ -22135,7 +22178,7 @@
 	 */
 	var removeElement = exports.removeElement = function removeElement(elementId) {
 	    return {
-	        type: REMOVE_ELEMENT,
+	        type: _consts.REMOVE_ELEMENT,
 	        id: elementId
 	    };
 	};
@@ -22155,10 +22198,21 @@
 	    };
 	};
 
-	var selectElement = exports.selectElement = function selectElement(elementId) {
+	var removeLines = exports.removeLines = function removeLines(elementKey) {
+	    return {
+	        type: _consts.REMOVE_LINES,
+	        id: elementKey
+	    };
+	};
+
+	var selectElement = exports.selectElement = function selectElement(elementId, x, y, width, height) {
 	    return {
 	        type: _consts.SELECT_ELEMENT,
-	        id: elementId
+	        id: elementId,
+	        x: x,
+	        y: y,
+	        width: width,
+	        height: height
 	    };
 	};
 
@@ -22242,7 +22296,8 @@
 									gridSize: state.svgProperties.gridSize,
 									elements: state.elements,
 									links: state.links,
-									properties: state.properties
+									properties: state.properties,
+									operator: state.operator
 					};
 	};
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
@@ -22282,7 +22337,9 @@
 	         * @param {} evt
 	         */
 									removeElement: function removeElement(evt) {
-													dispatch((0, _actions.removeElement)(evt.id));
+													var key = evt.currentTarget.getAttribute("data-element-key");
+													dispatch((0, _actions.removeLines)(key));
+													dispatch((0, _actions.removeElement)(key));
 									},
 									/**
 	         * drag an element over the canvas area
@@ -22309,7 +22366,13 @@
 	         */
 									dbClickElement: function dbClickElement(evt) {
 													var key = evt.currentTarget.getAttribute("data-key");
-													dispatch((0, _actions.selectElement)(key));
+													var elementInfo = _Utility.StoreHelper.getCanvasElmentInfoById(key);
+													var x = elementInfo.x;
+													var y = elementInfo.y;
+													var width = elementInfo.width;
+													var height = elementInfo.height;
+
+													dispatch((0, _actions.selectElement)(key, x, y, width, height));
 													evt.preventDefault();
 													evt.stopPropagation();
 									},
@@ -22425,7 +22488,7 @@
 	      _react2.default.createElement(
 	        "g",
 	        { className: "ca-border" },
-	        _react2.default.createElement("rect", { width: width, height: height })
+	        _react2.default.createElement("rect", { width: width + 2, height: height + 2 })
 	      ),
 	      _react2.default.createElement(
 	        "g",
@@ -22452,12 +22515,27 @@
 	    _react2.default.createElement("path", { d: path })
 	  );
 	};
-	var Operator = function Operator(data) {
+	var Operator = function Operator(_ref4) {
+	  var id = _ref4.id;
+	  var x = _ref4.x;
+	  var y = _ref4.y;
+	  var width = _ref4.width;
+	  var height = _ref4.height;
+	  var onRemoveClick = _ref4.onRemoveClick;
+
 	  return _react2.default.createElement(
 	    "g",
-	    { className: "operator" },
-	    _react2.default.createElement("g", { className: "operator-del" }),
-	    _react2.default.createElement("rect", { className: "operator-hightlight" })
+	    { className: "operator", transform: "translate(" + (x - 2) + "," + (y - 2) + ")" },
+	    _react2.default.createElement(
+	      "g",
+	      { className: "operator-del" },
+	      _react2.default.createElement(
+	        "text",
+	        { "data-element-key": id, onClick: onRemoveClick, x: width / 2, y: "-5", textAnchor: "middle" },
+	        "删除"
+	      )
+	    ),
+	    _react2.default.createElement("rect", { className: "operator-hightlight", width: width + 4, height: height + 4 })
 	  );
 	};
 	var Canvas = function Canvas(data) {
@@ -22482,7 +22560,8 @@
 	          var properties = data.elements[key];
 	          return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown }));
 	        })
-	      )
+	      ),
+	      _react2.default.createElement(Operator, _extends({ key: (0, _Utility.generateUUID)() }, data.operator, { onRemoveClick: data.removeElement }))
 	    )
 	  );
 	};

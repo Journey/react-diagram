@@ -7,7 +7,7 @@ import {
     CANVAS_ELEMENT_DRAG_START
 } from "../consts";
 import groups from "./PalletReducer";
-import {svgProperties,elements,links} from "./CanvasReducer";
+import {svgProperties,elements,links,operator} from "./CanvasReducer";
 import properties from "./PropertyReducer";
 
 let _defaultSelectedElement = {
@@ -51,6 +51,7 @@ const componentReducers = combineReducers({
     groups,
     elements,
     links,
-    properties
+    properties,
+    operator
 });
 export default componentReducers;

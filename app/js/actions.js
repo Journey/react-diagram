@@ -12,7 +12,9 @@ import {
     SAVE_ELEMENT_PROPERTIES,
     SAVE_MEASURE_POINT_VALUE,
     ADD_MEASURE_POINT,
-    REMOVE_MEASURE_POINT
+    REMOVE_MEASURE_POINT,
+    REMOVE_LINES,
+    REMOVE_ELEMENT
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -97,10 +99,21 @@ export const updateLines = (elementId) => {
     };
 };
 
-export const selectElement = (elementId) => {
+export const removeLines = (elementKey) => {
+    return {
+	type: REMOVE_LINES,
+	id: elementKey
+    };
+};
+
+export const selectElement = (elementId,x,y,width,height) => {
     return {
 	type: SELECT_ELEMENT,
-	id: elementId
+	id: elementId,
+	x: x,
+	y: y,
+	width: width,
+	height: height
     };
 };
 

@@ -3,16 +3,28 @@ import {
     UPDATE_SVG_PROPERTIES,
     ADD_ELEMENT,
     REMOVE_ELEMENT,
+    REMOVE_LINES,
     MOVE_ELEMENT,
     ADD_LINE,
     UPDATE_LINES,
-    SAVE_SVG_PROPERTIES
+    SAVE_SVG_PROPERTIES,
+    SELECT_CANVAS,
+    SELECT_ELEMENT
 } from "../consts";
 import {generateUUID, StoreHelper, LineHelper} from "../Utility";
 let _defaultProperties = {
     width: 700,
     height: 700,
     gridSize: 20
+};
+const _getDefaultOperator = () => {
+    return {
+	id: null,
+	x: 100000,
+	y: 100000,
+	width: 10000,
+	height: 10000
+    };
 };
 /**
  * The States for the whole canvas
@@ -63,7 +75,8 @@ const elements = (state={},action) => {
 	newState = Object.assign({},state,wrapElement);
 	break;
     case REMOVE_ELEMENT:
-	newState = state;
+	newState = Object.assign({},state);
+	delete newState[action.id];
 	break;
     default:
 	newState = state;
@@ -84,6 +97,14 @@ const links = (state={},action) => {
 	let oUpdatedLinks = StoreHelper.getUpdatedLinks(aRefLinks);
 	return Object.assign({},state, oUpdatedLinks);
 	break;
+    case REMOVE_LINES:
+	aRefLinks = StoreHelper.getRefLinksByElementKey(action.id);
+	let newLinks = Object.assign({},state);
+	aRefLinks.forEach((key)=>{
+	    delete newLinks[key]; 
+	});
+	return newLinks;
+	break;
     case ADD_LINE:
 	let key = generateUUID();
 	var startPoint = StoreHelper.getPortPosition(action.startPort.elementKey,action.startPort.position);
@@ -101,4 +122,24 @@ const links = (state={},action) => {
     }
     return state;
 };
-export {svgProperties, elements, links};
+const operator = (state={id:null,x:10000,y:10000,width:10000,height:10000},action) => {
+    switch(action.type){
+    case MOVE_ELEMENT:
+    case REMOVE_ELEMENT:
+    case SELECT_CANVAS:
+	return _getDefaultOperator();
+	break;
+    case SELECT_ELEMENT:
+	return {
+	    id: action.id,
+	    x: action.x,
+	    y: action.y,
+	    width: action.width,
+	    height: action.height
+	};
+	break;
+    default:
+	return state;
+    }
+};
+export {svgProperties, elements, links, operator};
