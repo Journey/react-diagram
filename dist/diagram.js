@@ -21234,10 +21234,14 @@
 	var REMOVE_ELEMENT = exports.REMOVE_ELEMENT = "Remove element";
 	var MOVE_ELEMENT = exports.MOVE_ELEMENT = "Move Element";
 	var SELECT_ELEMENT = exports.SELECT_ELEMENT = "Select Element";
+	var SELECT_LINE = exports.SELECT_LINE = "Select Line";
 	var UPDATE_LINES = exports.UPDATE_LINES = "Update lines";
 	var REMOVE_LINES = exports.REMOVE_LINES = "Remove Lines";
+	var REMOVE_LINE = exports.REMOVE_LINE = "Remove Line";
 	var ADD_LINE = exports.ADD_LINE = "Add Line";
 	var SELECT_CANVAS = exports.SELECT_CANVAS = "Select canva";
+	var ZOOM_IN = exports.ZOOM_IN = "Zoom in";
+	var ZOOM_OUT = exports.ZOOM_OUT = "Zoom out";
 
 	var SAVE_SVG_PROPERTIES = exports.SAVE_SVG_PROPERTIES = "Save SVG Properties";
 	var SAVE_ELEMENT_PROPERTIES = exports.SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
@@ -21311,7 +21315,38 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.StoreHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
+	exports.StoreHelper = exports.RectHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
+
+	var _slicedToArray = function () {
+		function sliceIterator(arr, i) {
+			var _arr = [];var _n = true;var _d = false;var _e = undefined;try {
+				for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+					_arr.push(_s.value);if (i && _arr.length === i) break;
+				}
+			} catch (err) {
+				_d = true;_e = err;
+			} finally {
+				try {
+					if (!_n && _i["return"]) _i["return"]();
+				} finally {
+					if (_d) throw _e;
+				}
+			}return _arr;
+		}return function (arr, i) {
+			if (Array.isArray(arr)) {
+				return arr;
+			} else if (Symbol.iterator in Object(arr)) {
+				return sliceIterator(arr, i);
+			} else {
+				throw new TypeError("Invalid attempt to destructure non-iterable instance");
+			}
+		};
+	}(); /**
+	      * @Define Utility
+	      * @name Utility.js
+	      * @author journey
+	      * @license BSD
+	      */
 
 	var _consts = __webpack_require__(181);
 
@@ -21319,12 +21354,6 @@
 	/**
 	 * generate uuid
 	 * @returns {string} uuid
-	 */
-	/**
-	 * @Define Utility
-	 * @name Utility.js
-	 * @author journey
-	 * @license BSD
 	 */
 	var generateUUID = exports.generateUUID = function generateUUID() {
 		return uuidTemplate.replace(/[xy]/g, function (c) {
@@ -21505,6 +21534,121 @@
 			},
 			getPath: function getPath(startPoint, endPoint) {
 				return 'M' + startPoint.x + ' ' + startPoint.y + ' L' + endPoint.x + ' ' + endPoint.y + ' Z';
+			},
+
+			/**
+	   * get the hover rect of the path
+	   * @param {string} path only composed by M L Z e.g 'M250 145 L360 145 Z'
+	   */
+			getPathHoverRect: function getPathHoverRect(sPath) {
+				var points = sPath.split(/[A-Z]/);
+				//
+				points = points.filter(function (value) {
+					return value !== "";
+				});
+				//["22 33 ","33 44"] ->[[22,33],[33,44]]
+				points = points.map(function (sPoints) {
+					sPoints = sPoints.trim();
+					var aPoint = sPoints.split(/\s/);
+					return [parseInt(aPoint[0]), parseInt(aPoint[1])];
+				});
+
+				return RectHelper.getRectPathByPoints(points);
+			}
+		};
+	}();
+	//todo
+	var RectHelper = exports.RectHelper = function () {
+		var VERTICAL_TYPE = "Verticle Type";
+		var HORIZONTAL_TYPE = "Horizontal Type";
+		var UP_LINE = "Up Line";
+		var DOWN_LINE = "Down Line";
+
+		return {
+			/**
+	   * get the rect area 
+	   * @param {} aPoints
+	   */
+			getRectPathByPoints: function getRectPathByPoints(aPoints) {
+				var aUpArea = [],
+				    aDownArea = [];
+				var sPath = "M",
+				    temp = void 0;
+				for (var index = 0, length = aPoints.length; index < length - 1; index++) {
+					temp = RectHelper.getRectPoints(aPoints[index], aPoints[index + 1]);
+					aUpArea = aUpArea.concat(temp.up);
+					aDownArea = aDownArea.concat(temp.down);
+				}
+				aUpArea.forEach(function (aPoint) {
+					sPath = sPath + aPoint[0] + " " + aPoint[1] + "L";
+				});
+				for (var len = aDownArea.length, inx = len; inx > 0; inx--) {
+					temp = aDownArea[inx - 1];
+					sPath = sPath + temp[0] + " " + temp[1] + "L";
+				}
+				sPath = sPath + aUpArea[0][0] + " " + aUpArea[0][1] + "Z";
+				return sPath;
+			},
+			getLineType: function getLineType(aStartPoint, aEndPoint) {
+				var deltaX = aEndPoint[0] - aStartPoint[0];
+				var deltaY = aEndPoint[1] - aStartPoint[1];
+				if (deltaX == 0) {
+					return VERTICAL_TYPE;
+				}
+				if (deltaY == 0) {
+					return HORIZONTAL_TYPE;
+				}
+				if (deltaY / deltaX > 0) {
+					return UP_LINE;
+				}
+				return DOWN_LINE;
+			},
+			getRectPoints: function getRectPoints(aStartPoint, aEndPoint) {
+				var lineDirction = RectHelper.getLineType(aStartPoint, aEndPoint);
+
+				var _aStartPoint = _slicedToArray(aStartPoint, 2);
+
+				var startX = _aStartPoint[0];
+				var startY = _aStartPoint[1];
+
+				var _aEndPoint = _slicedToArray(aEndPoint, 2);
+
+				var endX = _aEndPoint[0];
+				var endY = _aEndPoint[1];
+
+				var aUpArea = [];
+				var aDownArea = [];
+				var dimension = 6;
+				switch (lineDirction) {
+					case UP_LINE:
+						aUpArea.push([startX - dimension, startY + dimension]);
+						aUpArea.push([endX - dimension, endY + dimension]);
+						aDownArea.push([startX + dimension, startY - dimension]);
+						aDownArea.push([endX + dimension, endY - dimension]);
+						break;
+					case DOWN_LINE:
+						aUpArea.push([startX + dimension, startY + dimension]);
+						aUpArea.push([endX + dimension, endY + dimension]);
+						aDownArea.push([startX - dimension, startY - dimension]);
+						aDownArea.push([endX - dimension, endY - dimension]);
+						break;
+					case HORIZONTAL_TYPE:
+						aUpArea.push([startX, startY + dimension]);
+						aUpArea.push([endX, endY + dimension]);
+						aDownArea.push([startX, startY - dimension]);
+						aDownArea.push([endX, endY - dimension]);
+						break;
+					case VERTICAL_TYPE:
+						aUpArea.push([startX + dimension, startY]);
+						aUpArea.push([endX + dimension, endY]);
+						aDownArea.push([startX - dimension, startY]);
+						aDownArea.push([endX - dimension, endY]);
+						break;
+				}
+				return {
+					up: aUpArea,
+					down: aDownArea
+				};
 			}
 		};
 	}();
@@ -21647,17 +21791,21 @@
 	}
 
 	var _defaultProperties = {
-				width: 700,
-				height: 700,
-				gridSize: 20
+				width: 1000,
+				height: 1000,
+				gridSize: 20,
+				scaleX: 1,
+				scaleY: 1,
+				zoomLevel: 1
 	};
 	var _getDefaultOperator = function _getDefaultOperator() {
 				return {
-							id: null,
+							id: null, //selected element id
 							x: 100000,
 							y: 100000,
 							width: 10000,
-							height: 10000
+							height: 10000,
+							lineId: null //selected line id
 				};
 	};
 	/**
@@ -21671,7 +21819,32 @@
 				var action = arguments[1];
 
 				var newState;
+				var _origZoomLevel = state.zoomLevel;
+				var _newZoomLevel = void 0;
 				switch (action.type) {
+							case _consts.ZOOM_IN:
+										_newZoomLevel = _newZoomLevel + 0.2;
+										newState = Object.assign({}, state, {
+													width: action.width / _origZoomLevel * _newZoomLevel,
+													height: action.height / _origZoomLevel * _newZoomLevel,
+													scaleX: _newZoomLevel,
+													scaleY: _newZoomLevel,
+													zoomLevel: _newZoomLevel
+										});
+										break;
+							case _consts.ZOOM_OUT:
+										_newZoomLevel = _newZoomLevel - 0.2;
+										if (_newZoomLevel <= 0) {
+													_newZoomLevel = 0.2;
+										}
+										newState = Object.assign({}, state, {
+													width: action.width / _origZoomLevel * _newZoomLevel,
+													height: action.height / _origZoomLevel * _newZoomLevel,
+													scaleX: _newZoomLevel,
+													scaleY: _newZoomLevel,
+													zoomLevel: _newZoomLevel
+										});
+										break;
 							case _consts.SAVE_SVG_PROPERTIES:
 										newState = Object.assign({}, state, {
 													width: action.width,
@@ -21746,6 +21919,11 @@
 										});
 										return newLinks;
 										break;
+							case _consts.REMOVE_LINE:
+										newLinks = Object.assign({}, state);
+										delete newLinks[action.id];
+										return newLinks;
+										break;
 							case _consts.ADD_LINE:
 										var key = (0, _Utility.generateUUID)();
 										var startPoint = _Utility.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
@@ -21762,7 +21940,7 @@
 				return state;
 	};
 	var operator = function operator() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? { id: null, x: 10000, y: 10000, width: 10000, height: 10000 } : arguments[0];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? { id: null, x: 10000, y: 10000, width: 10000, height: 10000, lineId: null } : arguments[0];
 				var action = arguments[1];
 
 				switch (action.type) {
@@ -21779,6 +21957,9 @@
 													width: action.width,
 													height: action.height
 										};
+										break;
+							case _consts.SELECT_LINE:
+										return Object.assign({}, state, { lineId: action.id });
 										break;
 							default:
 										return state;
@@ -22111,7 +22292,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectElement = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.propertyAction = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.zoomOut = exports.zoomIn = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(181);
 
@@ -22131,13 +22312,6 @@
 	var clearSelection = exports.clearSelection = function clearSelection() {
 	    return {
 	        type: _consts.CLEAR_SELECTION
-	    };
-	};
-
-	var propertyAction = exports.propertyAction = function propertyAction(id) {
-	    return {
-	        type: "TEST_PROPERTY",
-	        content: id
 	    };
 	};
 	/**
@@ -22198,10 +22372,22 @@
 	    };
 	};
 
+	/**
+	 * remove lines which related with the element
+	 * @param {} elementKey
+	 * @returns {} 
+	 */
 	var removeLines = exports.removeLines = function removeLines(elementKey) {
 	    return {
 	        type: _consts.REMOVE_LINES,
 	        id: elementKey
+	    };
+	};
+
+	var removeLine = exports.removeLine = function removeLine(lineId) {
+	    return {
+	        type: _consts.REMOVE_LINE,
+	        id: lineId
 	    };
 	};
 
@@ -22213,6 +22399,13 @@
 	        y: y,
 	        width: width,
 	        height: height
+	    };
+	};
+
+	var selectLine = exports.selectLine = function selectLine(lineId) {
+	    return {
+	        type: _consts.SELECT_LINE,
+	        id: lineId
 	    };
 	};
 
@@ -22263,6 +22456,18 @@
 	    };
 	};
 
+	var zoomIn = exports.zoomIn = function zoomIn() {
+	    return {
+	        type: _consts.ZOOM_IN
+	    };
+	};
+
+	var zoomOut = exports.zoomOut = function zoomOut() {
+	    return {
+	        type: _consts.ZOOM_OUT
+	    };
+	};
+
 /***/ },
 /* 190 */
 /***/ function(module, exports, __webpack_require__) {
@@ -22294,6 +22499,9 @@
 									width: state.svgProperties.width,
 									height: state.svgProperties.height,
 									gridSize: state.svgProperties.gridSize,
+									scaleX: state.svgProperties.scaleX,
+									scaleY: state.svgProperties.scaleY,
+									zoomLevel: state.svgProperties.zoomLevel,
 									elements: state.elements,
 									links: state.links,
 									properties: state.properties,
@@ -22340,6 +22548,10 @@
 													var key = evt.currentTarget.getAttribute("data-element-key");
 													dispatch((0, _actions.removeLines)(key));
 													dispatch((0, _actions.removeElement)(key));
+									},
+									removeLine: function removeLine(event) {
+													var key = event.currentTarget.getAttribute("data-line-key");
+													dispatch((0, _actions.removeLine)(key));
 									},
 									/**
 	         * drag an element over the canvas area
@@ -22388,6 +22600,13 @@
 													var gridSize = _StoreHelper$getSvgPr.gridSize;
 
 													dispatch((0, _actions.selectCanvas)(width, height, gridSize));
+													evt.preventDefault();
+													evt.stopPropagation();
+									},
+									dbClickLine: function dbClickLine(evt) {
+													var lineId = evt.currentTarget.getAttribute("data-key");
+													console.log("line clicked:" + lineId);
+													dispatch((0, _actions.selectLine)(lineId));
 													evt.preventDefault();
 													evt.stopPropagation();
 									},
@@ -22508,24 +22727,45 @@
 	};
 	var Link = function Link(_ref3) {
 	  var path = _ref3.path;
+	  var id = _ref3.id;
+	  var dbClick = _ref3.dbClick;
 
 	  return _react2.default.createElement(
 	    "g",
-	    { className: "link" },
-	    _react2.default.createElement("path", { d: path })
+	    { className: "link", "data-key": id, onDoubleClick: dbClick },
+	    _react2.default.createElement("path", { id: id, d: path }),
+	    _react2.default.createElement("path", { className: "path-hover", d: _Utility.LineHelper.getPathHoverRect(path) })
 	  );
 	};
-	var Operator = function Operator(_ref4) {
-	  var id = _ref4.id;
-	  var x = _ref4.x;
-	  var y = _ref4.y;
-	  var width = _ref4.width;
-	  var height = _ref4.height;
+	var LineOperator = function LineOperator(_ref4) {
+	  var lineId = _ref4.lineId;
 	  var onRemoveClick = _ref4.onRemoveClick;
 
 	  return _react2.default.createElement(
 	    "g",
-	    { className: "operator", transform: "translate(" + (x - 2) + "," + (y - 2) + ")" },
+	    { className: "line-operator" },
+	    _react2.default.createElement(
+	      "text",
+	      null,
+	      _react2.default.createElement(
+	        "textPath",
+	        { xlinkHref: "#" + lineId, "data-line-key": lineId, onClick: onRemoveClick },
+	        "删除"
+	      )
+	    )
+	  );
+	};
+	var ElementOperator = function ElementOperator(_ref5) {
+	  var id = _ref5.id;
+	  var x = _ref5.x;
+	  var y = _ref5.y;
+	  var width = _ref5.width;
+	  var height = _ref5.height;
+	  var onRemoveClick = _ref5.onRemoveClick;
+
+	  return _react2.default.createElement(
+	    "g",
+	    { className: "operator", transform: "translate(" + (x - 3) + "," + (y - 3) + ")" },
 	    _react2.default.createElement(
 	      "g",
 	      { className: "operator-del" },
@@ -22535,7 +22775,7 @@
 	        "删除"
 	      )
 	    ),
-	    _react2.default.createElement("rect", { className: "operator-hightlight", width: width + 4, height: height + 4 })
+	    _react2.default.createElement("rect", { className: "operator-hightlight", width: width + 8, height: height + 8 })
 	  );
 	};
 	var Canvas = function Canvas(data) {
@@ -22547,21 +22787,26 @@
 	      { width: data.width, height: data.height, onDrop: data.onDrop, onDragOver: data.dragOver, onDragEnd: data.onDragEnd, onDoubleClick: data.dbClickCanvas },
 	      _react2.default.createElement(
 	        "g",
-	        { className: "links" },
-	        Object.keys(data.links).map(function (key) {
-	          var properties = data.links[key];
-	          return _react2.default.createElement(Link, { path: properties.path, key: properties.key, id: properties.key });
-	        })
-	      ),
-	      _react2.default.createElement(
-	        "g",
-	        { className: "elements" },
-	        Object.keys(data.elements).map(function (key) {
-	          var properties = data.elements[key];
-	          return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown }));
-	        })
-	      ),
-	      _react2.default.createElement(Operator, _extends({ key: (0, _Utility.generateUUID)() }, data.operator, { onRemoveClick: data.removeElement }))
+	        { transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
+	        _react2.default.createElement(
+	          "g",
+	          { className: "links" },
+	          Object.keys(data.links).map(function (key) {
+	            var properties = data.links[key];
+	            return _react2.default.createElement(Link, { path: properties.path, key: properties.key, dbClick: data.dbClickLine, id: properties.key });
+	          })
+	        ),
+	        _react2.default.createElement(
+	          "g",
+	          { className: "elements" },
+	          Object.keys(data.elements).map(function (key) {
+	            var properties = data.elements[key];
+	            return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown }));
+	          })
+	        ),
+	        _react2.default.createElement(ElementOperator, _extends({ key: (0, _Utility.generateUUID)() }, data.operator, { onRemoveClick: data.removeElement })),
+	        _react2.default.createElement(LineOperator, { key: (0, _Utility.generateUUID)(), lineId: data.operator.lineId, onRemoveClick: data.removeLine })
+	      )
 	    )
 	  );
 	};

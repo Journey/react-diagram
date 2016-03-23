@@ -18,10 +18,14 @@ export const ADD_ELEMENT="Add element";
 export const REMOVE_ELEMENT="Remove element";
 export const MOVE_ELEMENT="Move Element";
 export const SELECT_ELEMENT="Select Element";
+export const SELECT_LINE="Select Line";
 export const UPDATE_LINES = "Update lines";
 export const REMOVE_LINES = "Remove Lines";
+export const REMOVE_LINE = "Remove Line";
 export const ADD_LINE = "Add Line";
 export const SELECT_CANVAS="Select canva";
+export const ZOOM_IN="Zoom in";
+export const ZOOM_OUT="Zoom out";
 
 export const SAVE_SVG_PROPERTIES = "Save SVG Properties";
 export const SAVE_ELEMENT_PROPERTIES = "Save Element Properties";

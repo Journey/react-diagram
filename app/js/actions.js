@@ -8,13 +8,17 @@ import {
     UPDATE_LINES,
     SELECT_ELEMENT,
     SELECT_CANVAS,
+    SELECT_LINE,
     SAVE_SVG_PROPERTIES,
     SAVE_ELEMENT_PROPERTIES,
     SAVE_MEASURE_POINT_VALUE,
     ADD_MEASURE_POINT,
     REMOVE_MEASURE_POINT,
     REMOVE_LINES,
-    REMOVE_ELEMENT
+    REMOVE_LINE,
+    REMOVE_ELEMENT,
+    ZOOM_IN,
+    ZOOM_OUT
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -32,13 +36,6 @@ export const canvasElementDragStart = (key) => {
 export const clearSelection = () => {
     return {
 	type: CLEAR_SELECTION
-    };
-};
-
-export const propertyAction = (id) => {
-    return {
-	type:"TEST_PROPERTY",
-	content:id
     };
 };
 /**
@@ -99,10 +96,22 @@ export const updateLines = (elementId) => {
     };
 };
 
+/**
+ * remove lines which related with the element
+ * @param {} elementKey
+ * @returns {} 
+ */
 export const removeLines = (elementKey) => {
     return {
 	type: REMOVE_LINES,
 	id: elementKey
+    };
+};
+
+export const removeLine = (lineId) => {
+    return {
+	type: REMOVE_LINE,
+	id: lineId
     };
 };
 
@@ -114,6 +123,13 @@ export const selectElement = (elementId,x,y,width,height) => {
 	y: y,
 	width: width,
 	height: height
+    };
+};
+
+export const selectLine = (lineId) => {
+    return {
+	type: SELECT_LINE,
+	id: lineId
     };
 };
 
@@ -161,5 +177,17 @@ export const saveMeasurePointValue = (index,key,value) => {
 	index: index,
 	key: key,
 	value: value
+    };
+};
+
+export const zoomIn = () => {
+    return {
+	type: ZOOM_IN
+    };
+};
+
+export const zoomOut = () => {
+    return {
+	type: ZOOM_OUT
     };
 };

@@ -6,11 +6,13 @@ import {
     moveElement,
     removeElement,
     removeLines,
+    removeLine,
     clearSelection,
     addLine,
     updateLines,
     selectElement,
-    selectCanvas
+    selectCanvas,
+    selectLine
 } from "../actions";
 import {
     generateUUID,
@@ -27,6 +29,9 @@ const mapStateToProps = (state) => {
 	width: state.svgProperties.width,
 	height: state.svgProperties.height,
 	gridSize: state.svgProperties.gridSize,
+	scaleX: state.svgProperties.scaleX,
+	scaleY: state.svgProperties.scaleY,
+	zoomLevel: state.svgProperties.zoomLevel,
 	elements: state.elements,
 	links: state.links,
 	properties: state.properties,
@@ -74,6 +79,10 @@ const mapDispatchtoProps = (dispatch) => {
 	    dispatch(removeLines(key));
 	    dispatch(removeElement(key));
 	},
+	removeLine: (event) => {
+	    let key = event.currentTarget.getAttribute("data-line-key");
+	    dispatch(removeLine(key));
+	},
 	/**
 	 * drag an element over the canvas area
 	 * @param {} evt
@@ -112,6 +121,13 @@ const mapDispatchtoProps = (dispatch) => {
 	dbClickCanvas: (evt) => {
 	    let{width,height,gridSize} = StoreHelper.getSvgProperties();
 	    dispatch(selectCanvas(width,height,gridSize));
+	    evt.preventDefault();
+	    evt.stopPropagation();
+	},
+	dbClickLine: (evt) => {
+	    let lineId = evt.currentTarget.getAttribute("data-key");
+	    console.log("line clicked:" + lineId);
+	    dispatch(selectLine(lineId));
 	    evt.preventDefault();
 	    evt.stopPropagation();
 	},

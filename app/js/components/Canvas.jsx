@@ -35,31 +35,42 @@ const Element = ({id,typeId,image,x,y,width,height,dbclick,dragElementStart,onPo
     </g>
   )
 };
-const Link = ({path}) => {
+const Link = ({path,id,dbClick}) => {
   return (
-    <g className="link">
-      <path d={path} />
+    <g className="link" data-key={id} onDoubleClick={dbClick}>
+      <path id={id} d={path} />
+      <path className="path-hover" d={LineHelper.getPathHoverRect(path)}></path>
     </g>
   )
 };
-const Operator = ({id,x,y,width,height,onRemoveClick}) => {
+const LineOperator = ({lineId,onRemoveClick}) => {
   return (
-    <g className="operator" transform={`translate(${x-2},${y-2})`}>
+    <g className="line-operator">
+      <text>
+	<textPath xlinkHref={`#${lineId}`} data-line-key={lineId} onClick={onRemoveClick}>删除</textPath>
+      </text>
+    </g>
+  );
+};
+const ElementOperator = ({id,x,y,width,height,onRemoveClick}) => {
+  return (
+    <g className="operator" transform={`translate(${x-3},${y-3})`}>
       <g className="operator-del">
 	<text data-element-key={id} onClick={onRemoveClick} x={width/2} y="-5"  textAnchor="middle">删除</text>
       </g>
-      <rect className="operator-hightlight" width={width+4} height={height+4}/>
+      <rect className="operator-hightlight" width={width+8} height={height+8}/>
     </g>
   )
 }
 const Canvas = (data) =>(
   <div className="canvas">
     <svg width={data.width} height={data.height} onDrop={data.onDrop} onDragOver={data.dragOver} onDragEnd={data.onDragEnd} onDoubleClick={data.dbClickCanvas}>
+      <g transform={`scale(${data.scaleX},${data.scaleY})`}>
       <g className="links">
 	{
 	  Object.keys(data.links).map(key =>{
 	    let properties = data.links[key];
-	    return <Link path={properties.path} key={properties.key} id={properties.key}/>
+	    return <Link path={properties.path} key={properties.key} dbClick={data.dbClickLine} id={properties.key}/>
 	  })
 	}
       </g>
@@ -71,7 +82,9 @@ const Canvas = (data) =>(
 	})
       }
       </g>
-      <Operator key={generateUUID()} {...data.operator} onRemoveClick={data.removeElement}></Operator>
+      <ElementOperator key={generateUUID()} {...data.operator} onRemoveClick={data.removeElement}></ElementOperator>
+      <LineOperator key={generateUUID()} lineId={data.operator.lineId} onRemoveClick={data.removeLine}></LineOperator>
+      </g>
     </svg>
   </div>
 );

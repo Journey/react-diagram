@@ -4,26 +4,34 @@ import {
     ADD_ELEMENT,
     REMOVE_ELEMENT,
     REMOVE_LINES,
+    REMOVE_LINE,
     MOVE_ELEMENT,
     ADD_LINE,
     UPDATE_LINES,
     SAVE_SVG_PROPERTIES,
     SELECT_CANVAS,
-    SELECT_ELEMENT
+    SELECT_ELEMENT,
+    SELECT_LINE,
+    ZOOM_IN,
+    ZOOM_OUT
 } from "../consts";
 import {generateUUID, StoreHelper, LineHelper} from "../Utility";
 let _defaultProperties = {
-    width: 700,
-    height: 700,
-    gridSize: 20
+    width: 1000,
+    height: 1000,
+    gridSize: 20,
+    scaleX: 1,
+    scaleY: 1,
+    zoomLevel: 1
 };
 const _getDefaultOperator = () => {
     return {
-	id: null,
+	id: null, //selected element id
 	x: 100000,
 	y: 100000,
 	width: 10000,
-	height: 10000
+	height: 10000,
+	lineId: null //selected line id
     };
 };
 /**
@@ -34,7 +42,32 @@ const _getDefaultOperator = () => {
  */
 const svgProperties = (state=_defaultProperties, action) => {
     var newState;
+    let _origZoomLevel = state.zoomLevel;
+    let _newZoomLevel;
     switch(action.type){
+    case ZOOM_IN:
+	_newZoomLevel = _newZoomLevel + 0.2;
+	newState = Object.assign({},state, {
+	    width: action.width/_origZoomLevel * _newZoomLevel,
+	    height: action.height/_origZoomLevel * _newZoomLevel,
+	    scaleX: _newZoomLevel,
+	    scaleY: _newZoomLevel,
+	    zoomLevel: _newZoomLevel
+	});
+	break;
+    case ZOOM_OUT:
+	_newZoomLevel = _newZoomLevel - 0.2;
+	if(_newZoomLevel <= 0){
+	    _newZoomLevel = 0.2;
+	}
+	newState = Object.assign({},state, {
+	    width: action.width/_origZoomLevel * _newZoomLevel,
+	    height: action.height/_origZoomLevel * _newZoomLevel,
+	    scaleX: _newZoomLevel,
+	    scaleY: _newZoomLevel,
+	    zoomLevel: _newZoomLevel
+	});
+	break;
     case SAVE_SVG_PROPERTIES:
 	newState = Object.assign({},state,{
 	    width: action.width,
@@ -105,6 +138,11 @@ const links = (state={},action) => {
 	});
 	return newLinks;
 	break;
+    case REMOVE_LINE:
+	newLinks = Object.assign({},state);
+	delete newLinks[action.id];
+	return newLinks;
+	break;
     case ADD_LINE:
 	let key = generateUUID();
 	var startPoint = StoreHelper.getPortPosition(action.startPort.elementKey,action.startPort.position);
@@ -122,7 +160,7 @@ const links = (state={},action) => {
     }
     return state;
 };
-const operator = (state={id:null,x:10000,y:10000,width:10000,height:10000},action) => {
+const operator = (state={id:null,x:10000,y:10000,width:10000,height:10000,lineId:null},action) => {
     switch(action.type){
     case MOVE_ELEMENT:
     case REMOVE_ELEMENT:
@@ -137,6 +175,9 @@ const operator = (state={id:null,x:10000,y:10000,width:10000,height:10000},actio
 	    width: action.width,
 	    height: action.height
 	};
+	break;
+    case SELECT_LINE:
+	return Object.assign({},state,{lineId: action.id});
 	break;
     default:
 	return state;

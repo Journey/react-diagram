@@ -76,3 +76,17 @@ g.link path{
 .operator-del{
     cursor: pointer;
 }
+.path-hover{
+    stroke: #fff;
+    fill: #ddd;
+    opacity: 0.5;
+    cursor: pointer;
+    visibility: hidden;
+    pointer-events: all;
+}
+.path-hover:hover{
+    visibility: visible;
+}
+.line-operator{
+    cursor: pointer;
+}
