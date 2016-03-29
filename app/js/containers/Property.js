@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import Property from "../components/Property.jsx";
-import {saveSvgProperties, saveElementProperties, addMeasurePoint,removeMeasurePoint,saveMeasurePointValue} from "../actions";
+import {saveSvgProperties, saveElementProperties, addMeasurePoint,removeMeasurePoint,saveMeasurePointValue, updateElementGeometricData,updateLines} from "../actions";
 import {CANVAS,COMMON_ELEMENT} from "../consts";
 
 function _getSVGPropertiesByEvent(event){
@@ -19,6 +19,7 @@ function _getCommonElementPropertiesByEvent(event){
     var containerElement = event.currentTarget.parentElement.parentElement;
     var propertyElement = containerElement.querySelector("div.pro-deviceInfo");
     var measurePointInfos = containerElement.querySelector("div.measure-info");
+    var geometricElement = containerElement.querySelector("div.pro-geo-data");
     var key = propertyElement.getAttribute("data-element-key");
     var measureInfoElements = measurePointInfos.querySelectorAll("div.measure-template");
     var deviceInfo = {
@@ -31,8 +32,23 @@ function _getCommonElementPropertiesByEvent(event){
 	let type = infoElement.querySelector("select").value;
 	return {name,identifier,type};
     });
-    return {key,deviceInfo,measurePointInfos:measurePointInfoObject};
+    var geometricData = {
+	id: key,
+	width: parseInt(geometricElement.querySelector("input[name=width]").value),
+	height: parseInt( geometricElement.querySelector("input[name=height]").value),
+	x: parseInt(geometricElement.querySelector("input[name=xAxies]").value),
+	y: parseInt(geometricElement.querySelector("input[name=yAxies]").value)
+    };
+    return {key,deviceInfo,measurePointInfos:measurePointInfoObject,geometricData:geometricData};
 }
+
+/**
+ * todo:: get geometrict data only
+ * @param {} evt
+ */
+function _getGeometricDataByEvent(evt) {
+    
+};
 
 const mapStateToProps = (state) => {
     let properties = state.properties;
@@ -59,10 +75,21 @@ const mapDispatchtoProps = (dispatch) => {
 	    case COMMON_ELEMENT:
 		//collect element properties
 		var elementProperties = _getCommonElementPropertiesByEvent(evt);
-		console.log(elementProperties);
+		var geometricData = elementProperties.geometricData;
 		dispatch(saveElementProperties(elementProperties));
+		dispatch(updateElementGeometricData(geometricData.id,geometricData.width,geometricData.height,geometricData.x,geometricData.y));
+		setTimeout(()=>{
+		    dispatch(updateLines(geometricData.id));
+		},100);
 		break;
 	    }
+	},
+	/**
+	 * todo:: update the Geometric data only
+	 * @param {} evt
+	 */
+	onGeometricDataChange: (evt) => {
+	    
 	},
 	onAddMeasurePoint: () => {
 	    dispatch(addMeasurePoint());

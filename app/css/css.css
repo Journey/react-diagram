@@ -6,6 +6,9 @@
     -webkit-user-select: none;
     cursor: move;
 }
+.dia-toolbar{
+    text-align: center;
+}
 .diagram-component{
     display: flex;
     flex-direction: row;

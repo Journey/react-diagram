@@ -21240,8 +21240,13 @@
 	var REMOVE_LINE = exports.REMOVE_LINE = "Remove Line";
 	var ADD_LINE = exports.ADD_LINE = "Add Line";
 	var SELECT_CANVAS = exports.SELECT_CANVAS = "Select canva";
+
 	var ZOOM_IN = exports.ZOOM_IN = "Zoom in";
 	var ZOOM_OUT = exports.ZOOM_OUT = "Zoom out";
+	var REDO_OPERATION = exports.REDO_OPERATION = "Re do operation";
+	var UNDO_OPERATION = exports.UNDO_OPERATION = "undo operation";
+	var CREATE_SUB_PAPGER = exports.CREATE_SUB_PAPGER = "Create Sub page operation";
+	var DELETE_SUB_PAPGER = exports.DELETE_SUB_PAPGER = "Delete Sub page operation";
 
 	var SAVE_SVG_PROPERTIES = exports.SAVE_SVG_PROPERTIES = "Save SVG Properties";
 	var SAVE_ELEMENT_PROPERTIES = exports.SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
@@ -21250,6 +21255,7 @@
 	var SAVE_MEASURE_POINT_VALUE = exports.SAVE_MEASURE_POINT_VALUE = "Save Measure point value when changed";
 	var CANVAS = exports.CANVAS = "Canvas";
 	var COMMON_ELEMENT = exports.COMMON_ELEMENT = "Common element which contains measure point info";
+	var UPDATE_GEOMETRIC_DATA = exports.UPDATE_GEOMETRIC_DATA = "Update geometric data from property area";
 
 /***/ },
 /* 182 */
@@ -21823,23 +21829,23 @@
 				var _newZoomLevel = void 0;
 				switch (action.type) {
 							case _consts.ZOOM_IN:
-										_newZoomLevel = _newZoomLevel + 0.2;
+										_newZoomLevel = _origZoomLevel + 0.2;
 										newState = Object.assign({}, state, {
-													width: action.width / _origZoomLevel * _newZoomLevel,
-													height: action.height / _origZoomLevel * _newZoomLevel,
+													width: state.width / _origZoomLevel * _newZoomLevel,
+													height: state.height / _origZoomLevel * _newZoomLevel,
 													scaleX: _newZoomLevel,
 													scaleY: _newZoomLevel,
 													zoomLevel: _newZoomLevel
 										});
 										break;
 							case _consts.ZOOM_OUT:
-										_newZoomLevel = _newZoomLevel - 0.2;
+										_newZoomLevel = _origZoomLevel - 0.2;
 										if (_newZoomLevel <= 0) {
 													_newZoomLevel = 0.2;
 										}
 										newState = Object.assign({}, state, {
-													width: action.width / _origZoomLevel * _newZoomLevel,
-													height: action.height / _origZoomLevel * _newZoomLevel,
+													width: state.width / _origZoomLevel * _newZoomLevel,
+													height: state.height / _origZoomLevel * _newZoomLevel,
 													scaleX: _newZoomLevel,
 													scaleY: _newZoomLevel,
 													zoomLevel: _newZoomLevel
@@ -21867,12 +21873,24 @@
 				var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 				var action = arguments[1];
 
-				var newState = void 0;
+				var newState = void 0,
+				    newElement = void 0;
 				switch (action.type) {
+							case _consts.UPDATE_GEOMETRIC_DATA:
+										//save geometric data to elements
+										var key = action.id;
+										newElement = Object.assign({}, state[key], {
+													width: action.width,
+													height: action.height,
+													x: action.x,
+													y: action.y
+										});
+										newState = Object.assign({}, state, _defineProperty({}, key, newElement));
+										break;
 							case _consts.ADD_ELEMENT:
-										var key = (0, _Utility.generateUUID)();
+										key = (0, _Utility.generateUUID)();
 										var element = _Utility.StoreHelper.getPalletElementInfoById(action.id);
-										var newElement = Object.assign({}, element, { key: key, x: action.x, y: action.y });
+										newElement = Object.assign({}, element, { key: key, x: action.x, y: action.y });
 										newState = Object.assign({}, state);
 										newState[key] = newElement;
 										break;
@@ -21945,11 +21963,20 @@
 
 				switch (action.type) {
 							case _consts.MOVE_ELEMENT:
+										if (state.id === action.id) {
+													return Object.assign({}, state, {
+																x: action.x,
+																y: action.y
+													});
+										}
+										return state;
+										break;
 							case _consts.REMOVE_ELEMENT:
 							case _consts.SELECT_CANVAS:
 										return _getDefaultOperator();
 										break;
 							case _consts.SELECT_ELEMENT:
+							case _consts.UPDATE_GEOMETRIC_DATA:
 										return {
 													id: action.id,
 													x: action.x,
@@ -22023,7 +22050,22 @@
 				var action = arguments[1];
 
 				var selectedProperties = null;
+				var geometricData = {};
 				switch (action.type) {
+							case _consts.MOVE_ELEMENT:
+										if (state.selectedProperties.key === action.id) {
+													selectedProperties = state.selectedProperties;
+													geometricData = Object.assign({}, selectedProperties.geometricData, {
+																x: action.x,
+																y: action.y
+													});
+													selectedProperties = Object.assign({}, state.selectedProperties, {
+																geometricData: geometricData
+													});
+													return Object.assign({}, state, { selectedProperties: selectedProperties });
+										}
+										return state;
+										break;
 							case _consts.SELECT_CANVAS:
 										selectedProperties = {
 													width: action.width,
@@ -22034,6 +22076,13 @@
 										break;
 							case _consts.SELECT_ELEMENT:
 										selectedProperties = state.properties[action.id];
+										var selectedElement = _Utility.StoreHelper.getCanvasElmentInfoById(action.id);
+										geometricData = {
+													width: selectedElement.width,
+													height: selectedElement.height,
+													x: selectedElement.x,
+													y: selectedElement.y
+										};
 										if (selectedProperties) {
 													var newDeviceInfo = Object.assign(selectedProperties.deviceInfo);
 													var newMeasurePointInfos = selectedProperties.measurePointInfos.map(function (info) {
@@ -22042,16 +22091,31 @@
 													selectedProperties = {
 																key: action.id,
 																deviceInfo: newDeviceInfo,
-																measurePointInfos: newMeasurePointInfos
+																measurePointInfos: newMeasurePointInfos,
+																geometricData: geometricData
 													};
 										} else {
 													selectedProperties = {
 																key: action.id,
 																deviceInfo: _getDefaultDeviceInfo(),
-																measurePointInfos: [_getDefaultMeasurePointInfo()]
+																measurePointInfos: [_getDefaultMeasurePointInfo()],
+																geometricData: geometricData
 													};
 										}
 										return Object.assign({}, state, { selectedProperties: selectedProperties, type: _consts.COMMON_ELEMENT });
+										break;
+							case _consts.UPDATE_GEOMETRIC_DATA:
+										selectedProperties = state.properties[action.id];
+										geometricData = Object.assign({}, state.selectedProperties.geometricData, {
+													width: action.width,
+													height: action.height,
+													x: action.x,
+													y: action.y
+										});
+										selectedProperties = Object.assign({}, state.selectedProperties, {
+													geometricData: geometricData
+										});
+										return Object.assign({}, state, { selectedProperties: selectedProperties });
 										break;
 							case _consts.ADD_MEASURE_POINT:
 										selectedProperties = state.selectedProperties;
@@ -22112,26 +22176,39 @@
 
 	var _Property2 = _interopRequireDefault(_Property);
 
+	var _Toolbar = __webpack_require__(194);
+
+	var _Toolbar2 = _interopRequireDefault(_Toolbar);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var App = function App() {
 	  return _react2.default.createElement(
 	    "div",
-	    { className: "diagram-component" },
+	    { className: "diagram" },
 	    _react2.default.createElement(
 	      "div",
-	      { className: "first-col" },
-	      _react2.default.createElement(_Pallet2.default, null)
+	      null,
+	      _react2.default.createElement(_Toolbar2.default, null)
 	    ),
 	    _react2.default.createElement(
 	      "div",
-	      { className: "mid-col" },
-	      _react2.default.createElement(_Canvas2.default, null)
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      { className: "lat-col" },
-	      _react2.default.createElement(_Property2.default, null)
+	      { className: "diagram-component" },
+	      _react2.default.createElement(
+	        "div",
+	        { className: "first-col" },
+	        _react2.default.createElement(_Pallet2.default, null)
+	      ),
+	      _react2.default.createElement(
+	        "div",
+	        { className: "mid-col" },
+	        _react2.default.createElement(_Canvas2.default, null)
+	      ),
+	      _react2.default.createElement(
+	        "div",
+	        { className: "lat-col" },
+	        _react2.default.createElement(_Property2.default, null)
+	      )
 	    )
 	  );
 	};
@@ -22292,7 +22369,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.zoomOut = exports.zoomIn = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.deleteSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(181);
 
@@ -22456,6 +22533,17 @@
 	    };
 	};
 
+	var updateElementGeometricData = exports.updateElementGeometricData = function updateElementGeometricData(id, width, height, x, y) {
+	    return {
+	        type: _consts.UPDATE_GEOMETRIC_DATA,
+	        id: id,
+	        width: width,
+	        height: height,
+	        x: x,
+	        y: y
+	    };
+	};
+
 	var zoomIn = exports.zoomIn = function zoomIn() {
 	    return {
 	        type: _consts.ZOOM_IN
@@ -22465,6 +22553,27 @@
 	var zoomOut = exports.zoomOut = function zoomOut() {
 	    return {
 	        type: _consts.ZOOM_OUT
+	    };
+	};
+
+	var redo = exports.redo = function redo() {
+	    return {
+	        type: _consts.REDO_OPERATION
+	    };
+	};
+	var undo = exports.undo = function undo() {
+	    return {
+	        type: _consts.UNDO_OPERATION
+	    };
+	};
+	var createSubPage = exports.createSubPage = function createSubPage() {
+	    return {
+	        type: _consts.CREATE_SUB_PAPGER
+	    };
+	};
+	var deleteSubPage = exports.deleteSubPage = function deleteSubPage() {
+	    return {
+	        type: _consts.DELETE_SUB_PAPGER
 	    };
 	};
 
@@ -22548,6 +22657,14 @@
 													var key = evt.currentTarget.getAttribute("data-element-key");
 													dispatch((0, _actions.removeLines)(key));
 													dispatch((0, _actions.removeElement)(key));
+
+													var _StoreHelper$getSvgPr = _Utility.StoreHelper.getSvgProperties();
+
+													var width = _StoreHelper$getSvgPr.width;
+													var height = _StoreHelper$getSvgPr.height;
+													var gridSize = _StoreHelper$getSvgPr.gridSize;
+
+													dispatch((0, _actions.selectCanvas)(width, height, gridSize));
 									},
 									removeLine: function removeLine(event) {
 													var key = event.currentTarget.getAttribute("data-line-key");
@@ -22593,11 +22710,11 @@
 	         * @param {} evt
 	         */
 									dbClickCanvas: function dbClickCanvas(evt) {
-													var _StoreHelper$getSvgPr = _Utility.StoreHelper.getSvgProperties();
+													var _StoreHelper$getSvgPr2 = _Utility.StoreHelper.getSvgProperties();
 
-													var width = _StoreHelper$getSvgPr.width;
-													var height = _StoreHelper$getSvgPr.height;
-													var gridSize = _StoreHelper$getSvgPr.gridSize;
+													var width = _StoreHelper$getSvgPr2.width;
+													var height = _StoreHelper$getSvgPr2.height;
+													var gridSize = _StoreHelper$getSvgPr2.gridSize;
 
 													dispatch((0, _actions.selectCanvas)(width, height, gridSize));
 													evt.preventDefault();
@@ -22853,6 +22970,7 @@
 					var containerElement = event.currentTarget.parentElement.parentElement;
 					var propertyElement = containerElement.querySelector("div.pro-deviceInfo");
 					var measurePointInfos = containerElement.querySelector("div.measure-info");
+					var geometricElement = containerElement.querySelector("div.pro-geo-data");
 					var key = propertyElement.getAttribute("data-element-key");
 					var measureInfoElements = measurePointInfos.querySelectorAll("div.measure-template");
 					var deviceInfo = {
@@ -22865,8 +22983,21 @@
 									var type = infoElement.querySelector("select").value;
 									return { name: name, identifier: identifier, type: type };
 					});
-					return { key: key, deviceInfo: deviceInfo, measurePointInfos: measurePointInfoObject };
+					var geometricData = {
+									id: key,
+									width: parseInt(geometricElement.querySelector("input[name=width]").value),
+									height: parseInt(geometricElement.querySelector("input[name=height]").value),
+									x: parseInt(geometricElement.querySelector("input[name=xAxies]").value),
+									y: parseInt(geometricElement.querySelector("input[name=yAxies]").value)
+					};
+					return { key: key, deviceInfo: deviceInfo, measurePointInfos: measurePointInfoObject, geometricData: geometricData };
 	}
+
+	/**
+	 * todo:: get geometrict data only
+	 * @param {} evt
+	 */
+	function _getGeometricDataByEvent(evt) {};
 
 	var mapStateToProps = function mapStateToProps(state) {
 					var properties = state.properties;
@@ -22899,11 +23030,20 @@
 																	case _consts.COMMON_ELEMENT:
 																					//collect element properties
 																					var elementProperties = _getCommonElementPropertiesByEvent(evt);
-																					console.log(elementProperties);
+																					var geometricData = elementProperties.geometricData;
 																					dispatch((0, _actions.saveElementProperties)(elementProperties));
+																					dispatch((0, _actions.updateElementGeometricData)(geometricData.id, geometricData.width, geometricData.height, geometricData.x, geometricData.y));
+																					setTimeout(function () {
+																									dispatch((0, _actions.updateLines)(geometricData.id));
+																					}, 100);
 																					break;
 													}
 									},
+									/**
+	         * todo:: update the Geometric data only
+	         * @param {} evt
+	         */
+									onGeometricDataChange: function onGeometricDataChange(evt) {},
 									onAddMeasurePoint: function onAddMeasurePoint() {
 													dispatch((0, _actions.addMeasurePoint)());
 									},
@@ -23065,18 +23205,76 @@
 	    )
 	  );
 	};
-	var CommonElement = function CommonElement(_ref3) {
-	  var elementKey = _ref3.elementKey;
-	  var deviceInfo = _ref3.deviceInfo;
-	  var measurePointInfos = _ref3.measurePointInfos;
-	  var onAddMeasurePoint = _ref3.onAddMeasurePoint;
-	  var onRemoveMeasurePoint = _ref3.onRemoveMeasurePoint;
-	  var onMeasurePointValueChange = _ref3.onMeasurePointValueChange;
+	var GeometricDataElement = function GeometricDataElement(_ref3) {
+	  var width = _ref3.width;
+	  var height = _ref3.height;
+	  var x = _ref3.x;
+	  var y = _ref3.y;
+
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "pro-geo-data" },
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-header" },
+	      "几何数据"
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "宽度"
+	      ),
+	      _react2.default.createElement("input", { type: "number", name: "width", step: "1", min: "10", max: "1000", defaultValue: width })
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "高度"
+	      ),
+	      _react2.default.createElement("input", { type: "number", name: "height", step: "1", min: "10", max: "1000", defaultValue: height })
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "x轴"
+	      ),
+	      _react2.default.createElement("input", { type: "number", name: "xAxies", step: "1", min: "10", max: "1000", defaultValue: x })
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "y轴"
+	      ),
+	      _react2.default.createElement("input", { type: "number", name: "yAxies", step: "1", min: "10", max: "1000", defaultValue: y })
+	    )
+	  );
+	};
+	var CommonElement = function CommonElement(_ref4) {
+	  var geometricData = _ref4.geometricData;
+	  var elementKey = _ref4.elementKey;
+	  var deviceInfo = _ref4.deviceInfo;
+	  var measurePointInfos = _ref4.measurePointInfos;
+	  var onAddMeasurePoint = _ref4.onAddMeasurePoint;
+	  var onRemoveMeasurePoint = _ref4.onRemoveMeasurePoint;
+	  var onMeasurePointValueChange = _ref4.onMeasurePointValueChange;
 
 
 	  return _react2.default.createElement(
 	    "div",
 	    null,
+	    _react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, geometricData)),
 	    _react2.default.createElement(
 	      "div",
 	      { className: "pro-deviceInfo", "data-element-key": elementKey },
@@ -23131,6 +23329,7 @@
 	    )
 	  );
 	};
+
 	var TextProperties = function TextProperties(key, text) {
 	  return _react2.default.createElement(
 	    "div",
@@ -23177,11 +23376,127 @@
 	        { className: "align-center" },
 	        _react2.default.createElement("input", { type: "button", onClick: state.onSave, "data-key": state.key, "data-selected-type": state.type, value: "保存" })
 	      )
-	    )
+	    ),
+	    _react2.default.createElement("div", { className: "dia-map-navigator" })
 	  );
 	};
 
 	exports.default = Property;
+
+/***/ },
+/* 194 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+					value: true
+	});
+
+	var _reactRedux = __webpack_require__(159);
+
+	var _Toolbar = __webpack_require__(195);
+
+	var _Toolbar2 = _interopRequireDefault(_Toolbar);
+
+	var _actions = __webpack_require__(189);
+
+	function _interopRequireDefault(obj) {
+					return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var mapStateToProps = function mapStateToProps(state) {
+					return state;
+	};
+	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
+					return {
+									onZoomIn: function onZoomIn(evt) {
+													dispatch((0, _actions.zoomIn)());
+									},
+									onZoomOut: function onZoomOut() {
+													dispatch((0, _actions.zoomOut)());
+									},
+									onRedo: function onRedo(event) {
+													dispatch((0, _actions.redo)());
+									},
+									onUndo: function onUndo(event) {
+													dispatch((0, _actions.undo)());
+									},
+									onCreateSubPage: function onCreateSubPage() {
+													dispatch((0, _actions.createSubPage)());
+									},
+									onDeleteSubPage: function onDeleteSubPage() {
+													dispatch((0, _actions.deleteSubPage)());
+									},
+									onSave: function onSave(event) {}
+					};
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Toolbar2.default);
+
+/***/ },
+/* 195 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	__webpack_require__(181);
+
+	var _Utility = __webpack_require__(183);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Toolbar = function Toolbar(state) {
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "dia-toolbar" },
+	    _react2.default.createElement(
+	      "button",
+	      { name: "zoomin", onClick: state.onZoomIn },
+	      "放大"
+	    ),
+	    _react2.default.createElement(
+	      "button",
+	      { name: "zoomout", onClick: state.onZoomOut },
+	      "缩小"
+	    ),
+	    _react2.default.createElement(
+	      "button",
+	      { name: "redo", onClick: state.onRedo },
+	      "Redo"
+	    ),
+	    _react2.default.createElement(
+	      "button",
+	      { name: "undo", onClick: state.onUndo },
+	      "撤销"
+	    ),
+	    _react2.default.createElement(
+	      "button",
+	      { name: "creat_sub_page", onClick: state.onCreateSubPage },
+	      "创建子图"
+	    ),
+	    _react2.default.createElement(
+	      "button",
+	      { name: "delete_sub_page", onClick: state.onDeleteSubPage },
+	      "删除子图"
+	    ),
+	    _react2.default.createElement(
+	      "button",
+	      { name: "delete_sub_page", onClick: state.onSave },
+	      "保存"
+	    )
+	  );
+	};
+
+	exports.default = Toolbar;
 
 /***/ }
 /******/ ]);

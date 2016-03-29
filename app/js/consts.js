@@ -24,8 +24,13 @@ export const REMOVE_LINES = "Remove Lines";
 export const REMOVE_LINE = "Remove Line";
 export const ADD_LINE = "Add Line";
 export const SELECT_CANVAS="Select canva";
+
 export const ZOOM_IN="Zoom in";
 export const ZOOM_OUT="Zoom out";
+export const REDO_OPERATION = "Re do operation";
+export const UNDO_OPERATION = "undo operation";
+export const CREATE_SUB_PAPGER = "Create Sub page operation";
+export const DELETE_SUB_PAPGER = "Delete Sub page operation";
 
 export const SAVE_SVG_PROPERTIES = "Save SVG Properties";
 export const SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
@@ -34,3 +39,4 @@ export const REMOVE_MEASURE_POINT = "Remove Measure Point Properties";
 export const SAVE_MEASURE_POINT_VALUE="Save Measure point value when changed";
 export const CANVAS = "Canvas";
 export const COMMON_ELEMENT="Common element which contains measure point info";
+export const UPDATE_GEOMETRIC_DATA= "Update geometric data from property area";

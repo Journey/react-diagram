@@ -13,7 +13,12 @@ import {
     SELECT_ELEMENT,
     SELECT_LINE,
     ZOOM_IN,
-    ZOOM_OUT
+    ZOOM_OUT,
+    REDO_OPERATION,
+    UNDO_OPERATION,
+    CREATE_SUB_PAPGER,
+    DELETE_SUB_PAPGER,
+    UPDATE_GEOMETRIC_DATA
 } from "../consts";
 import {generateUUID, StoreHelper, LineHelper} from "../Utility";
 let _defaultProperties = {
@@ -46,23 +51,23 @@ const svgProperties = (state=_defaultProperties, action) => {
     let _newZoomLevel;
     switch(action.type){
     case ZOOM_IN:
-	_newZoomLevel = _newZoomLevel + 0.2;
+	_newZoomLevel = _origZoomLevel + 0.2;
 	newState = Object.assign({},state, {
-	    width: action.width/_origZoomLevel * _newZoomLevel,
-	    height: action.height/_origZoomLevel * _newZoomLevel,
+	    width: state.width/_origZoomLevel * _newZoomLevel,
+	    height: state.height/_origZoomLevel * _newZoomLevel,
 	    scaleX: _newZoomLevel,
 	    scaleY: _newZoomLevel,
 	    zoomLevel: _newZoomLevel
 	});
 	break;
     case ZOOM_OUT:
-	_newZoomLevel = _newZoomLevel - 0.2;
+	_newZoomLevel = _origZoomLevel - 0.2;
 	if(_newZoomLevel <= 0){
 	    _newZoomLevel = 0.2;
 	}
 	newState = Object.assign({},state, {
-	    width: action.width/_origZoomLevel * _newZoomLevel,
-	    height: action.height/_origZoomLevel * _newZoomLevel,
+	    width: state.width/_origZoomLevel * _newZoomLevel,
+	    height: state.height/_origZoomLevel * _newZoomLevel,
 	    scaleX: _newZoomLevel,
 	    scaleY: _newZoomLevel,
 	    zoomLevel: _newZoomLevel
@@ -87,12 +92,22 @@ const svgProperties = (state=_defaultProperties, action) => {
  * @returns {} 
  */
 const elements = (state={},action) => {
-    let newState;
+    let newState,newElement;
     switch(action.type){
+    case UPDATE_GEOMETRIC_DATA: //save geometric data to elements
+	let key = action.id;
+	newElement = Object.assign({},state[key],{
+	    width: action.width,
+	    height: action.height,
+	    x: action.x,
+	    y: action.y
+	});
+	newState = Object.assign({},state,{[key]:newElement});
+	break;
     case ADD_ELEMENT:
-	let key = generateUUID();
+	key = generateUUID();
 	let element = StoreHelper.getPalletElementInfoById(action.id);
-	let newElement = Object.assign({}, element, {key:key,x:action.x,y:action.y});
+	newElement = Object.assign({}, element, {key:key,x:action.x,y:action.y});
 	newState = Object.assign({},state);
 	newState[key] = newElement;
 	break;
@@ -163,11 +178,20 @@ const links = (state={},action) => {
 const operator = (state={id:null,x:10000,y:10000,width:10000,height:10000,lineId:null},action) => {
     switch(action.type){
     case MOVE_ELEMENT:
+	if(state.id === action.id){
+	    return Object.assign({},state,{
+		x: action.x,
+		y: action.y
+	    });
+	}
+	return state;
+	break;
     case REMOVE_ELEMENT:
     case SELECT_CANVAS:
 	return _getDefaultOperator();
 	break;
     case SELECT_ELEMENT:
+    case UPDATE_GEOMETRIC_DATA:
 	return {
 	    id: action.id,
 	    x: action.x,

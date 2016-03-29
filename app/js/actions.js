@@ -18,7 +18,12 @@ import {
     REMOVE_LINE,
     REMOVE_ELEMENT,
     ZOOM_IN,
-    ZOOM_OUT
+    ZOOM_OUT,
+    REDO_OPERATION,
+    UNDO_OPERATION,
+    CREATE_SUB_PAPGER,
+    DELETE_SUB_PAPGER,
+    UPDATE_GEOMETRIC_DATA
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -180,6 +185,17 @@ export const saveMeasurePointValue = (index,key,value) => {
     };
 };
 
+export const updateElementGeometricData = (id,width,height,x,y) => {
+    return {
+	type: UPDATE_GEOMETRIC_DATA,
+	id: id,
+	width: width,
+	height: height,
+	x: x,
+	y: y
+    };
+};
+
 export const zoomIn = () => {
     return {
 	type: ZOOM_IN
@@ -189,5 +205,26 @@ export const zoomIn = () => {
 export const zoomOut = () => {
     return {
 	type: ZOOM_OUT
+    };
+};
+
+export const redo = () => {
+    return {
+	type: REDO_OPERATION
+    };  
+};
+export const undo = () => {
+    return {
+	type: UNDO_OPERATION
+    };  
+};
+export const createSubPage = () => {
+    return {
+	type: CREATE_SUB_PAPGER
+    };
+};
+export const deleteSubPage = () => {
+    return {
+	type: DELETE_SUB_PAPGER
     };
 };

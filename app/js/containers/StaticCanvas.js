@@ -1,34 +1,24 @@
 import {connect} from 'react-redux';
-import Canvas from "../components/Canvas.jsx";
+import Canvas from "../components/StaticCanvas.jsx";
 import {StoreHelper} from "../Utility";
 import {
-    addElement,
-    moveElement,
-    removeElement,
-    removeLines,
-    removeLine,
-    clearSelection,
-    addLine,
-    updateLines,
-    selectElement,
-    selectCanvas,
-    selectLine
+    scrollStaticCanvas,
+    scrollDynamicCanvas
 } from "../actions";
 import {
-    generateUUID,
-    getRelativePosition,
-    setDragContext,
-    getDragContextObject,
-    Position,
-    LineHelper
+    generateUUID
 } from "../Utility";
-import {TYPE_CANVASELEMENT,TYPE_PALLETELEMENT} from "../consts";
+import {} from "../consts";
+
+let _static_width = 100;
+let _static_height = 100;
 
 const mapStateToProps = (state) => {
+    let _width = state.svgProperties.width;
+    let _height = state.svgProperties.height;
     return {
-	width: state.svgProperties.width,
-	height: state.svgProperties.height,
-	gridSize: state.svgProperties.gridSize,
+	width: _static_width,
+	height: _static_height,
 	scaleX: state.svgProperties.scaleX,
 	scaleY: state.svgProperties.scaleY,
 	zoomLevel: state.svgProperties.zoomLevel,
@@ -78,8 +68,6 @@ const mapDispatchtoProps = (dispatch) => {
 	    let key = evt.currentTarget.getAttribute("data-element-key");
 	    dispatch(removeLines(key));
 	    dispatch(removeElement(key));
-	    let{width,height,gridSize} = StoreHelper.getSvgProperties();
-	    dispatch(selectCanvas(width,height,gridSize));
 	},
 	removeLine: (event) => {
 	    let key = event.currentTarget.getAttribute("data-line-key");

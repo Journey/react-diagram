@@ -7,7 +7,9 @@ import {
     CANVAS,
     COMMON_ELEMENT,
     SAVE_ELEMENT_PROPERTIES,
-    SAVE_MEASURE_POINT_VALUE
+    SAVE_MEASURE_POINT_VALUE,
+    UPDATE_GEOMETRIC_DATA,
+    MOVE_ELEMENT
 } from "../consts";
 
 const _getDefaultDeviceInfo = () =>{
@@ -28,7 +30,22 @@ const _getDefaultMeasurePointInfo = () => {
 //{selectedProperties:{},properties:{}}
 const properties = (state={type:CANVAS,selectedProperties:{},properties:{}},action) => {
     let selectedProperties = null;
+    let geometricData = {};
     switch(action.type){
+    case MOVE_ELEMENT:
+	if(state.selectedProperties.key === action.id) {
+	    selectedProperties = state.selectedProperties;
+	    geometricData = Object.assign({},selectedProperties.geometricData,{
+		x: action.x,
+		y: action.y
+	    });
+	    selectedProperties = Object.assign({},state.selectedProperties,{
+		geometricData: geometricData
+	    });
+	    return Object.assign({},state,{selectedProperties: selectedProperties});
+	}
+	return state;
+	break;
     case SELECT_CANVAS:
 	selectedProperties = {
 	    width: action.width,
@@ -39,6 +56,13 @@ const properties = (state={type:CANVAS,selectedProperties:{},properties:{}},acti
 	break;
     case SELECT_ELEMENT:
 	selectedProperties = state.properties[action.id];
+	let selectedElement = StoreHelper.getCanvasElmentInfoById(action.id);
+	geometricData = {
+	    width: selectedElement.width,
+	    height: selectedElement.height,
+	    x: selectedElement.x,
+	    y: selectedElement.y
+	};
 	if(selectedProperties) {
 	    let newDeviceInfo = Object.assign(selectedProperties.deviceInfo);
 	    let newMeasurePointInfos = selectedProperties.measurePointInfos.map((info)=>{
@@ -47,16 +71,31 @@ const properties = (state={type:CANVAS,selectedProperties:{},properties:{}},acti
 	    selectedProperties = {
 		key: action.id,
 		deviceInfo: newDeviceInfo,
-		measurePointInfos: newMeasurePointInfos
+		measurePointInfos: newMeasurePointInfos,
+		geometricData: geometricData
 	    };
 	} else {
 	    selectedProperties = {
 		key: action.id,
 		deviceInfo: _getDefaultDeviceInfo(),
-		measurePointInfos: [_getDefaultMeasurePointInfo()]
+		measurePointInfos: [_getDefaultMeasurePointInfo()],
+		geometricData: geometricData
 	    };
 	}
 	return Object.assign({},state,{selectedProperties,type: COMMON_ELEMENT});
+	break;
+    case UPDATE_GEOMETRIC_DATA:
+	selectedProperties = state.properties[action.id];
+	geometricData = Object.assign({},state.selectedProperties.geometricData,{
+	    width: action.width,
+	    height: action.height,
+	    x: action.x,
+	    y: action.y
+	});
+	selectedProperties = Object.assign({},state.selectedProperties,{
+	    geometricData: geometricData
+	});
+	return Object.assign({},state,{selectedProperties:selectedProperties});
 	break;
     case ADD_MEASURE_POINT:
 	selectedProperties = state.selectedProperties;
