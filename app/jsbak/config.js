@@ -1,3 +1,0 @@
-const ElementsConfig = {};
-
-export{ElementsConfig};

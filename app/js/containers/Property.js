@@ -42,13 +42,18 @@ function _getCommonElementPropertiesByEvent(event){
     return {key,deviceInfo,measurePointInfos:measurePointInfoObject,geometricData:geometricData};
 }
 
-/**
- * todo:: get geometrict data only
- * @param {} evt
- */
-function _getGeometricDataByEvent(evt) {
-    
-};
+function getElementGeometricDataByEvent(event){
+    var containerElement = event.currentTarget.parentElement.parentElement.parentElement;
+    var propertyElement = containerElement.querySelector("div.pro-deviceInfo");
+    var geometricElement = containerElement.querySelector("div.pro-geo-data");
+     return {
+	 id: propertyElement.getAttribute("data-element-key"),
+	width: parseInt(geometricElement.querySelector("input[name=width]").value),
+	height: parseInt( geometricElement.querySelector("input[name=height]").value),
+	x: parseInt(geometricElement.querySelector("input[name=xAxies]").value),
+	y: parseInt(geometricElement.querySelector("input[name=yAxies]").value)
+    };
+}
 
 const mapStateToProps = (state) => {
     let properties = state.properties;
@@ -89,7 +94,11 @@ const mapDispatchtoProps = (dispatch) => {
 	 * @param {} evt
 	 */
 	onGeometricDataChange: (evt) => {
-	    
+	    var geometricData = getElementGeometricDataByEvent(evt);
+	    dispatch(updateElementGeometricData(geometricData.id,geometricData.width,geometricData.height,geometricData.x,geometricData.y));
+		setTimeout(()=>{
+		    dispatch(updateLines(geometricData.id));
+		},100);
 	},
 	onAddMeasurePoint: () => {
 	    dispatch(addMeasurePoint());

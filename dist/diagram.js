@@ -22993,11 +22993,18 @@
 					return { key: key, deviceInfo: deviceInfo, measurePointInfos: measurePointInfoObject, geometricData: geometricData };
 	}
 
-	/**
-	 * todo:: get geometrict data only
-	 * @param {} evt
-	 */
-	function _getGeometricDataByEvent(evt) {};
+	function getElementGeometricDataByEvent(event) {
+					var containerElement = event.currentTarget.parentElement.parentElement.parentElement;
+					var propertyElement = containerElement.querySelector("div.pro-deviceInfo");
+					var geometricElement = containerElement.querySelector("div.pro-geo-data");
+					return {
+									id: propertyElement.getAttribute("data-element-key"),
+									width: parseInt(geometricElement.querySelector("input[name=width]").value),
+									height: parseInt(geometricElement.querySelector("input[name=height]").value),
+									x: parseInt(geometricElement.querySelector("input[name=xAxies]").value),
+									y: parseInt(geometricElement.querySelector("input[name=yAxies]").value)
+					};
+	}
 
 	var mapStateToProps = function mapStateToProps(state) {
 					var properties = state.properties;
@@ -23043,7 +23050,13 @@
 	         * todo:: update the Geometric data only
 	         * @param {} evt
 	         */
-									onGeometricDataChange: function onGeometricDataChange(evt) {},
+									onGeometricDataChange: function onGeometricDataChange(evt) {
+													var geometricData = getElementGeometricDataByEvent(evt);
+													dispatch((0, _actions.updateElementGeometricData)(geometricData.id, geometricData.width, geometricData.height, geometricData.x, geometricData.y));
+													setTimeout(function () {
+																	dispatch((0, _actions.updateLines)(geometricData.id));
+													}, 100);
+									},
 									onAddMeasurePoint: function onAddMeasurePoint() {
 													dispatch((0, _actions.addMeasurePoint)());
 									},
@@ -23210,6 +23223,7 @@
 	  var height = _ref3.height;
 	  var x = _ref3.x;
 	  var y = _ref3.y;
+	  var onGeometricDataChange = _ref3.onGeometricDataChange;
 
 	  return _react2.default.createElement(
 	    "div",
@@ -23227,7 +23241,7 @@
 	        null,
 	        "宽度"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "width", step: "1", min: "10", max: "1000", defaultValue: width })
+	      _react2.default.createElement("input", { type: "number", name: "width", step: "1", min: "10", max: "1000", defaultValue: width, onBlur: onGeometricDataChange })
 	    ),
 	    _react2.default.createElement(
 	      "div",
@@ -23237,7 +23251,7 @@
 	        null,
 	        "高度"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "height", step: "1", min: "10", max: "1000", defaultValue: height })
+	      _react2.default.createElement("input", { type: "number", name: "height", step: "1", min: "10", max: "1000", defaultValue: height, onBlur: onGeometricDataChange })
 	    ),
 	    _react2.default.createElement(
 	      "div",
@@ -23247,7 +23261,7 @@
 	        null,
 	        "x轴"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "xAxies", step: "1", min: "10", max: "1000", defaultValue: x })
+	      _react2.default.createElement("input", { type: "number", name: "xAxies", step: "1", min: "10", max: "1000", defaultValue: x, onBlur: onGeometricDataChange })
 	    ),
 	    _react2.default.createElement(
 	      "div",
@@ -23257,7 +23271,7 @@
 	        null,
 	        "y轴"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "yAxies", step: "1", min: "10", max: "1000", defaultValue: y })
+	      _react2.default.createElement("input", { type: "number", name: "yAxies", step: "1", min: "10", max: "1000", defaultValue: y, onBlur: onGeometricDataChange })
 	    )
 	  );
 	};
@@ -23269,12 +23283,13 @@
 	  var onAddMeasurePoint = _ref4.onAddMeasurePoint;
 	  var onRemoveMeasurePoint = _ref4.onRemoveMeasurePoint;
 	  var onMeasurePointValueChange = _ref4.onMeasurePointValueChange;
+	  var onGeometricDataChange = _ref4.onGeometricDataChange;
 
 
 	  return _react2.default.createElement(
 	    "div",
 	    null,
-	    _react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, geometricData)),
+	    _react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, geometricData, { onGeometricDataChange: onGeometricDataChange })),
 	    _react2.default.createElement(
 	      "div",
 	      { className: "pro-deviceInfo", "data-element-key": elementKey },
@@ -23352,7 +23367,7 @@
 	      return _react2.default.createElement(SVGProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties));
 	      break;
 	    case _consts.COMMON_ELEMENT:
-	      return _react2.default.createElement(CommonElement, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties, { onAddMeasurePoint: state.onAddMeasurePoint, onRemoveMeasurePoint: state.onRemoveMeasurePoint, onMeasurePointValueChange: state.onMeasurePointValueChange }));
+	      return _react2.default.createElement(CommonElement, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties, { onAddMeasurePoint: state.onAddMeasurePoint, onRemoveMeasurePoint: state.onRemoveMeasurePoint, onMeasurePointValueChange: state.onMeasurePointValueChange, onGeometricDataChange: state.onGeometricDataChange }));
 	      break;
 	    default:
 	      return _react2.default.createElement(

@@ -47,34 +47,34 @@ const MeasureInfo = ({name,identifier,type,onRemoveMeasurePoint,index,onMeasureP
     </div>
   );
 };
-const GeometricDataElement = ({width,height,x,y}) => {
+const GeometricDataElement = ({width,height,x,y,onGeometricDataChange}) => {
   return (
     <div className="pro-geo-data">
       <div className="pro-header">几何数据</div>
       <div className="pro-row">
 	<label>宽度</label>
-	<input type="number" name="width" step="1" min="10" max="1000" defaultValue={width} />
+	<input type="number" name="width" step="1" min="10" max="1000" defaultValue={width} onBlur={onGeometricDataChange}/>
       </div>
       <div className="pro-row">
 	<label>高度</label>
-	<input type="number" name="height" step="1" min="10" max="1000" defaultValue={height} />
+	<input type="number" name="height" step="1" min="10" max="1000" defaultValue={height}  onBlur={onGeometricDataChange}/>
       </div>
       <div className="pro-row">
 	<label>x轴</label>
-	<input type="number" name="xAxies" step="1" min="10" max="1000" defaultValue={x} />
+	<input type="number" name="xAxies" step="1" min="10" max="1000" defaultValue={x}  onBlur={onGeometricDataChange}/>
       </div>
       <div className="pro-row">
 	<label>y轴</label>
-	<input type="number" name="yAxies" step="1" min="10" max="1000" defaultValue={y} />
+	<input type="number" name="yAxies" step="1" min="10" max="1000" defaultValue={y}  onBlur={onGeometricDataChange}/>
       </div>
     </div>
   );
 };
-const CommonElement = ({geometricData,elementKey, deviceInfo, measurePointInfos, onAddMeasurePoint, onRemoveMeasurePoint,onMeasurePointValueChange}) => {
+const CommonElement = ({geometricData,elementKey, deviceInfo, measurePointInfos, onAddMeasurePoint, onRemoveMeasurePoint,onMeasurePointValueChange,onGeometricDataChange}) => {
 
   return (
     <div>
-      <GeometricDataElement key={generateUUID()} {...geometricData}/>
+      <GeometricDataElement key={generateUUID()} {...geometricData} onGeometricDataChange={onGeometricDataChange}/>
       <div className="pro-deviceInfo" data-element-key={elementKey}>
 	<div className="pro-header">设备</div>
 	<div className="pro-row">
@@ -119,7 +119,7 @@ const PropertyFactory = (state) => {
       break;
     case COMMON_ELEMENT:
       return (
-	<CommonElement key={generateUUID()} elementKey={state.selectedProperties.key} {...state.selectedProperties} onAddMeasurePoint={state.onAddMeasurePoint} onRemoveMeasurePoint={state.onRemoveMeasurePoint} onMeasurePointValueChange={state.onMeasurePointValueChange}></CommonElement>
+	<CommonElement key={generateUUID()} elementKey={state.selectedProperties.key} {...state.selectedProperties} onAddMeasurePoint={state.onAddMeasurePoint} onRemoveMeasurePoint={state.onRemoveMeasurePoint} onMeasurePointValueChange={state.onMeasurePointValueChange} onGeometricDataChange={state.onGeometricDataChange}></CommonElement>
       )
       break;
     default:
