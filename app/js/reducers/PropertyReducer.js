@@ -1,4 +1,4 @@
-import {generateUUID, StoreHelper} from "../Utility";
+import {generateUUID, StoreHelper, DefaultValues} from "../Utility";
 import {
     ADD_MEASURE_POINT,
     REMOVE_MEASURE_POINT,
@@ -9,23 +9,9 @@ import {
     SAVE_ELEMENT_PROPERTIES,
     SAVE_MEASURE_POINT_VALUE,
     UPDATE_GEOMETRIC_DATA,
-    MOVE_ELEMENT
+    MOVE_ELEMENT,
+    SWITCH_SUB_PAPER
 } from "../consts";
-
-const _getDefaultDeviceInfo = () =>{
-    return {
-	name:"",
-	serialNumber:""
-    };
-};
-
-const _getDefaultMeasurePointInfo = () => {
-    return {
-	    name:"",
-	    identifier:"",
-	    type:"1"
-    };
-};
 
 //{selectedProperties:{},properties:{}}
 const properties = (state={type:CANVAS,selectedProperties:{},properties:{}},action) => {
@@ -77,8 +63,8 @@ const properties = (state={type:CANVAS,selectedProperties:{},properties:{}},acti
 	} else {
 	    selectedProperties = {
 		key: action.id,
-		deviceInfo: _getDefaultDeviceInfo(),
-		measurePointInfos: [_getDefaultMeasurePointInfo()],
+		deviceInfo: DefaultValues.getDeviceInfo(),
+		measurePointInfos: [DefaultValues.getMeasurePointInfo()],
 		geometricData: geometricData
 	    };
 	}
@@ -101,7 +87,7 @@ const properties = (state={type:CANVAS,selectedProperties:{},properties:{}},acti
 	selectedProperties = state.selectedProperties;
 	let measurePointInfos = selectedProperties.measurePointInfos;
 	selectedProperties = Object.assign({},selectedProperties,{
-	    measurePointInfos: [ _getDefaultMeasurePointInfo(), ...measurePointInfos]
+	    measurePointInfos: [ DefaultValues.getMeasurePointInfo(), ...measurePointInfos]
 	});
 	return Object.assign({},state,{selectedProperties});
 	break;

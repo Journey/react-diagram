@@ -3,6 +3,7 @@ import Pallet from "../containers/Pallet";
 import Canvas from "../containers/Canvas";
 import Property from "../containers/Property";
 import Toolbar from "../containers/Toolbar";
+import Tabs from "../containers/Tabs";
 
 const App = () => (
   <div className="diagram">
@@ -14,6 +15,7 @@ const App = () => (
 	<Pallet />
       </div>
       <div className="mid-col">
+	<Tabs />
 	<Canvas />
       </div>
       <div className="lat-col">

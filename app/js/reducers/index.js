@@ -9,6 +9,7 @@ import {
 import groups from "./PalletReducer";
 import {svgProperties,elements,links,operator} from "./CanvasReducer";
 import properties from "./PropertyReducer";
+import {papers,selectedPaperId} from "./TabsReducer";
 
 let _defaultSelectedElement = {
     selectedPalletItem: null,
@@ -52,6 +53,8 @@ const componentReducers = combineReducers({
     elements,
     links,
     properties,
-    operator
+    operator,
+    papers,
+    selectedPaperId
 });
 export default componentReducers;

@@ -1,10 +1,13 @@
 import {connect} from 'react-redux';
+import {generateUUID} from "../Utility";
 import Toolbar from "../components/Toolbar.jsx";
 import {zoomIn,zoomOut,redo,undo,createSubPage,deleteSubPage} from "../actions";
 
-
 const mapStateToProps = (state) => {
-    return state;
+    return {
+	selectedPaperId: state.selectedPaperId,
+	papers: state.papers
+    };
 };
 const mapDispatchtoProps = (dispatch) => {
     return {
@@ -20,14 +23,37 @@ const mapDispatchtoProps = (dispatch) => {
 	onUndo: (event) => {
 	    dispatch(undo());
 	},
-	onCreateSubPage: () => {
-	    dispatch(createSubPage());
+	onCreateSubPage: (event) => {
+	    var containerEle = event.target.parentElement.parentElement;
+	    var overlayEle = containerEle.querySelector("div.dia-overlay");
+	    overlayEle.style.display = "";
 	},
-	onDeleteSubPage: () => {
-	    dispatch(deleteSubPage());
-	},
-	onSave: (event) => {
+	onSaveSubPage: (event) => {
+	    var subCreateEle = event.target.parentElement.parentElement.parentElement;
+	    var typeEle = subCreateEle.querySelector("select");
+	    var nameEle = subCreateEle.querySelector("input[name=name]");
+	    var idEle = subCreateEle.querySelector("input[name=identify]");
+	    var name = nameEle.value;
+	    if(!name){
+		return;
+	    }
+	    var id = idEle.value;
+	    if(!id){
+		id = generateUUID();
+	    }
 	    
+	    dispatch(createSubPage({
+		name: name,
+		type: typeEle.value,
+		key: id
+	    }));
+	    subCreateEle.style.display = "none";
+	    nameEle.value = "";
+	    idEle.value = "";
+	},
+	onCancelSubPage: (event) => {
+	    var overlayEle = event.target.parentElement.parentElement.parentElement;
+	    overlayEle.style.display = "none";
 	}
     };
 };

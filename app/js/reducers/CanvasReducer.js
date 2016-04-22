@@ -18,27 +18,12 @@ import {
     UNDO_OPERATION,
     CREATE_SUB_PAPGER,
     DELETE_SUB_PAPGER,
-    UPDATE_GEOMETRIC_DATA
+    UPDATE_GEOMETRIC_DATA,
+    SWITCH_SUB_PAPER
 } from "../consts";
-import {generateUUID, StoreHelper, LineHelper} from "../Utility";
-let _defaultProperties = {
-    width: 1000,
-    height: 1000,
-    gridSize: 20,
-    scaleX: 1,
-    scaleY: 1,
-    zoomLevel: 1
-};
-const _getDefaultOperator = () => {
-    return {
-	id: null, //selected element id
-	x: 100000,
-	y: 100000,
-	width: 10000,
-	height: 10000,
-	lineId: null //selected line id
-    };
-};
+import {generateUUID, StoreHelper, LineHelper,DefaultValues} from "../Utility";
+let _defaultProperties = DefaultValues.getSvgProperties();
+
 /**
  * The States for the whole canvas
  * @param {} _defaultProperties
@@ -79,6 +64,9 @@ const svgProperties = (state=_defaultProperties, action) => {
 	    height: action.height,
 	    gridSize: action.gridSize
 	});
+	break;
+    case SWITCH_SUB_PAPER:
+	newState = Object.assign({},action.paper.svgProperties);
 	break;
     default:
 	newState = state;
@@ -126,6 +114,9 @@ const elements = (state={},action) => {
 	newState = Object.assign({},state);
 	delete newState[action.id];
 	break;
+    case SWITCH_SUB_PAPER:
+	newState = Object.assign({},action.paper.elements);
+	break;
     default:
 	newState = state;
     }
@@ -172,10 +163,13 @@ const links = (state={},action) => {
 	    }
 	});
 	break;
+    case SWITCH_SUB_PAPER:
+	return  Object.assign({},action.paper.links);
+	break;
     }
     return state;
 };
-const operator = (state={id:null,x:10000,y:10000,width:10000,height:10000,lineId:null},action) => {
+const operator = (state=DefaultValues.getOperator(),action) => {
     switch(action.type){
     case MOVE_ELEMENT:
 	if(state.id === action.id){
@@ -188,7 +182,7 @@ const operator = (state={id:null,x:10000,y:10000,width:10000,height:10000,lineId
 	break;
     case REMOVE_ELEMENT:
     case SELECT_CANVAS:
-	return _getDefaultOperator();
+	return DefaultValues.getOperator();
 	break;
     case SELECT_ELEMENT:
     case UPDATE_GEOMETRIC_DATA:
@@ -202,6 +196,9 @@ const operator = (state={id:null,x:10000,y:10000,width:10000,height:10000,lineId
 	break;
     case SELECT_LINE:
 	return Object.assign({},state,{lineId: action.id});
+	break;
+    case SWITCH_SUB_PAPER:
+	return Object.assign({},action.paper.operator);
 	break;
     default:
 	return state;

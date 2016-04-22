@@ -60,7 +60,7 @@
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
-	var _App = __webpack_require__(186);
+	var _App = __webpack_require__(187);
 
 	var _App2 = _interopRequireDefault(_App);
 
@@ -21152,6 +21152,8 @@
 
 	var _PropertyReducer2 = _interopRequireDefault(_PropertyReducer);
 
+	var _TabsReducer = __webpack_require__(186);
+
 	function _interopRequireDefault(obj) {
 	   return obj && obj.__esModule ? obj : { default: obj };
 	}
@@ -21201,7 +21203,9 @@
 	   elements: _CanvasReducer.elements,
 	   links: _CanvasReducer.links,
 	   properties: _PropertyReducer2.default,
-	   operator: _CanvasReducer.operator
+	   operator: _CanvasReducer.operator,
+	   papers: _TabsReducer.papers,
+	   selectedPaperId: _TabsReducer.selectedPaperId
 	});
 	exports.default = componentReducers;
 
@@ -21247,6 +21251,7 @@
 	var UNDO_OPERATION = exports.UNDO_OPERATION = "undo operation";
 	var CREATE_SUB_PAPGER = exports.CREATE_SUB_PAPGER = "Create Sub page operation";
 	var DELETE_SUB_PAPGER = exports.DELETE_SUB_PAPGER = "Delete Sub page operation";
+	var SWITCH_SUB_PAPER = exports.SWITCH_SUB_PAPER = "Switch sub page operation";
 
 	var SAVE_SVG_PROPERTIES = exports.SAVE_SVG_PROPERTIES = "Save SVG Properties";
 	var SAVE_ELEMENT_PROPERTIES = exports.SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
@@ -21256,6 +21261,7 @@
 	var CANVAS = exports.CANVAS = "Canvas";
 	var COMMON_ELEMENT = exports.COMMON_ELEMENT = "Common element which contains measure point info";
 	var UPDATE_GEOMETRIC_DATA = exports.UPDATE_GEOMETRIC_DATA = "Update geometric data from property area";
+	var SAVE_CHART = exports.SAVE_CHART = "Save Chart";
 
 /***/ },
 /* 182 */
@@ -21319,34 +21325,34 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	    value: true
 	});
-	exports.StoreHelper = exports.RectHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
+	exports.DefaultValues = exports.StoreHelper = exports.RectHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
 
 	var _slicedToArray = function () {
-		function sliceIterator(arr, i) {
-			var _arr = [];var _n = true;var _d = false;var _e = undefined;try {
-				for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-					_arr.push(_s.value);if (i && _arr.length === i) break;
-				}
-			} catch (err) {
-				_d = true;_e = err;
-			} finally {
-				try {
-					if (!_n && _i["return"]) _i["return"]();
-				} finally {
-					if (_d) throw _e;
-				}
-			}return _arr;
-		}return function (arr, i) {
-			if (Array.isArray(arr)) {
-				return arr;
-			} else if (Symbol.iterator in Object(arr)) {
-				return sliceIterator(arr, i);
-			} else {
-				throw new TypeError("Invalid attempt to destructure non-iterable instance");
-			}
-		};
+	    function sliceIterator(arr, i) {
+	        var _arr = [];var _n = true;var _d = false;var _e = undefined;try {
+	            for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+	                _arr.push(_s.value);if (i && _arr.length === i) break;
+	            }
+	        } catch (err) {
+	            _d = true;_e = err;
+	        } finally {
+	            try {
+	                if (!_n && _i["return"]) _i["return"]();
+	            } finally {
+	                if (_d) throw _e;
+	            }
+	        }return _arr;
+	    }return function (arr, i) {
+	        if (Array.isArray(arr)) {
+	            return arr;
+	        } else if (Symbol.iterator in Object(arr)) {
+	            return sliceIterator(arr, i);
+	        } else {
+	            throw new TypeError("Invalid attempt to destructure non-iterable instance");
+	        }
+	    };
 	}(); /**
 	      * @Define Utility
 	      * @name Utility.js
@@ -21356,39 +21362,47 @@
 
 	var _consts = __webpack_require__(181);
 
+	function _defineProperty(obj, key, value) {
+	    if (key in obj) {
+	        Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+	    } else {
+	        obj[key] = value;
+	    }return obj;
+	}
+
 	var uuidTemplate = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
 	/**
 	 * generate uuid
 	 * @returns {string} uuid
 	 */
 	var generateUUID = exports.generateUUID = function generateUUID() {
-		return uuidTemplate.replace(/[xy]/g, function (c) {
-			var r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0,
-			    v = c == 'x' ? r : r & 0x3 | 0x8;
-			return v.toString(16);
-		});
+	    return uuidTemplate.replace(/[xy]/g, function (c) {
+	        var r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0,
+	            v = c == 'x' ? r : r & 0x3 | 0x8;
+	        return v.toString(16);
+	    });
 	};
 
 	var getRelativePosition = exports.getRelativePosition = function getRelativePosition(evt) {
-		return {
-			x: 100,
-			y: 200
-		};
+	    return {
+	        x: 100,
+	        y: 200
+	    };
 	};
 	/**
 	 * store the pallet data, is an array [group1, group2].
 	 * @returns {object} the getter/setter of the pallet data
 	 */
 	var PalletData = exports.PalletData = function () {
-		var _palletData = null;
-		return {
-			get: function get() {
-				return _palletData;
-			},
-			set: function set(data) {
-				_palletData = data;
-			}
-		};
+	    var _palletData = null;
+	    return {
+	        get: function get() {
+	            return _palletData;
+	        },
+	        set: function set(data) {
+	            _palletData = data;
+	        }
+	    };
 	}();
 
 	/**
@@ -21397,13 +21411,13 @@
 	 * @returns {object} the properties of the element  
 	 */
 	var getElementById = exports.getElementById = function getElementById(id) {
-		return {
-			id: 1,
-			name: "element one",
-			image: "css/1.jpg",
-			width: 50,
-			height: 50
-		};
+	    return {
+	        id: 1,
+	        name: "element one",
+	        image: "css/1.jpg",
+	        width: 50,
+	        height: 50
+	    };
 	};
 
 	/**
@@ -21413,7 +21427,7 @@
 	 * @param {int} id the id of the pallet element
 	 */
 	var setDragContext = exports.setDragContext = function setDragContext(event, type, id) {
-		event.dataTransfer.setData("text/plain", type + id);
+	    event.dataTransfer.setData("text/plain", type + id);
 	};
 
 	/**
@@ -21422,7 +21436,7 @@
 	 * @returns {string}  the data object which stored by setDrageContext
 	 */
 	var getDragContext = exports.getDragContext = function getDragContext(event) {
-		return event.dataTransfer.getData("text");
+	    return event.dataTransfer.getData("text");
 	};
 
 	/**
@@ -21431,18 +21445,18 @@
 	 * @returns {object} oContext which contained type/id properties 
 	 */
 	var parseDragContext = exports.parseDragContext = function parseDragContext(sContext) {
-		var oContext = {
-			type: null,
-			id: null
-		};
-		if (sContext.indexOf(_consts.TYPE_PALLETELEMENT) > -1) {
-			oContext.type = _consts.TYPE_PALLETELEMENT;
-			oContext.id = sContext.split(_consts.TYPE_PALLETELEMENT)[1];
-		} else if (sContext.indexOf(_consts.TYPE_CANVASELEMENT) > -1) {
-			oContext.type = _consts.TYPE_CANVASELEMENT;
-			oContext.id = sContext.split(_consts.TYPE_CANVASELEMENT)[1];
-		}
-		return oContext;
+	    var oContext = {
+	        type: null,
+	        id: null
+	    };
+	    if (sContext.indexOf(_consts.TYPE_PALLETELEMENT) > -1) {
+	        oContext.type = _consts.TYPE_PALLETELEMENT;
+	        oContext.id = sContext.split(_consts.TYPE_PALLETELEMENT)[1];
+	    } else if (sContext.indexOf(_consts.TYPE_CANVASELEMENT) > -1) {
+	        oContext.type = _consts.TYPE_CANVASELEMENT;
+	        oContext.id = sContext.split(_consts.TYPE_CANVASELEMENT)[1];
+	    }
+	    return oContext;
 	};
 
 	/**
@@ -21451,7 +21465,7 @@
 	 * @returns {Object} oContext  contain type/id proerties
 	 */
 	var getDragContextObject = exports.getDragContextObject = function getDragContextObject(evt) {
-		return parseDragContext(getDragContext(evt));
+	    return parseDragContext(getDragContext(evt));
 	};
 
 	/**
@@ -21459,204 +21473,211 @@
 	 * @returns {} 
 	 */
 	var Position = exports.Position = function () {
-		var _mistake = { x: 0, y: 0 };
-		var _gridSize = 20;
-		function _alignPostion(iPosition) {
-			var iUnit = Math.floor(iPosition / _gridSize);
-			iUnit = iUnit > 0 ? iUnit : 0;
-			return iUnit * _gridSize;
-		}
-		function _offset(element, window, document) {
-			var box = element.getBoundingClientRect();
-			return {
-				top: box.top + window.pageYOffset - document.documentElement.clientTop,
-				left: box.left + window.pageXOffset - document.documentElement.clientLeft
-			};
-		}
-		//position relative to the element
-		//http://stackoverflow.com/questions/3234256/find-mouse-position-relative-to-element
-		function _positionRelativeToElement(event, element, window, document) {
-			var offset = _offset(element, window, document);
-			return {
-				x: event.pageX - offset.left,
-				y: event.pageY - offset.top
-			};
-		}
-		return {
-			setGridSize: function setGridSize(iSize) {
-				_gridSize = iSize;
-			},
-			getMousePostionRelativeToElement: function getMousePostionRelativeToElement(event, element, widnow, document) {
-				return _positionRelativeToElement(event, element, window, document);
-			},
-			logElementMistake: function logElementMistake(event, element, window, document) {
-				var mistake = _positionRelativeToElement(event, element, window, document);
-				_mistake.x = mistake.x;
-				_mistake.y = mistake.y;
-			},
-			correctElementPosition: function correctElementPosition(oPosition) {
-				var realX = oPosition.x - _mistake.x;
-				var realY = oPosition.y - _mistake.y;
-				return {
-					x: _alignPostion(realX),
-					y: _alignPostion(realY)
-				};
-			}
-		};
+	    var _mistake = {
+	        x: 0,
+	        y: 0
+	    };
+	    var _gridSize = 20;
+
+	    function _alignPostion(iPosition) {
+	        var iUnit = Math.floor(iPosition / _gridSize);
+	        iUnit = iUnit > 0 ? iUnit : 0;
+	        return iUnit * _gridSize;
+	    }
+
+	    function _offset(element, window, document) {
+	        var box = element.getBoundingClientRect();
+	        return {
+	            top: box.top + window.pageYOffset - document.documentElement.clientTop,
+	            left: box.left + window.pageXOffset - document.documentElement.clientLeft
+	        };
+	    }
+	    //position relative to the element
+	    //http://stackoverflow.com/questions/3234256/find-mouse-position-relative-to-element
+	    function _positionRelativeToElement(event, element, window, document) {
+	        var offset = _offset(element, window, document);
+	        return {
+	            x: event.pageX - offset.left,
+	            y: event.pageY - offset.top
+	        };
+	    }
+	    return {
+	        setGridSize: function setGridSize(iSize) {
+	            _gridSize = iSize;
+	        },
+	        getMousePostionRelativeToElement: function getMousePostionRelativeToElement(event, element, widnow, document) {
+	            return _positionRelativeToElement(event, element, window, document);
+	        },
+	        logElementMistake: function logElementMistake(event, element, window, document) {
+	            var mistake = _positionRelativeToElement(event, element, window, document);
+	            _mistake.x = mistake.x;
+	            _mistake.y = mistake.y;
+	        },
+	        correctElementPosition: function correctElementPosition(oPosition) {
+	            var realX = oPosition.x - _mistake.x;
+	            var realY = oPosition.y - _mistake.y;
+	            return {
+	                x: _alignPostion(realX),
+	                y: _alignPostion(realY)
+	            };
+	        }
+	    };
 	}();
 	/**
 	 * Line Helper. used to log some temp information for draw lines, and provide some helper operations
 	 * @returns {Object} Line Helper methods
 	 */
 	var LineHelper = exports.LineHelper = function () {
-		var _startInfo = {
-			elementKey: null,
-			position: null
-		};
-		return {
-			/**
-	   * wrap line start/end point info into a certain constructor
-	   * @param {Object} evt the react Event object
-	   * @returns {Object} oContext  contain type/id proerties
-	   */
+	    var _startInfo = {
+	        elementKey: null,
+	        position: null
+	    };
+	    return {
+	        /**
+	         * wrap line start/end point info into a certain constructor
+	         * @param {Object} evt the react Event object
+	         * @returns {Object} oContext  contain type/id proerties
+	         */
 
-			portInfo: function portInfo(elementKey, position) {
-				return { elementKey: elementKey, position: position };
-			},
-			logStartInfo: function logStartInfo(key, position) {
-				_startInfo = this.portInfo(key, position);
-			},
-			getStartInfo: function getStartInfo() {
-				return _startInfo;
-			},
-			clearStartInfo: function clearStartInfo() {
-				_startInfo = this.portInfo(null, null);
-			},
-			isSamePort: function isSamePort(startPort, endPort) {
-				if (startPort.elementKey !== undefined && startPort.elementKey !== endPort.elementKey) {
-					return false;
-				};
-				return true;
-			},
-			getPath: function getPath(startPoint, endPoint) {
-				return 'M' + startPoint.x + ' ' + startPoint.y + ' L' + endPoint.x + ' ' + endPoint.y + ' Z';
-			},
+	        portInfo: function portInfo(elementKey, position) {
+	            return {
+	                elementKey: elementKey, position: position
+	            };
+	        },
+	        logStartInfo: function logStartInfo(key, position) {
+	            _startInfo = this.portInfo(key, position);
+	        },
+	        getStartInfo: function getStartInfo() {
+	            return _startInfo;
+	        },
+	        clearStartInfo: function clearStartInfo() {
+	            _startInfo = this.portInfo(null, null);
+	        },
+	        isSamePort: function isSamePort(startPort, endPort) {
+	            if (startPort.elementKey !== undefined && startPort.elementKey !== endPort.elementKey) {
+	                return false;
+	            };
+	            return true;
+	        },
+	        getPath: function getPath(startPoint, endPoint) {
+	            return 'M' + startPoint.x + ' ' + startPoint.y + ' L' + endPoint.x + ' ' + endPoint.y + ' Z';
+	        },
 
-			/**
-	   * get the hover rect of the path
-	   * @param {string} path only composed by M L Z e.g 'M250 145 L360 145 Z'
-	   */
-			getPathHoverRect: function getPathHoverRect(sPath) {
-				var points = sPath.split(/[A-Z]/);
-				//
-				points = points.filter(function (value) {
-					return value !== "";
-				});
-				//["22 33 ","33 44"] ->[[22,33],[33,44]]
-				points = points.map(function (sPoints) {
-					sPoints = sPoints.trim();
-					var aPoint = sPoints.split(/\s/);
-					return [parseInt(aPoint[0]), parseInt(aPoint[1])];
-				});
+	        /**
+	         * get the hover rect of the path
+	         * @param {string} path only composed by M L Z e.g 'M250 145 L360 145 Z'
+	         */
+	        getPathHoverRect: function getPathHoverRect(sPath) {
+	            var points = sPath.split(/[A-Z]/);
+	            //
+	            points = points.filter(function (value) {
+	                return value !== "";
+	            });
+	            //["22 33 ","33 44"] ->[[22,33],[33,44]]
+	            points = points.map(function (sPoints) {
+	                sPoints = sPoints.trim();
+	                var aPoint = sPoints.split(/\s/);
+	                return [parseInt(aPoint[0]), parseInt(aPoint[1])];
+	            });
 
-				return RectHelper.getRectPathByPoints(points);
-			}
-		};
+	            return RectHelper.getRectPathByPoints(points);
+	        }
+	    };
 	}();
 	//todo
 	var RectHelper = exports.RectHelper = function () {
-		var VERTICAL_TYPE = "Verticle Type";
-		var HORIZONTAL_TYPE = "Horizontal Type";
-		var UP_LINE = "Up Line";
-		var DOWN_LINE = "Down Line";
+	    var VERTICAL_TYPE = "Verticle Type";
+	    var HORIZONTAL_TYPE = "Horizontal Type";
+	    var UP_LINE = "Up Line";
+	    var DOWN_LINE = "Down Line";
 
-		return {
-			/**
-	   * get the rect area 
-	   * @param {} aPoints
-	   */
-			getRectPathByPoints: function getRectPathByPoints(aPoints) {
-				var aUpArea = [],
-				    aDownArea = [];
-				var sPath = "M",
-				    temp = void 0;
-				for (var index = 0, length = aPoints.length; index < length - 1; index++) {
-					temp = RectHelper.getRectPoints(aPoints[index], aPoints[index + 1]);
-					aUpArea = aUpArea.concat(temp.up);
-					aDownArea = aDownArea.concat(temp.down);
-				}
-				aUpArea.forEach(function (aPoint) {
-					sPath = sPath + aPoint[0] + " " + aPoint[1] + "L";
-				});
-				for (var len = aDownArea.length, inx = len; inx > 0; inx--) {
-					temp = aDownArea[inx - 1];
-					sPath = sPath + temp[0] + " " + temp[1] + "L";
-				}
-				sPath = sPath + aUpArea[0][0] + " " + aUpArea[0][1] + "Z";
-				return sPath;
-			},
-			getLineType: function getLineType(aStartPoint, aEndPoint) {
-				var deltaX = aEndPoint[0] - aStartPoint[0];
-				var deltaY = aEndPoint[1] - aStartPoint[1];
-				if (deltaX == 0) {
-					return VERTICAL_TYPE;
-				}
-				if (deltaY == 0) {
-					return HORIZONTAL_TYPE;
-				}
-				if (deltaY / deltaX > 0) {
-					return UP_LINE;
-				}
-				return DOWN_LINE;
-			},
-			getRectPoints: function getRectPoints(aStartPoint, aEndPoint) {
-				var lineDirction = RectHelper.getLineType(aStartPoint, aEndPoint);
+	    return {
+	        /**
+	         * get the rect area 
+	         * @param {} aPoints
+	         */
+	        getRectPathByPoints: function getRectPathByPoints(aPoints) {
+	            var aUpArea = [],
+	                aDownArea = [];
+	            var sPath = "M",
+	                temp = void 0;
+	            for (var index = 0, length = aPoints.length; index < length - 1; index++) {
+	                temp = RectHelper.getRectPoints(aPoints[index], aPoints[index + 1]);
+	                aUpArea = aUpArea.concat(temp.up);
+	                aDownArea = aDownArea.concat(temp.down);
+	            }
+	            aUpArea.forEach(function (aPoint) {
+	                sPath = sPath + aPoint[0] + " " + aPoint[1] + "L";
+	            });
+	            for (var len = aDownArea.length, inx = len; inx > 0; inx--) {
+	                temp = aDownArea[inx - 1];
+	                sPath = sPath + temp[0] + " " + temp[1] + "L";
+	            }
+	            sPath = sPath + aUpArea[0][0] + " " + aUpArea[0][1] + "Z";
+	            return sPath;
+	        },
+	        getLineType: function getLineType(aStartPoint, aEndPoint) {
+	            var deltaX = aEndPoint[0] - aStartPoint[0];
+	            var deltaY = aEndPoint[1] - aStartPoint[1];
+	            if (deltaX == 0) {
+	                return VERTICAL_TYPE;
+	            }
+	            if (deltaY == 0) {
+	                return HORIZONTAL_TYPE;
+	            }
+	            if (deltaY / deltaX > 0) {
+	                return UP_LINE;
+	            }
+	            return DOWN_LINE;
+	        },
+	        getRectPoints: function getRectPoints(aStartPoint, aEndPoint) {
+	            var lineDirction = RectHelper.getLineType(aStartPoint, aEndPoint);
 
-				var _aStartPoint = _slicedToArray(aStartPoint, 2);
+	            var _aStartPoint = _slicedToArray(aStartPoint, 2);
 
-				var startX = _aStartPoint[0];
-				var startY = _aStartPoint[1];
+	            var startX = _aStartPoint[0];
+	            var startY = _aStartPoint[1];
 
-				var _aEndPoint = _slicedToArray(aEndPoint, 2);
+	            var _aEndPoint = _slicedToArray(aEndPoint, 2);
 
-				var endX = _aEndPoint[0];
-				var endY = _aEndPoint[1];
+	            var endX = _aEndPoint[0];
+	            var endY = _aEndPoint[1];
 
-				var aUpArea = [];
-				var aDownArea = [];
-				var dimension = 6;
-				switch (lineDirction) {
-					case UP_LINE:
-						aUpArea.push([startX - dimension, startY + dimension]);
-						aUpArea.push([endX - dimension, endY + dimension]);
-						aDownArea.push([startX + dimension, startY - dimension]);
-						aDownArea.push([endX + dimension, endY - dimension]);
-						break;
-					case DOWN_LINE:
-						aUpArea.push([startX + dimension, startY + dimension]);
-						aUpArea.push([endX + dimension, endY + dimension]);
-						aDownArea.push([startX - dimension, startY - dimension]);
-						aDownArea.push([endX - dimension, endY - dimension]);
-						break;
-					case HORIZONTAL_TYPE:
-						aUpArea.push([startX, startY + dimension]);
-						aUpArea.push([endX, endY + dimension]);
-						aDownArea.push([startX, startY - dimension]);
-						aDownArea.push([endX, endY - dimension]);
-						break;
-					case VERTICAL_TYPE:
-						aUpArea.push([startX + dimension, startY]);
-						aUpArea.push([endX + dimension, endY]);
-						aDownArea.push([startX - dimension, startY]);
-						aDownArea.push([endX - dimension, endY]);
-						break;
-				}
-				return {
-					up: aUpArea,
-					down: aDownArea
-				};
-			}
-		};
+	            var aUpArea = [];
+	            var aDownArea = [];
+	            var dimension = 6;
+	            switch (lineDirction) {
+	                case UP_LINE:
+	                    aUpArea.push([startX - dimension, startY + dimension]);
+	                    aUpArea.push([endX - dimension, endY + dimension]);
+	                    aDownArea.push([startX + dimension, startY - dimension]);
+	                    aDownArea.push([endX + dimension, endY - dimension]);
+	                    break;
+	                case DOWN_LINE:
+	                    aUpArea.push([startX + dimension, startY + dimension]);
+	                    aUpArea.push([endX + dimension, endY + dimension]);
+	                    aDownArea.push([startX - dimension, startY - dimension]);
+	                    aDownArea.push([endX - dimension, endY - dimension]);
+	                    break;
+	                case HORIZONTAL_TYPE:
+	                    aUpArea.push([startX, startY + dimension]);
+	                    aUpArea.push([endX, endY + dimension]);
+	                    aDownArea.push([startX, startY - dimension]);
+	                    aDownArea.push([endX, endY - dimension]);
+	                    break;
+	                case VERTICAL_TYPE:
+	                    aUpArea.push([startX + dimension, startY]);
+	                    aUpArea.push([endX + dimension, endY]);
+	                    aDownArea.push([startX - dimension, startY]);
+	                    aDownArea.push([endX - dimension, endY]);
+	                    break;
+	            }
+	            return {
+	                up: aUpArea,
+	                down: aDownArea
+	            };
+	        }
+	    };
 	}();
 
 	/**
@@ -21664,111 +21685,232 @@
 	 * infromation
 	 */
 	var StoreHelper = exports.StoreHelper = function () {
-		var _store = null;
-		function _getElements() {
-			return _store.getState().elements;
-		}
-		function _getLinks() {
-			return _store.getState().links;
-		}
-		function _getPallets() {
-			return _store.getState().groups;
-		}
-		function _getSvgProperties() {
-			return _store.getState().svgProperties;
-		}
-		return {
-			/**
-	   * the setting method to store
-	   * @param {} oStore
-	   */
-			setStore: function setStore(oStore) {
-				_store = oStore;
-			},
-			getSvgProperties: function getSvgProperties() {
-				return _getSvgProperties();
-			},
-			getPalletElementInfoById: function getPalletElementInfoById(iPalletelementid) {
-				var aGroups = _getPallets();
-				var retElement = null;
-				for (var groupInx = 0, groupLen = aGroups.length; groupInx < groupLen; groupInx++) {
-					var group = aGroups[groupInx];
-					retElement = group.items.find(function (item) {
-						if (item.id == iPalletelementid) {
-							return true;
-						}
-						return false;
-					});
-					if (retElement) {
-						break;
-					}
-				}
-				return Object.assign({}, retElement);
-			},
-			getCanvasElmentInfoById: function getCanvasElmentInfoById(sElementId) {
-				var oElements = _getElements();
-				return Object.assign({}, oElements[sElementId]);
-			},
-			getPortPosition: function getPortPosition(elementKey, position) {
-				var oElement = StoreHelper.getCanvasElmentInfoById(elementKey);
-				var startX = oElement.x;
-				var startY = oElement.y;
-				var width = oElement.width;
-				var height = oElement.height;
+	    var _store = null;
 
-				var portPosition = null;
-				switch (position) {
-					case _consts.POSITION_TOP:
-						portPosition = {
-							x: startX + width / 2,
-							y: startY
-						};
-						break;
-					case _consts.POSITION_RIGHT:
-						portPosition = {
-							x: startX + width,
-							y: startY + height / 2
-						};
-						break;
-					case _consts.POSITION_BOTTOM:
-						portPosition = {
-							x: startX + width / 2,
-							y: startY + height
-						};
-						break;
-					case _consts.POSITION_LEFT:
-						portPosition = {
-							x: startX,
-							y: startY + height / 2
-						};
-						break;
-				}
-				return portPosition;
-			},
-			getRefLinksByElementKey: function getRefLinksByElementKey(elementId) {
-				var oLinks = _getLinks();
-				var aRefLinks = Object.keys(oLinks).filter(function (linkKey) {
-					var link = oLinks[linkKey];
-					if (link.startPort.elementKey === elementId || link.endPort.elementKey === elementId) {
-						return true;
-					}
-					return false;
-				});
-				return aRefLinks;
-			},
-			getUpdatedLinks: function getUpdatedLinks(aLinkKeys) {
-				var oLinks = _getLinks();
-				var oUpdatedLinks = {};
-				aLinkKeys.forEach(function (key) {
-					var oldLink = oLinks[key];
-					var startPoint = StoreHelper.getPortPosition(oldLink.startPort.elementKey, oldLink.startPort.position);
-					var endPoint = StoreHelper.getPortPosition(oldLink.endPort.elementKey, oldLink.endPort.position);
-					var path = LineHelper.getPath(startPoint, endPoint);
-					oUpdatedLinks[key] = Object.assign({}, oldLink, { path: path });
-				});
-				return oUpdatedLinks;
-			}
-		};
+	    function _getElements() {
+	        return _store.getState().elements;
+	    }
+
+	    function _getLinks() {
+	        return _store.getState().links;
+	    }
+
+	    function _getPallets() {
+	        return _store.getState().groups;
+	    }
+
+	    function _getSvgProperties() {
+	        return _store.getState().svgProperties;
+	    }
+	    function _getPapers() {
+	        return _store.getState().papers;
+	    }
+	    return {
+	        /**
+	         * the setting method to store
+	         * @param {} oStore
+	         */
+	        setStore: function setStore(oStore) {
+	            _store = oStore;
+	        },
+	        getSvgProperties: function getSvgProperties() {
+	            return _getSvgProperties();
+	        },
+	        storeData: function storeData() {
+	            var _state = _store.getState();
+	            var _selectedPaperId = _state.selectedPaperId;
+	            var paper = _state.papers[_selectedPaperId];
+	            paper.svgProperties = _state.svgProperties;
+	            paper.elements = _state.elements;
+	            paper.links = _state.links;
+	            paper.properties = _state.properties;
+	        },
+	        getPalletElementInfoById: function getPalletElementInfoById(iPalletelementid) {
+	            var aGroups = _getPallets();
+	            var retElement = null;
+	            for (var groupInx = 0, groupLen = aGroups.length; groupInx < groupLen; groupInx++) {
+	                var group = aGroups[groupInx];
+	                retElement = group.items.find(function (item) {
+	                    if (item.id == iPalletelementid) {
+	                        return true;
+	                    }
+	                    return false;
+	                });
+	                if (retElement) {
+	                    break;
+	                }
+	            }
+	            return Object.assign({}, retElement);
+	        },
+	        getCanvasElmentInfoById: function getCanvasElmentInfoById(sElementId) {
+	            var oElements = _getElements();
+	            return Object.assign({}, oElements[sElementId]);
+	        },
+	        getPortPosition: function getPortPosition(elementKey, position) {
+	            var oElement = StoreHelper.getCanvasElmentInfoById(elementKey);
+	            var startX = oElement.x;
+	            var startY = oElement.y;
+	            var width = oElement.width;
+	            var height = oElement.height;
+
+	            var portPosition = null;
+	            switch (position) {
+	                case _consts.POSITION_TOP:
+	                    portPosition = {
+	                        x: startX + width / 2,
+	                        y: startY
+	                    };
+	                    break;
+	                case _consts.POSITION_RIGHT:
+	                    portPosition = {
+	                        x: startX + width,
+	                        y: startY + height / 2
+	                    };
+	                    break;
+	                case _consts.POSITION_BOTTOM:
+	                    portPosition = {
+	                        x: startX + width / 2,
+	                        y: startY + height
+	                    };
+	                    break;
+	                case _consts.POSITION_LEFT:
+	                    portPosition = {
+	                        x: startX,
+	                        y: startY + height / 2
+	                    };
+	                    break;
+	            }
+	            return portPosition;
+	        },
+	        getRefLinksByElementKey: function getRefLinksByElementKey(elementId) {
+	            var oLinks = _getLinks();
+	            var aRefLinks = Object.keys(oLinks).filter(function (linkKey) {
+	                var link = oLinks[linkKey];
+	                if (link.startPort.elementKey === elementId || link.endPort.elementKey === elementId) {
+	                    return true;
+	                }
+	                return false;
+	            });
+	            return aRefLinks;
+	        },
+	        getUpdatedLinks: function getUpdatedLinks(aLinkKeys) {
+	            var oLinks = _getLinks();
+	            var oUpdatedLinks = {};
+	            aLinkKeys.forEach(function (key) {
+	                var oldLink = oLinks[key];
+	                var startPoint = StoreHelper.getPortPosition(oldLink.startPort.elementKey, oldLink.startPort.position);
+	                var endPoint = StoreHelper.getPortPosition(oldLink.endPort.elementKey, oldLink.endPort.position);
+	                var path = LineHelper.getPath(startPoint, endPoint);
+	                oUpdatedLinks[key] = Object.assign({}, oldLink, {
+	                    path: path
+	                });
+	            });
+	            return oUpdatedLinks;
+	        },
+	        getSelectedPaper: function getSelectedPaper(paperId) {
+	            var _papers = _getPapers();
+	            if (paperId) {
+	                return _papers[paperId];
+	            } else {
+	                var keys = Object.keys(_papers);
+	                if (keys) {
+	                    return _papers[keys[0]];
+	                }
+	            }
+	            return null;
+	        },
+	        isLastPaper: function isLastPaper() {
+	            var _papers = _getPapers();
+	            if (Object.keys(_papers).length > 1) {
+	                return false;
+	            }
+	            return true;
+	        }
+	    };
+	}();
+
+	var DefaultValues = exports.DefaultValues = function () {
+	    return {
+	        getSvgProperties: function getSvgProperties() {
+	            return {
+	                width: 1000,
+	                height: 1000,
+	                gridSize: 20,
+	                scaleX: 1,
+	                scaleY: 1,
+	                zoomLevel: 1
+	            };
+	        },
+	        getOperator: function getOperator() {
+	            return {
+	                id: null, //selected element id
+	                x: 100000,
+	                y: 100000,
+	                width: 10000,
+	                height: 10000,
+	                lineId: null //selected line id
+	            };
+	        },
+	        getDefaultPaper: function () {
+	            var id = generateUUID();
+	            return function () {
+	                return {
+	                    key: id,
+	                    paperName: "默认",
+	                    paperType: 1, // 普通页面
+	                    svgProperties: DefaultValues.getSvgProperties(),
+	                    elements: {},
+	                    links: {},
+	                    properties: {}
+	                };
+	            };
+	        }(),
+	        generatePaper: function generatePaper(paperId, paperName, paperType) {
+	            return {
+	                key: paperId,
+	                paperName: paperName,
+	                paperType: paperType,
+	                svgProperties: DefaultValues.getSvgProperties(),
+	                elements: {},
+	                links: {},
+	                properties: {},
+	                operator: DefaultValues.getOperator()
+	            };
+	        },
+	        getDefaultPapers: function getDefaultPapers() {
+	            var defaultPaper = DefaultValues.getDefaultPaper();
+	            return _defineProperty({}, defaultPaper.key, defaultPaper);
+	        },
+	        getDefaultSelectedPaperId: function getDefaultSelectedPaperId(papers) {
+	            return Object.keys(papers)[0];
+	        },
+	        getDefaultState: function getDefaultState() {
+	            var defaultPaper = DefaultValues.getDefaultPaper();
+	            var operator = DefaultValues.getOperator();
+	            return {
+	                selectedPaperId: defaultPaper.key,
+	                svgProperties: defaultPaper.svgProperties,
+	                elements: defaultPaper.elements,
+	                properties: defaultPaper.properties,
+	                links: defaultPaper.links,
+	                operator: operator,
+	                papers: _defineProperty({}, defaultPaper.key, defaultPaper)
+	            };
+	        },
+	        getPalletDatas: function getPalletDatas() {
+	            //todo::
+	        },
+	        getDeviceInfo: function getDeviceInfo() {
+	            return { name: "", serialNumber: "" };
+	        },
+	        getMeasurePointInfo: function getMeasurePointInfo() {
+	            return {
+	                name: "",
+	                identifier: "",
+	                type: "1"
+	            };
+	        }
+	    };
 	}();
 
 /***/ },
@@ -21796,24 +21938,8 @@
 				}return obj;
 	}
 
-	var _defaultProperties = {
-				width: 1000,
-				height: 1000,
-				gridSize: 20,
-				scaleX: 1,
-				scaleY: 1,
-				zoomLevel: 1
-	};
-	var _getDefaultOperator = function _getDefaultOperator() {
-				return {
-							id: null, //selected element id
-							x: 100000,
-							y: 100000,
-							width: 10000,
-							height: 10000,
-							lineId: null //selected line id
-				};
-	};
+	var _defaultProperties = _Utility.DefaultValues.getSvgProperties();
+
 	/**
 	 * The States for the whole canvas
 	 * @param {} _defaultProperties
@@ -21857,6 +21983,9 @@
 													height: action.height,
 													gridSize: action.gridSize
 										});
+										break;
+							case _consts.SWITCH_SUB_PAPER:
+										newState = Object.assign({}, action.paper.svgProperties);
 										break;
 							default:
 										newState = state;
@@ -21907,6 +22036,9 @@
 										newState = Object.assign({}, state);
 										delete newState[action.id];
 										break;
+							case _consts.SWITCH_SUB_PAPER:
+										newState = Object.assign({}, action.paper.elements);
+										break;
 							default:
 										newState = state;
 				}
@@ -21954,11 +22086,14 @@
 													path: path
 										}));
 										break;
+							case _consts.SWITCH_SUB_PAPER:
+										return Object.assign({}, action.paper.links);
+										break;
 				}
 				return state;
 	};
 	var operator = function operator() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? { id: null, x: 10000, y: 10000, width: 10000, height: 10000, lineId: null } : arguments[0];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.DefaultValues.getOperator() : arguments[0];
 				var action = arguments[1];
 
 				switch (action.type) {
@@ -21973,7 +22108,7 @@
 										break;
 							case _consts.REMOVE_ELEMENT:
 							case _consts.SELECT_CANVAS:
-										return _getDefaultOperator();
+										return _Utility.DefaultValues.getOperator();
 										break;
 							case _consts.SELECT_ELEMENT:
 							case _consts.UPDATE_GEOMETRIC_DATA:
@@ -21987,6 +22122,9 @@
 										break;
 							case _consts.SELECT_LINE:
 										return Object.assign({}, state, { lineId: action.id });
+										break;
+							case _consts.SWITCH_SUB_PAPER:
+										return Object.assign({}, action.paper.operator);
 										break;
 							default:
 										return state;
@@ -22028,21 +22166,6 @@
 							return Array.from(arr);
 				}
 	}
-
-	var _getDefaultDeviceInfo = function _getDefaultDeviceInfo() {
-				return {
-							name: "",
-							serialNumber: ""
-				};
-	};
-
-	var _getDefaultMeasurePointInfo = function _getDefaultMeasurePointInfo() {
-				return {
-							name: "",
-							identifier: "",
-							type: "1"
-				};
-	};
 
 	//{selectedProperties:{},properties:{}}
 	var properties = function properties() {
@@ -22097,8 +22220,8 @@
 										} else {
 													selectedProperties = {
 																key: action.id,
-																deviceInfo: _getDefaultDeviceInfo(),
-																measurePointInfos: [_getDefaultMeasurePointInfo()],
+																deviceInfo: _Utility.DefaultValues.getDeviceInfo(),
+																measurePointInfos: [_Utility.DefaultValues.getMeasurePointInfo()],
 																geometricData: geometricData
 													};
 										}
@@ -22121,7 +22244,7 @@
 										selectedProperties = state.selectedProperties;
 										var measurePointInfos = selectedProperties.measurePointInfos;
 										selectedProperties = Object.assign({}, selectedProperties, {
-													measurePointInfos: [_getDefaultMeasurePointInfo()].concat(_toConsumableArray(measurePointInfos))
+													measurePointInfos: [_Utility.DefaultValues.getMeasurePointInfo()].concat(_toConsumableArray(measurePointInfos))
 										});
 										return Object.assign({}, state, { selectedProperties: selectedProperties });
 										break;
@@ -22157,6 +22280,62 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.selectedPaperId = exports.papers = undefined;
+
+	var _Utility = __webpack_require__(183);
+
+	var _consts = __webpack_require__(181);
+
+	function _defineProperty(obj, key, value) {
+	    if (key in obj) {
+	        Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+	    } else {
+	        obj[key] = value;
+	    }return obj;
+	}
+
+	var _papers = _Utility.DefaultValues.getDefaultPapers();
+	var _selectedPaperId = _Utility.DefaultValues.getDefaultSelectedPaperId(_papers);
+
+	var papers = function papers() {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _papers : arguments[0];
+	    var action = arguments[1];
+
+	    switch (action.type) {
+	        case _consts.CREATE_SUB_PAPGER:
+	            state = Object.assign({}, state, _defineProperty({}, action.paperId, _Utility.DefaultValues.generatePaper(action.paperId, action.paperName, action.paperType)));
+	            break;
+	        case _consts.DELETE_SUB_PAPGER:
+	            state = Object.assign({}, state);
+	            delete state[action.paperId];
+	            break;
+	    }
+	    return state;
+	};
+
+	var selectedPaperId = function selectedPaperId() {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _selectedPaperId : arguments[0];
+	    var action = arguments[1];
+
+	    switch (action.type) {
+	        case _consts.SWITCH_SUB_PAPER:
+	            return action.paper.key;
+	    }
+	    return state;
+	};
+
+	exports.papers = papers;
+	exports.selectedPaperId = selectedPaperId;
+
+/***/ },
+/* 187 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
@@ -22164,21 +22343,25 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Pallet = __webpack_require__(187);
+	var _Pallet = __webpack_require__(188);
 
 	var _Pallet2 = _interopRequireDefault(_Pallet);
 
-	var _Canvas = __webpack_require__(190);
+	var _Canvas = __webpack_require__(191);
 
 	var _Canvas2 = _interopRequireDefault(_Canvas);
 
-	var _Property = __webpack_require__(192);
+	var _Property = __webpack_require__(193);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _Toolbar = __webpack_require__(194);
+	var _Toolbar = __webpack_require__(195);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
+
+	var _Tabs = __webpack_require__(197);
+
+	var _Tabs2 = _interopRequireDefault(_Tabs);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22202,6 +22385,7 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "mid-col" },
+	        _react2.default.createElement(_Tabs2.default, null),
 	        _react2.default.createElement(_Canvas2.default, null)
 	      ),
 	      _react2.default.createElement(
@@ -22216,7 +22400,7 @@
 	exports.default = App;
 
 /***/ },
-/* 187 */
+/* 188 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22227,11 +22411,11 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Pallet = __webpack_require__(188);
+	var _Pallet = __webpack_require__(189);
 
 	var _Pallet2 = _interopRequireDefault(_Pallet);
 
-	var _actions = __webpack_require__(189);
+	var _actions = __webpack_require__(190);
 
 	var _Utility = __webpack_require__(183);
 
@@ -22259,7 +22443,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Pallet2.default);
 
 /***/ },
-/* 188 */
+/* 189 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22361,7 +22545,7 @@
 	exports.default = Pallet;
 
 /***/ },
-/* 189 */
+/* 190 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22369,7 +22553,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.deleteSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(181);
 
@@ -22566,19 +22750,33 @@
 	        type: _consts.UNDO_OPERATION
 	    };
 	};
-	var createSubPage = exports.createSubPage = function createSubPage() {
+	var createSubPage = exports.createSubPage = function createSubPage(_ref) {
+	    var name = _ref.name;
+	    var type = _ref.type;
+	    var key = _ref.key;
+
 	    return {
-	        type: _consts.CREATE_SUB_PAPGER
+	        type: _consts.CREATE_SUB_PAPGER,
+	        paperName: name,
+	        paperType: type,
+	        paperId: key
 	    };
 	};
-	var deleteSubPage = exports.deleteSubPage = function deleteSubPage() {
+	var switchSubPage = exports.switchSubPage = function switchSubPage(paper) {
 	    return {
-	        type: _consts.DELETE_SUB_PAPGER
+	        type: _consts.SWITCH_SUB_PAPER,
+	        paper: paper
+	    };
+	};
+	var deleteSubPage = exports.deleteSubPage = function deleteSubPage(paperId) {
+	    return {
+	        type: _consts.DELETE_SUB_PAPGER,
+	        paperId: paperId
 	    };
 	};
 
 /***/ },
-/* 190 */
+/* 191 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22589,13 +22787,13 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Canvas = __webpack_require__(191);
+	var _Canvas = __webpack_require__(192);
 
 	var _Canvas2 = _interopRequireDefault(_Canvas);
 
 	var _Utility = __webpack_require__(183);
 
-	var _actions = __webpack_require__(189);
+	var _actions = __webpack_require__(190);
 
 	var _consts = __webpack_require__(181);
 
@@ -22760,7 +22958,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Canvas2.default);
 
 /***/ },
-/* 191 */
+/* 192 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22931,7 +23129,7 @@
 	exports.default = Canvas;
 
 /***/ },
-/* 192 */
+/* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22942,11 +23140,11 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Property = __webpack_require__(193);
+	var _Property = __webpack_require__(194);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _actions = __webpack_require__(189);
+	var _actions = __webpack_require__(190);
 
 	var _consts = __webpack_require__(181);
 
@@ -23078,7 +23276,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Property2.default);
 
 /***/ },
-/* 193 */
+/* 194 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23399,58 +23597,88 @@
 	exports.default = Property;
 
 /***/ },
-/* 194 */
+/* 195 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-					value: true
+		value: true
 	});
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Toolbar = __webpack_require__(195);
+	var _Utility = __webpack_require__(183);
+
+	var _Toolbar = __webpack_require__(196);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _actions = __webpack_require__(189);
+	var _actions = __webpack_require__(190);
 
 	function _interopRequireDefault(obj) {
-					return obj && obj.__esModule ? obj : { default: obj };
+		return obj && obj.__esModule ? obj : { default: obj };
 	}
 
 	var mapStateToProps = function mapStateToProps(state) {
-					return state;
+		return {
+			selectedPaperId: state.selectedPaperId,
+			papers: state.papers
+		};
 	};
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
-					return {
-									onZoomIn: function onZoomIn(evt) {
-													dispatch((0, _actions.zoomIn)());
-									},
-									onZoomOut: function onZoomOut() {
-													dispatch((0, _actions.zoomOut)());
-									},
-									onRedo: function onRedo(event) {
-													dispatch((0, _actions.redo)());
-									},
-									onUndo: function onUndo(event) {
-													dispatch((0, _actions.undo)());
-									},
-									onCreateSubPage: function onCreateSubPage() {
-													dispatch((0, _actions.createSubPage)());
-									},
-									onDeleteSubPage: function onDeleteSubPage() {
-													dispatch((0, _actions.deleteSubPage)());
-									},
-									onSave: function onSave(event) {}
-					};
+		return {
+			onZoomIn: function onZoomIn(evt) {
+				dispatch((0, _actions.zoomIn)());
+			},
+			onZoomOut: function onZoomOut() {
+				dispatch((0, _actions.zoomOut)());
+			},
+			onRedo: function onRedo(event) {
+				dispatch((0, _actions.redo)());
+			},
+			onUndo: function onUndo(event) {
+				dispatch((0, _actions.undo)());
+			},
+			onCreateSubPage: function onCreateSubPage(event) {
+				var containerEle = event.target.parentElement.parentElement;
+				var overlayEle = containerEle.querySelector("div.dia-overlay");
+				overlayEle.style.display = "";
+			},
+			onSaveSubPage: function onSaveSubPage(event) {
+				var subCreateEle = event.target.parentElement.parentElement.parentElement;
+				var typeEle = subCreateEle.querySelector("select");
+				var nameEle = subCreateEle.querySelector("input[name=name]");
+				var idEle = subCreateEle.querySelector("input[name=identify]");
+				var name = nameEle.value;
+				if (!name) {
+					return;
+				}
+				var id = idEle.value;
+				if (!id) {
+					id = (0, _Utility.generateUUID)();
+				}
+
+				dispatch((0, _actions.createSubPage)({
+					name: name,
+					type: typeEle.value,
+					key: id
+				}));
+				subCreateEle.style.display = "none";
+				nameEle.value = "";
+				idEle.value = "";
+			},
+			onCancelSubPage: function onCancelSubPage(event) {
+				var overlayEle = event.target.parentElement.parentElement.parentElement;
+				overlayEle.style.display = "none";
+			}
+		};
 	};
 
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Toolbar2.default);
 
 /***/ },
-/* 195 */
+/* 196 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23472,46 +23700,236 @@
 	var Toolbar = function Toolbar(state) {
 	  return _react2.default.createElement(
 	    "div",
-	    { className: "dia-toolbar" },
+	    null,
 	    _react2.default.createElement(
-	      "button",
-	      { name: "zoomin", onClick: state.onZoomIn },
-	      "放大"
+	      "div",
+	      { className: "dia-toolbar" },
+	      _react2.default.createElement(
+	        "button",
+	        { name: "zoomin", onClick: state.onZoomIn },
+	        "放大"
+	      ),
+	      _react2.default.createElement(
+	        "button",
+	        { name: "zoomout", onClick: state.onZoomOut },
+	        "缩小"
+	      ),
+	      _react2.default.createElement(
+	        "button",
+	        { name: "redo", onClick: state.onRedo },
+	        "Redo"
+	      ),
+	      _react2.default.createElement(
+	        "button",
+	        { name: "undo", onClick: state.onUndo },
+	        "撤销"
+	      ),
+	      _react2.default.createElement(
+	        "button",
+	        { name: "creat_sub_page", onClick: state.onCreateSubPage },
+	        "创建子图"
+	      ),
+	      _react2.default.createElement(
+	        "button",
+	        { name: "delete_sub_page", onClick: state.onSave },
+	        "保存"
+	      )
 	    ),
 	    _react2.default.createElement(
-	      "button",
-	      { name: "zoomout", onClick: state.onZoomOut },
-	      "缩小"
-	    ),
-	    _react2.default.createElement(
-	      "button",
-	      { name: "redo", onClick: state.onRedo },
-	      "Redo"
-	    ),
-	    _react2.default.createElement(
-	      "button",
-	      { name: "undo", onClick: state.onUndo },
-	      "撤销"
-	    ),
-	    _react2.default.createElement(
-	      "button",
-	      { name: "creat_sub_page", onClick: state.onCreateSubPage },
-	      "创建子图"
-	    ),
-	    _react2.default.createElement(
-	      "button",
-	      { name: "delete_sub_page", onClick: state.onDeleteSubPage },
-	      "删除子图"
-	    ),
-	    _react2.default.createElement(
-	      "button",
-	      { name: "delete_sub_page", onClick: state.onSave },
-	      "保存"
+	      "div",
+	      { className: "dia-overlay", style: { display: 'none' } },
+	      _react2.default.createElement(
+	        "div",
+	        { className: "dia-sub-create" },
+	        _react2.default.createElement(
+	          "div",
+	          { className: "dia-center" },
+	          "创建子图"
+	        ),
+	        _react2.default.createElement(
+	          "ul",
+	          null,
+	          _react2.default.createElement(
+	            "li",
+	            { className: "dia-center" },
+	            _react2.default.createElement(
+	              "label",
+	              null,
+	              "类型"
+	            ),
+	            _react2.default.createElement(
+	              "select",
+	              { name: "page-type" },
+	              _react2.default.createElement(
+	                "option",
+	                { value: "1", defaultVaule: true },
+	                "普通页面"
+	              ),
+	              _react2.default.createElement(
+	                "option",
+	                { value: "2" },
+	                "二级页面"
+	              )
+	            )
+	          ),
+	          _react2.default.createElement(
+	            "li",
+	            { className: "dia-center" },
+	            _react2.default.createElement(
+	              "label",
+	              null,
+	              "名称"
+	            ),
+	            _react2.default.createElement("input", { type: "text", name: "name" })
+	          ),
+	          _react2.default.createElement(
+	            "li",
+	            { className: "dia-center" },
+	            _react2.default.createElement(
+	              "label",
+	              null,
+	              "id"
+	            ),
+	            _react2.default.createElement("input", { type: "text", name: "identify" })
+	          )
+	        ),
+	        _react2.default.createElement(
+	          "div",
+	          { className: "dia-center" },
+	          _react2.default.createElement(
+	            "button",
+	            { onClick: state.onSaveSubPage },
+	            "保存"
+	          ),
+	          _react2.default.createElement(
+	            "button",
+	            { onClick: state.onCancelSubPage },
+	            "取消"
+	          )
+	        )
+	      )
 	    )
 	  );
 	};
 
 	exports.default = Toolbar;
+
+/***/ },
+/* 197 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+					value: true
+	});
+
+	var _reactRedux = __webpack_require__(159);
+
+	var _Utility = __webpack_require__(183);
+
+	var _Tabs = __webpack_require__(198);
+
+	var _Tabs2 = _interopRequireDefault(_Tabs);
+
+	var _actions = __webpack_require__(190);
+
+	function _interopRequireDefault(obj) {
+					return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var mapStateToProps = function mapStateToProps(state) {
+					return {
+									selectedPaperId: state.selectedPaperId,
+									papers: state.papers
+					};
+	};
+	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
+					return {
+									deletePaper: function deletePaper(event) {
+													if (_Utility.StoreHelper.isLastPaper()) {
+																	return;
+													}
+													var paperId = event.target.parentElement.getAttribute("data-paper-id");
+													dispatch((0, _actions.deleteSubPage)(paperId));
+													var paper = _Utility.StoreHelper.getSelectedPaper();
+													dispatch((0, _actions.switchSubPage)(paper));
+									},
+									clickPaper: function clickPaper(event) {
+													var paperId = event.target.parentElement.getAttribute("data-paper-id");
+													if (paperId) {
+																	var paper = _Utility.StoreHelper.getSelectedPaper(paperId);
+																	_Utility.StoreHelper.storeData();
+																	dispatch((0, _actions.switchSubPage)(paper));
+													}
+									},
+									onDeleteSubPage: function onDeleteSubPage(event) {
+													dispatch((0, _actions.deleteSubPage)());
+									}
+					};
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Tabs2.default);
+
+/***/ },
+/* 198 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+			value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Utility = __webpack_require__(183);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Tab = function Tab(_ref) {
+			var paperId = _ref.paperId;
+			var paperName = _ref.paperName;
+			var paperType = _ref.paperType;
+			var deletePaper = _ref.deletePaper;
+			var selectPaper = _ref.selectPaper;
+			var isSelected = _ref.isSelected;
+			return _react2.default.createElement(
+					"div",
+					{ className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
+					_react2.default.createElement(
+							"span",
+							{ onClick: selectPaper },
+							paperName
+					),
+					_react2.default.createElement(
+							"span",
+							{ onClick: deletePaper },
+							"x"
+					)
+			);
+	};
+	var Tabs = function Tabs(data) {
+			return _react2.default.createElement(
+					"div",
+					{ className: "dia-tabs" },
+					Object.keys(data.papers).map(function (key) {
+							var paper = data.papers[key];
+							return _react2.default.createElement(Tab, {
+									key: (0, _Utility.generateUUID)(),
+									paperId: key,
+									paperName: paper.paperName,
+									paperType: paper.paperType,
+									deletePaper: data.deletePaper,
+									selectPaper: data.clickPaper,
+									isSelected: data.selectedPaperId === key ? true : false });
+					})
+			);
+	};
+
+	exports.default = Tabs;
 
 /***/ }
 /******/ ]);

@@ -93,3 +93,37 @@ g.link path{
 .line-operator{
     cursor: pointer;
 }
+.dia-overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ccc;
+    z-index: 999;
+}
+.dia-overlay .dia-sub-create{
+    width: 500px;
+    margin: 10% auto;
+    top: 50%;
+}
+.dia-center {
+    text-align: center;
+}
+.dia-tab{
+    display: inline-block;
+    padding: 6px;
+    border: 1px solid #666;
+    position: relative;
+}
+.dia-tab.selected{
+    border: 2px solid #000;
+}
+.dia-tab span{
+    cursor: pointer;
+}
+.dia-tab>span:last-child{
+    position:absolute;
+    right: -3px;
+    top: -3px;
+}

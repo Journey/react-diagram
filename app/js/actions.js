@@ -23,7 +23,8 @@ import {
     UNDO_OPERATION,
     CREATE_SUB_PAPGER,
     DELETE_SUB_PAPGER,
-    UPDATE_GEOMETRIC_DATA
+    UPDATE_GEOMETRIC_DATA,
+    SWITCH_SUB_PAPER
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -218,13 +219,23 @@ export const undo = () => {
 	type: UNDO_OPERATION
     };  
 };
-export const createSubPage = () => {
+export const createSubPage = ({name,type,key}) => {
     return {
-	type: CREATE_SUB_PAPGER
+	type: CREATE_SUB_PAPGER,
+	paperName: name,
+	paperType: type,
+	paperId: key
     };
 };
-export const deleteSubPage = () => {
+export const switchSubPage = (paper) => {
     return {
-	type: DELETE_SUB_PAPGER
+	type: SWITCH_SUB_PAPER,
+	paper: paper
+    };  
+};
+export const deleteSubPage = (paperId) => {
+    return {
+	type: DELETE_SUB_PAPGER,
+	paperId: paperId
     };
 };
