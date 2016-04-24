@@ -2,7 +2,11 @@ import {connect} from 'react-redux';
 import Property from "../components/Property.jsx";
 import {saveSvgProperties, saveElementProperties, addMeasurePoint,removeMeasurePoint,saveMeasurePointValue, updateElementGeometricData,updateLines} from "../actions";
 import {CANVAS,COMMON_ELEMENT} from "../consts";
+import {ElementHelper} from "../Utility";
 
+function _getElementType(event){
+    return event.target.getAttribute("data-element-type-id");
+}
 function _getSVGPropertiesByEvent(event){
     var containerElement = event.currentTarget.parentElement.parentElement;
     var widthEle = containerElement.querySelector("input[name=width]");
@@ -13,6 +17,21 @@ function _getSVGPropertiesByEvent(event){
 	height: heightEle.value,
 	gridSize: gridSizeEle.value
     };
+}
+
+function _getGeometricDataByEvent(event){
+    var containerElement = event.currentTarget.parentElement.parentElement;
+    var geometricElement = containerElement.querySelector("div.pro-geo-data");
+    var key = event.currentTarget.getAttribute("data-key");
+    var geometricData = {
+	id: key,
+	width: parseInt(geometricElement.querySelector("input[name=width]").value),
+	height: parseInt( geometricElement.querySelector("input[name=height]").value),
+	x: parseInt(geometricElement.querySelector("input[name=xAxies]").value),
+	y: parseInt(geometricElement.querySelector("input[name=yAxies]").value)
+    };
+
+    return geometricData;
 }
 
 function _getCommonElementPropertiesByEvent(event){
@@ -40,6 +59,31 @@ function _getCommonElementPropertiesByEvent(event){
 	y: parseInt(geometricElement.querySelector("input[name=yAxies]").value)
     };
     return {key,deviceInfo,measurePointInfos:measurePointInfoObject,geometricData:geometricData};
+}
+
+function _getTextElementPropertiesByEvent(event){
+    let key,text;
+    var containerElement = event.target.parentElement.parentElement;
+    var textElement = containerElement.querySelector("input[name=text]");
+    text = textElement.value;
+    key = textElement.getAttribute("data-element-key");
+    return {key,text};
+}
+function _getGroupElementPropertiesByEvent(event){
+    let key,bindingId;
+    var containerElement = event.target.parentElement.parentElement;
+    var textElement = containerElement.querySelector("input[name=binding-id]");
+    bindingId = textElement.value;
+    key = textElement.getAttribute("data-element-key");
+    return {key,bindingId};
+}
+function _getPlaceholderElementPropertiesByEvent(event){
+    let key, bindingId;
+    var containerElement = event.target.parentElement.parentElement;
+    var textElement = containerElement.querySelector("input[name=binding-id]");
+    bindingId = textElement.value;
+    key = textElement.getAttribute("data-element-key");
+    return {key,bindingId};
 }
 
 function getElementGeometricDataByEvent(event){
@@ -79,8 +123,11 @@ const mapDispatchtoProps = (dispatch) => {
 		break;
 	    case COMMON_ELEMENT:
 		//collect element properties
+		//todo:: if text element, sync text value
+		var elementType = _getElementType(event);
 		var elementProperties = _getCommonElementPropertiesByEvent(evt);
 		var geometricData = elementProperties.geometricData;
+		//save element by type
 		dispatch(saveElementProperties(elementProperties));
 		dispatch(updateElementGeometricData(geometricData.id,geometricData.width,geometricData.height,geometricData.x,geometricData.y));
 		setTimeout(()=>{

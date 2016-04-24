@@ -167,6 +167,7 @@ export const Position = (() => {
         }
     };
 })();
+
 /**
  * Line Helper. used to log some temp information for draw lines, and provide some helper operations
  * @returns {Object} Line Helper methods
@@ -314,6 +315,35 @@ export const RectHelper = (() => {
 })();
 
 /**
+ * Element Helper - used to determine the Special Elements. e.g. Text,PlaceHolder,GroupElement
+ */
+export const ElementHelper = (() => {
+    const TEXT_ID = 10;
+    const PLACE_HOLDER_ID = 11;
+    const GROUP = 12;
+    return {
+	isText: (eleTypeId) => {
+	    if(eleTypeId == TEXT_ID){
+		return true;
+	    }
+	    return false;
+	},
+	isPlaceHolder: (eleTypeId) => {
+	    if(eleTypeId == PLACE_HOLDER_ID){
+		return true;
+	    }
+	    return false;
+	},
+	isGroup: (eleTypeId) => {
+	    if(eleTypeId == GROUP){
+		return true;
+	    }
+	    return false;
+	}
+    };
+})();
+
+/**
  * the store helper used to access some informations in store. contains an referance to the redux golbal store
  * infromation
  */
@@ -338,6 +368,9 @@ export const StoreHelper = (() => {
     function _getPapers(){
 	return _store.getState().papers;
     }
+    function _getProperties() {
+	return _store.getState().properties;
+    }
     return {
         /**
          * the setting method to store
@@ -349,6 +382,9 @@ export const StoreHelper = (() => {
         getSvgProperties: () => {
             return _getSvgProperties();
         },
+	/**
+	 * sync paper data from active areas to the papers object
+	 */
 	storeData: () => {
 	    var _state = _store.getState();
 	    var _selectedPaperId = _state.selectedPaperId;
@@ -357,6 +393,19 @@ export const StoreHelper = (() => {
 	    paper.elements = _state.elements;
 	    paper.links = _state.links;
 	    paper.properties = _state.properties;
+	},
+	getElementProperties: (elementId) => {
+	    var properties = _getProperties();
+	    var elements = _getElements();
+	    var element = elements[elementId];
+	    var elementProperty = properties[elementId];
+	    var elementTypeId = element.id;
+	    if(elementProperty){
+		//todo::
+	    } else {
+		elementProperty= DefaultValues.getDefaultProperties(elementTypeId);
+	    }
+	    return elementProperty;
 	},
         getPalletElementInfoById: (iPalletelementid) => {
             var aGroups = _getPallets();
@@ -373,6 +422,19 @@ export const StoreHelper = (() => {
                     break;
                 }
             }
+	    if(ElementHelper.isText(iPalletelementid)){
+		retElement.text = "文字元素";
+		retElement.width = 100;
+		retElement.height = 20;
+	    } else if(ElementHelper.isGroup(iPalletelementid)){
+		retElement.bindingId = "";
+		
+	    } else if(ElementHelper.isPlaceHolder(iPalletelementid)){
+		retElement.text = "没有值";
+		retElement.width = 100;
+		retElement.height = 20;
+		retElement.bindingId = "";
+	    }
             return Object.assign({}, retElement);
         },
         getCanvasElmentInfoById: (sElementId) => {
@@ -454,7 +516,10 @@ export const StoreHelper = (() => {
 		return false;
 	    }
 	    return true;
-	}
+	},
+        getPapers: () => {
+            return _getPapers();
+        }
     };
 })();
 
@@ -494,8 +559,9 @@ export const DefaultValues = (() => {
 		};
 	    };
 	})(),
-	generatePaper: (paperId,paperName,paperType)=>{
+	generatePaper: (uuid,paperId,paperName,paperType)=>{
 	    return {
+                uuid: uuid,
 		key: paperId,
 		paperName: paperName,
 		paperType: paperType,
@@ -529,6 +595,32 @@ export const DefaultValues = (() => {
 		    [defaultPaper.key]: defaultPaper
 		}
 	    };
+	},
+        getDefaultTextProperties: () => {
+            return {text:"文字元素"};
+        },
+        getDefaultGroupProperties: () => {
+            return {bindingId:""};
+        },
+        getDefaultPlaceholderProperties: () => {
+            return {bindingId:""};
+        },
+	getDefaultProperties: (elementTypeId) => {
+	    let _oProperties;
+	    if(ElementHelper.isText(elementTypeId)){
+		_oProperties = DefaultValues.getDefaultTextProperties();
+	    } else if(ElementHelper.isGroup(elementTypeId)){
+		_oProperties = DefaultValues.getDefaultGroupProperties();
+	    } else if(ElementHelper.isPlaceHolder(elementTypeId)){
+		_oProperties = DefaultValues.getDefaultPlaceholderProperties();
+	    } else {
+		_oProperties = {
+		    deviceInfo: DefaultValues.getDeviceInfo(),
+		    measurePointInfos: [DefaultValues.getMeasurePointInfo()]
+		};
+	    }
+	    _oProperties.elementTypeId = elementTypeId;
+	    return _oProperties;
 	},
 	getPalletDatas: ()=>{
 	    //todo::

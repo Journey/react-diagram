@@ -1,6 +1,9 @@
 import React from 'react';
 import {CANVAS,COMMON_ELEMENT} from "../consts";
-import {generateUUID} from "../Utility";
+import {generateUUID,ElementHelper} from "../Utility";
+import {TextProperties} from "./TextElement.jsx";
+import {PlaceholderProperties} from "./PlaceHolder.jsx";
+import {GroupProperties} from "./GroupElement.jsx";
 const SVGProperties = ({width,height,gridSize}) =>{
   return (
   <div>
@@ -100,16 +103,6 @@ const CommonElement = ({geometricData,elementKey, deviceInfo, measurePointInfos,
   )
 };
 
-const TextProperties = (key,text) => {
-  return (
-    <div className="pro-text">
-      <div className="pro-row">
-	<label>文字</label>
-	<input type="text" value={text}/>
-      </div>
-    </div>
-  )
-};
 const PropertyFactory = (state) => {
   switch(state.type){
     case CANVAS:
@@ -118,9 +111,32 @@ const PropertyFactory = (state) => {
       )
       break;
     case COMMON_ELEMENT:
-      return (
-	<CommonElement key={generateUUID()} elementKey={state.selectedProperties.key} {...state.selectedProperties} onAddMeasurePoint={state.onAddMeasurePoint} onRemoveMeasurePoint={state.onRemoveMeasurePoint} onMeasurePointValueChange={state.onMeasurePointValueChange} onGeometricDataChange={state.onGeometricDataChange}></CommonElement>
-      )
+      let elementTypeId = state.selectedProperties.elementTypeId;
+      if(ElementHelper.isText(elementTypeId)){
+	return (
+	  <div>
+	    <GeometricDataElement key={generateUUID()} {...state.selectedProperties.geometricData} onGeometricDataChange={state.onGeometricDataChange}/>
+	    <TextProperties key={generateUUID()} elementKey={state.selectedProperties.key} {...state.selectedProperties}/>
+	</div>)
+      } else if(ElementHelper.isGroup(elementTypeId)){
+	return (
+	  <div>
+	    <GeometricDataElement key={generateUUID()} {...state.selectedProperties.geometricData} onGeometricDataChange={state.onGeometricDataChange} onGeometricDataChange={state.onGeometricDataChange}/>
+	    <GroupProperties key={generateUUID()} elementKey={state.selectedProperties.key} {...state.selectedProperties}/>
+	  </div>
+	)
+      } else if(ElementHelper.isPlaceHolder(elementTypeId)){
+	return (
+	  <div>
+	    <GeometricDataElement key={generateUUID()} {...state.selectedProperties.geometricData} onGeometricDataChange={state.onGeometricDataChange}/>
+	  <PlaceholderProperties  key={generateUUID()} elementKey={state.selectedProperties.key} {...state.selectedProperties}/>
+	  </div>
+	)
+      } else {
+	return (
+	  <CommonElement key={generateUUID()} elementKey={state.selectedProperties.key} {...state.selectedProperties} onAddMeasurePoint={state.onAddMeasurePoint} onRemoveMeasurePoint={state.onRemoveMeasurePoint} onMeasurePointValueChange={state.onMeasurePointValueChange} onGeometricDataChange={state.onGeometricDataChange}></CommonElement>
+	)
+      }
       break;
     default:
       return <div>empty</div>
@@ -132,7 +148,7 @@ const Property = (state) =>(
     <div>
       {PropertyFactory(state)}
       <div className="align-center">
-	<input type="button" onClick={state.onSave} data-key={state.key} data-selected-type={state.type} value="保存" />
+	<input type="button" data-element-type-id={state.selectedProperties.elementTypeId} onClick={state.onSave} data-key={state.key} data-selected-type={state.type} value="保存" />
       </div>
     </div>
     <div className="dia-map-navigator">

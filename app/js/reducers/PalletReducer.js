@@ -29,6 +29,26 @@ let _defaultGroups = [
 		image:"css/3.jpg",
 		width: 50,
 		height: 50
+	    },
+		  {
+		id:10,
+		name:"text",
+		image:"css/3.jpg",
+		width: 50,
+		height: 50
+		  },
+		  {
+		id:11,
+		name:"place holder",
+		image:"css/3.jpg",
+		width: 50,
+		height: 50
+		  },{
+		id:12,
+		name:"group",
+		image:"css/3.jpg",
+		width: 50,
+		height: 50
 	    }]
 	}
     ];

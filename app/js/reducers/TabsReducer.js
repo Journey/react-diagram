@@ -10,7 +10,7 @@ const papers = (state = _papers, action) => {
     switch(action.type){
     case CREATE_SUB_PAPGER:
 	state = Object.assign({},state,{
-	    [action.paperId]: DefaultValues.generatePaper(action.paperId,action.paperName,action.paperType)
+	    [action.paperId]: DefaultValues.generatePaper(action.uuid,action.paperId,action.paperName,action.paperType)
 	});
 	break;
     case DELETE_SUB_PAPGER:

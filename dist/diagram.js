@@ -21300,6 +21300,24 @@
 			image: "css/3.jpg",
 			width: 50,
 			height: 50
+		}, {
+			id: 10,
+			name: "text",
+			image: "css/3.jpg",
+			width: 50,
+			height: 50
+		}, {
+			id: 11,
+			name: "place holder",
+			image: "css/3.jpg",
+			width: 50,
+			height: 50
+		}, {
+			id: 12,
+			name: "group",
+			image: "css/3.jpg",
+			width: 50,
+			height: 50
 		}]
 	}];
 	/**
@@ -21327,7 +21345,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.DefaultValues = exports.StoreHelper = exports.RectHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
+	exports.DefaultValues = exports.StoreHelper = exports.ElementHelper = exports.RectHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
 
 	var _slicedToArray = function () {
 	    function sliceIterator(arr, i) {
@@ -21523,6 +21541,7 @@
 	        }
 	    };
 	}();
+
 	/**
 	 * Line Helper. used to log some temp information for draw lines, and provide some helper operations
 	 * @returns {Object} Line Helper methods
@@ -21681,6 +21700,35 @@
 	}();
 
 	/**
+	 * Element Helper - used to determine the Special Elements. e.g. Text,PlaceHolder,GroupElement
+	 */
+	var ElementHelper = exports.ElementHelper = function () {
+	    var TEXT_ID = 10;
+	    var PLACE_HOLDER_ID = 11;
+	    var GROUP = 12;
+	    return {
+	        isText: function isText(eleTypeId) {
+	            if (eleTypeId == TEXT_ID) {
+	                return true;
+	            }
+	            return false;
+	        },
+	        isPlaceHolder: function isPlaceHolder(eleTypeId) {
+	            if (eleTypeId == PLACE_HOLDER_ID) {
+	                return true;
+	            }
+	            return false;
+	        },
+	        isGroup: function isGroup(eleTypeId) {
+	            if (eleTypeId == GROUP) {
+	                return true;
+	            }
+	            return false;
+	        }
+	    };
+	}();
+
+	/**
 	 * the store helper used to access some informations in store. contains an referance to the redux golbal store
 	 * infromation
 	 */
@@ -21705,6 +21753,9 @@
 	    function _getPapers() {
 	        return _store.getState().papers;
 	    }
+	    function _getProperties() {
+	        return _store.getState().properties;
+	    }
 	    return {
 	        /**
 	         * the setting method to store
@@ -21716,6 +21767,9 @@
 	        getSvgProperties: function getSvgProperties() {
 	            return _getSvgProperties();
 	        },
+	        /**
+	         * sync paper data from active areas to the papers object
+	         */
 	        storeData: function storeData() {
 	            var _state = _store.getState();
 	            var _selectedPaperId = _state.selectedPaperId;
@@ -21724,6 +21778,19 @@
 	            paper.elements = _state.elements;
 	            paper.links = _state.links;
 	            paper.properties = _state.properties;
+	        },
+	        getElementProperties: function getElementProperties(elementId) {
+	            var properties = _getProperties();
+	            var elements = _getElements();
+	            var element = elements[elementId];
+	            var elementProperty = properties[elementId];
+	            var elementTypeId = element.id;
+	            if (elementProperty) {
+	                //todo::
+	            } else {
+	                    elementProperty = DefaultValues.getDefaultProperties(elementTypeId);
+	                }
+	            return elementProperty;
 	        },
 	        getPalletElementInfoById: function getPalletElementInfoById(iPalletelementid) {
 	            var aGroups = _getPallets();
@@ -21739,6 +21806,18 @@
 	                if (retElement) {
 	                    break;
 	                }
+	            }
+	            if (ElementHelper.isText(iPalletelementid)) {
+	                retElement.text = "文字元素";
+	                retElement.width = 100;
+	                retElement.height = 20;
+	            } else if (ElementHelper.isGroup(iPalletelementid)) {
+	                retElement.bindingId = "";
+	            } else if (ElementHelper.isPlaceHolder(iPalletelementid)) {
+	                retElement.text = "没有值";
+	                retElement.width = 100;
+	                retElement.height = 20;
+	                retElement.bindingId = "";
 	            }
 	            return Object.assign({}, retElement);
 	        },
@@ -21825,6 +21904,9 @@
 	                return false;
 	            }
 	            return true;
+	        },
+	        getPapers: function getPapers() {
+	            return _getPapers();
 	        }
 	    };
 	}();
@@ -21865,8 +21947,9 @@
 	                };
 	            };
 	        }(),
-	        generatePaper: function generatePaper(paperId, paperName, paperType) {
+	        generatePaper: function generatePaper(uuid, paperId, paperName, paperType) {
 	            return {
+	                uuid: uuid,
 	                key: paperId,
 	                paperName: paperName,
 	                paperType: paperType,
@@ -21896,6 +21979,32 @@
 	                operator: operator,
 	                papers: _defineProperty({}, defaultPaper.key, defaultPaper)
 	            };
+	        },
+	        getDefaultTextProperties: function getDefaultTextProperties() {
+	            return { text: "文字元素" };
+	        },
+	        getDefaultGroupProperties: function getDefaultGroupProperties() {
+	            return { bindingId: "" };
+	        },
+	        getDefaultPlaceholderProperties: function getDefaultPlaceholderProperties() {
+	            return { bindingId: "" };
+	        },
+	        getDefaultProperties: function getDefaultProperties(elementTypeId) {
+	            var _oProperties = void 0;
+	            if (ElementHelper.isText(elementTypeId)) {
+	                _oProperties = DefaultValues.getDefaultTextProperties();
+	            } else if (ElementHelper.isGroup(elementTypeId)) {
+	                _oProperties = DefaultValues.getDefaultGroupProperties();
+	            } else if (ElementHelper.isPlaceHolder(elementTypeId)) {
+	                _oProperties = DefaultValues.getDefaultPlaceholderProperties();
+	            } else {
+	                _oProperties = {
+	                    deviceInfo: DefaultValues.getDeviceInfo(),
+	                    measurePointInfos: [DefaultValues.getMeasurePointInfo()]
+	                };
+	            }
+	            _oProperties.elementTypeId = elementTypeId;
+	            return _oProperties;
 	        },
 	        getPalletDatas: function getPalletDatas() {
 	            //todo::
@@ -22038,6 +22147,10 @@
 										break;
 							case _consts.SWITCH_SUB_PAPER:
 										newState = Object.assign({}, action.paper.elements);
+										break;
+							case _consts.SAVE_ELEMENT_PROPERTIES:
+										debugger;
+										return state;
 										break;
 							default:
 										newState = state;
@@ -22207,23 +22320,14 @@
 													y: selectedElement.y
 										};
 										if (selectedProperties) {
-													var newDeviceInfo = Object.assign(selectedProperties.deviceInfo);
-													var newMeasurePointInfos = selectedProperties.measurePointInfos.map(function (info) {
-																return Object.assign({}, info);
+													selectedProperties = Object.assign({}, _Utility.StoreHelper.getElementProperties(action.id), {
+																geometricData: geometricData
 													});
-													selectedProperties = {
-																key: action.id,
-																deviceInfo: newDeviceInfo,
-																measurePointInfos: newMeasurePointInfos,
-																geometricData: geometricData
-													};
 										} else {
-													selectedProperties = {
+													selectedProperties = Object.assign({}, _Utility.StoreHelper.getElementProperties(action.id), {
 																key: action.id,
-																deviceInfo: _Utility.DefaultValues.getDeviceInfo(),
-																measurePointInfos: [_Utility.DefaultValues.getMeasurePointInfo()],
 																geometricData: geometricData
-													};
+													});
 										}
 										return Object.assign({}, state, { selectedProperties: selectedProperties, type: _consts.COMMON_ELEMENT });
 										break;
@@ -22305,7 +22409,7 @@
 
 	    switch (action.type) {
 	        case _consts.CREATE_SUB_PAPGER:
-	            state = Object.assign({}, state, _defineProperty({}, action.paperId, _Utility.DefaultValues.generatePaper(action.paperId, action.paperName, action.paperType)));
+	            state = Object.assign({}, state, _defineProperty({}, action.paperId, _Utility.DefaultValues.generatePaper(action.uuid, action.paperId, action.paperName, action.paperType)));
 	            break;
 	        case _consts.DELETE_SUB_PAPGER:
 	            state = Object.assign({}, state);
@@ -22351,15 +22455,15 @@
 
 	var _Canvas2 = _interopRequireDefault(_Canvas);
 
-	var _Property = __webpack_require__(193);
+	var _Property = __webpack_require__(196);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _Toolbar = __webpack_require__(195);
+	var _Toolbar = __webpack_require__(198);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _Tabs = __webpack_require__(197);
+	var _Tabs = __webpack_require__(200);
 
 	var _Tabs2 = _interopRequireDefault(_Tabs);
 
@@ -22754,12 +22858,14 @@
 	    var name = _ref.name;
 	    var type = _ref.type;
 	    var key = _ref.key;
+	    var uuid = _ref.uuid;
 
 	    return {
 	        type: _consts.CREATE_SUB_PAPGER,
 	        paperName: name,
 	        paperType: type,
-	        paperId: key
+	        paperId: key,
+	        uuid: uuid
 	    };
 	};
 	var switchSubPage = exports.switchSubPage = function switchSubPage(paper) {
@@ -22977,6 +23083,18 @@
 
 	var _Utility = __webpack_require__(183);
 
+	var _TextElement = __webpack_require__(193);
+
+	var _TextElement2 = _interopRequireDefault(_TextElement);
+
+	var _PlaceHolder = __webpack_require__(194);
+
+	var _PlaceHolder2 = _interopRequireDefault(_PlaceHolder);
+
+	var _GroupElement = __webpack_require__(195);
+
+	var _GroupElement2 = _interopRequireDefault(_GroupElement);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var MagnetPorts = function MagnetPorts(_ref) {
@@ -23116,7 +23234,16 @@
 	          { className: "elements" },
 	          Object.keys(data.elements).map(function (key) {
 	            var properties = data.elements[key];
-	            return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown }));
+	            var elementType = properties.id;
+	            if (_Utility.ElementHelper.isText(elementType)) {
+	              return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+	            } else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
+	              return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+	            } else if (_Utility.ElementHelper.isGroup(elementType)) {
+	              return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+	            } else {
+	              return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown }));
+	            }
 	          })
 	        ),
 	        _react2.default.createElement(ElementOperator, _extends({ key: (0, _Utility.generateUUID)() }, data.operator, { onRemoveClick: data.removeElement })),
@@ -23135,12 +23262,220 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.TextProperties = undefined;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Utility = __webpack_require__(183);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var TextElement = function TextElement(_ref) {
+	  var id = _ref.id;
+	  var typeId = _ref.typeId;
+	  var x = _ref.x;
+	  var y = _ref.y;
+	  var text = _ref.text;
+	  var width = _ref.width;
+	  var height = _ref.height;
+	  var dbClick = _ref.dbClick;
+	  var dragElementStart = _ref.dragElementStart;
+
+	  return _react2.default.createElement(
+	    "g",
+	    { className: "ca-element text-element", transform: "translate(" + x + "," + y + ")" },
+	    _react2.default.createElement(
+	      "g",
+	      { draggable: "true", "data-type": typeId, onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
+	      _react2.default.createElement(
+	        "g",
+	        { className: "ca-text" },
+	        _react2.default.createElement(
+	          "text",
+	          { x: "0", y: "0" },
+	          text
+	        )
+	      )
+	    )
+	  );
+	};
+
+	var TextProperties = exports.TextProperties = function TextProperties(_ref2) {
+	  var key = _ref2.key;
+	  var text = _ref2.text;
+
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "pro-text" },
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "文字"
+	      ),
+	      _react2.default.createElement("input", { name: "text", "data-element-key": key, type: "text", defaultValue: text })
+	    )
+	  );
+	};
+
+	exports.default = TextElement;
+
+/***/ },
+/* 194 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.PlaceholderProperties = undefined;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Utility = __webpack_require__(183);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var PlaceholderElement = function PlaceholderElement(_ref) {
+	  var id = _ref.id;
+	  var typeId = _ref.typeId;
+	  var x = _ref.x;
+	  var y = _ref.y;
+	  var text = _ref.text;
+	  var width = _ref.width;
+	  var height = _ref.height;
+	  var dbClick = _ref.dbClick;
+	  var dragElementStart = _ref.dragElementStart;
+
+	  return _react2.default.createElement(
+	    "g",
+	    { className: "ca-element placeholder-element", transform: "translate(" + x + "," + y + ")" },
+	    _react2.default.createElement(
+	      "g",
+	      { draggable: "true", "data-type": typeId, onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
+	      _react2.default.createElement(
+	        "g",
+	        { className: "ca-text" },
+	        _react2.default.createElement(
+	          "text",
+	          { x: "0", y: "0" },
+	          text
+	        )
+	      )
+	    )
+	  );
+	};
+
+	var PlaceholderProperties = exports.PlaceholderProperties = function PlaceholderProperties(_ref2) {
+	  var key = _ref2.key;
+	  var bindingId = _ref2.bindingId;
+
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "pro-placeholder" },
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "id"
+	      ),
+	      _react2.default.createElement("input", { name: "binding-id", "data-element-key": key, type: "text", defaultValue: bindingId })
+	    )
+	  );
+	};
+
+	exports.default = PlaceholderElement;
+
+/***/ },
+/* 195 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.GroupProperties = undefined;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Utility = __webpack_require__(183);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var GroupElement = function GroupElement(_ref) {
+	  var id = _ref.id;
+	  var typeId = _ref.typeId;
+	  var x = _ref.x;
+	  var y = _ref.y;
+	  var width = _ref.width;
+	  var height = _ref.height;
+	  var dbClick = _ref.dbClick;
+	  var dragElementStart = _ref.dragElementStart;
+
+	  return _react2.default.createElement(
+	    "g",
+	    { className: "ca-element group-element", transform: "translate(" + x + "," + y + ")" },
+	    _react2.default.createElement(
+	      "g",
+	      { draggable: "true", "data-type": typeId, onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
+	      _react2.default.createElement(
+	        "g",
+	        { className: "ca-border" },
+	        _react2.default.createElement("rect", { width: width + 2, height: height + 2 })
+	      )
+	    )
+	  );
+	};
+
+	var GroupProperties = exports.GroupProperties = function GroupProperties(_ref2) {
+	  var key = _ref2.key;
+	  var bindingId = _ref2.bindingId;
+
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "pro-group" },
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "id"
+	      ),
+	      _react2.default.createElement("input", { name: "binding-id", "data-element-key": key, type: "text", defaultValue: bindingId })
+	    )
+	  );
+	};
+
+	exports.default = GroupElement;
+
+/***/ },
+/* 196 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
 					value: true
 	});
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Property = __webpack_require__(194);
+	var _Property = __webpack_require__(197);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
@@ -23148,10 +23483,15 @@
 
 	var _consts = __webpack_require__(181);
 
+	var _Utility = __webpack_require__(183);
+
 	function _interopRequireDefault(obj) {
 					return obj && obj.__esModule ? obj : { default: obj };
 	}
 
+	function _getElementType(event) {
+					return event.target.getAttribute("data-element-type-id");
+	}
 	function _getSVGPropertiesByEvent(event) {
 					var containerElement = event.currentTarget.parentElement.parentElement;
 					var widthEle = containerElement.querySelector("input[name=width]");
@@ -23162,6 +23502,21 @@
 									height: heightEle.value,
 									gridSize: gridSizeEle.value
 					};
+	}
+
+	function _getGeometricDataByEvent(event) {
+					var containerElement = event.currentTarget.parentElement.parentElement;
+					var geometricElement = containerElement.querySelector("div.pro-geo-data");
+					var key = event.currentTarget.getAttribute("data-key");
+					var geometricData = {
+									id: key,
+									width: parseInt(geometricElement.querySelector("input[name=width]").value),
+									height: parseInt(geometricElement.querySelector("input[name=height]").value),
+									x: parseInt(geometricElement.querySelector("input[name=xAxies]").value),
+									y: parseInt(geometricElement.querySelector("input[name=yAxies]").value)
+					};
+
+					return geometricData;
 	}
 
 	function _getCommonElementPropertiesByEvent(event) {
@@ -23189,6 +23544,34 @@
 									y: parseInt(geometricElement.querySelector("input[name=yAxies]").value)
 					};
 					return { key: key, deviceInfo: deviceInfo, measurePointInfos: measurePointInfoObject, geometricData: geometricData };
+	}
+
+	function _getTextElementPropertiesByEvent(event) {
+					var key = void 0,
+					    text = void 0;
+					var containerElement = event.target.parentElement.parentElement;
+					var textElement = containerElement.querySelector("input[name=text]");
+					text = textElement.value;
+					key = textElement.getAttribute("data-element-key");
+					return { key: key, text: text };
+	}
+	function _getGroupElementPropertiesByEvent(event) {
+					var key = void 0,
+					    bindingId = void 0;
+					var containerElement = event.target.parentElement.parentElement;
+					var textElement = containerElement.querySelector("input[name=binding-id]");
+					bindingId = textElement.value;
+					key = textElement.getAttribute("data-element-key");
+					return { key: key, bindingId: bindingId };
+	}
+	function _getPlaceholderElementPropertiesByEvent(event) {
+					var key = void 0,
+					    bindingId = void 0;
+					var containerElement = event.target.parentElement.parentElement;
+					var textElement = containerElement.querySelector("input[name=binding-id]");
+					bindingId = textElement.value;
+					key = textElement.getAttribute("data-element-key");
+					return { key: key, bindingId: bindingId };
 	}
 
 	function getElementGeometricDataByEvent(event) {
@@ -23234,8 +23617,11 @@
 																					break;
 																	case _consts.COMMON_ELEMENT:
 																					//collect element properties
+																					//todo:: if text element, sync text value
+																					var elementType = _getElementType(event);
 																					var elementProperties = _getCommonElementPropertiesByEvent(evt);
 																					var geometricData = elementProperties.geometricData;
+																					//save element by type
 																					dispatch((0, _actions.saveElementProperties)(elementProperties));
 																					dispatch((0, _actions.updateElementGeometricData)(geometricData.id, geometricData.width, geometricData.height, geometricData.x, geometricData.y));
 																					setTimeout(function () {
@@ -23276,7 +23662,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Property2.default);
 
 /***/ },
-/* 194 */
+/* 197 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23295,7 +23681,15 @@
 
 	var _Utility = __webpack_require__(183);
 
+	var _TextElement = __webpack_require__(193);
+
+	var _PlaceHolder = __webpack_require__(194);
+
+	var _GroupElement = __webpack_require__(195);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 	var SVGProperties = function SVGProperties(_ref) {
 	  var width = _ref.width;
@@ -23543,29 +23937,37 @@
 	  );
 	};
 
-	var TextProperties = function TextProperties(key, text) {
-	  return _react2.default.createElement(
-	    "div",
-	    { className: "pro-text" },
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-row" },
-	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "文字"
-	      ),
-	      _react2.default.createElement("input", { type: "text", value: text })
-	    )
-	  );
-	};
 	var PropertyFactory = function PropertyFactory(state) {
 	  switch (state.type) {
 	    case _consts.CANVAS:
 	      return _react2.default.createElement(SVGProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties));
 	      break;
 	    case _consts.COMMON_ELEMENT:
-	      return _react2.default.createElement(CommonElement, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties, { onAddMeasurePoint: state.onAddMeasurePoint, onRemoveMeasurePoint: state.onRemoveMeasurePoint, onMeasurePointValueChange: state.onMeasurePointValueChange, onGeometricDataChange: state.onGeometricDataChange }));
+	      var elementTypeId = state.selectedProperties.elementTypeId;
+	      if (_Utility.ElementHelper.isText(elementTypeId)) {
+	        return _react2.default.createElement(
+	          "div",
+	          null,
+	          _react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties.geometricData, { onGeometricDataChange: state.onGeometricDataChange })),
+	          _react2.default.createElement(_TextElement.TextProperties, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties))
+	        );
+	      } else if (_Utility.ElementHelper.isGroup(elementTypeId)) {
+	        return _react2.default.createElement(
+	          "div",
+	          null,
+	          _react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties.geometricData, _defineProperty({ onGeometricDataChange: state.onGeometricDataChange }, "onGeometricDataChange", state.onGeometricDataChange))),
+	          _react2.default.createElement(_GroupElement.GroupProperties, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties))
+	        );
+	      } else if (_Utility.ElementHelper.isPlaceHolder(elementTypeId)) {
+	        return _react2.default.createElement(
+	          "div",
+	          null,
+	          _react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties.geometricData, { onGeometricDataChange: state.onGeometricDataChange })),
+	          _react2.default.createElement(_PlaceHolder.PlaceholderProperties, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties))
+	        );
+	      } else {
+	        return _react2.default.createElement(CommonElement, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties, { onAddMeasurePoint: state.onAddMeasurePoint, onRemoveMeasurePoint: state.onRemoveMeasurePoint, onMeasurePointValueChange: state.onMeasurePointValueChange, onGeometricDataChange: state.onGeometricDataChange }));
+	      }
 	      break;
 	    default:
 	      return _react2.default.createElement(
@@ -23587,7 +23989,7 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "align-center" },
-	        _react2.default.createElement("input", { type: "button", onClick: state.onSave, "data-key": state.key, "data-selected-type": state.type, value: "保存" })
+	        _react2.default.createElement("input", { type: "button", "data-element-type-id": state.selectedProperties.elementTypeId, onClick: state.onSave, "data-key": state.key, "data-selected-type": state.type, value: "保存" })
 	      )
 	    ),
 	    _react2.default.createElement("div", { className: "dia-map-navigator" })
@@ -23597,7 +23999,7 @@
 	exports.default = Property;
 
 /***/ },
-/* 195 */
+/* 198 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23610,7 +24012,7 @@
 
 	var _Utility = __webpack_require__(183);
 
-	var _Toolbar = __webpack_require__(196);
+	var _Toolbar = __webpack_require__(199);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
@@ -23655,14 +24057,16 @@
 					return;
 				}
 				var id = idEle.value;
+				var uuid = (0, _Utility.generateUUID)();
 				if (!id) {
-					id = (0, _Utility.generateUUID)();
+					id = uuid;
 				}
 
 				dispatch((0, _actions.createSubPage)({
 					name: name,
 					type: typeEle.value,
-					key: id
+					key: id,
+					uuid: uuid
 				}));
 				subCreateEle.style.display = "none";
 				nameEle.value = "";
@@ -23671,6 +24075,11 @@
 			onCancelSubPage: function onCancelSubPage(event) {
 				var overlayEle = event.target.parentElement.parentElement.parentElement;
 				overlayEle.style.display = "none";
+			},
+			onSave: function onSave(event) {
+				_Utility.StoreHelper.storeData();
+				//console.log(JSON.stringify(StoreHelper.getPapers()));
+				console.log(_Utility.StoreHelper.getPapers());
 			}
 		};
 	};
@@ -23678,7 +24087,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Toolbar2.default);
 
 /***/ },
-/* 196 */
+/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23815,7 +24224,7 @@
 	exports.default = Toolbar;
 
 /***/ },
-/* 197 */
+/* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23828,7 +24237,7 @@
 
 	var _Utility = __webpack_require__(183);
 
-	var _Tabs = __webpack_require__(198);
+	var _Tabs = __webpack_require__(201);
 
 	var _Tabs2 = _interopRequireDefault(_Tabs);
 
@@ -23854,6 +24263,7 @@
 													dispatch((0, _actions.deleteSubPage)(paperId));
 													var paper = _Utility.StoreHelper.getSelectedPaper();
 													dispatch((0, _actions.switchSubPage)(paper));
+													dispatch((0, _actions.selectCanvas)());
 									},
 									clickPaper: function clickPaper(event) {
 													var paperId = event.target.parentElement.getAttribute("data-paper-id");
@@ -23861,6 +24271,7 @@
 																	var paper = _Utility.StoreHelper.getSelectedPaper(paperId);
 																	_Utility.StoreHelper.storeData();
 																	dispatch((0, _actions.switchSubPage)(paper));
+																	dispatch((0, _actions.selectCanvas)());
 													}
 									},
 									onDeleteSubPage: function onDeleteSubPage(event) {
@@ -23872,7 +24283,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Tabs2.default);
 
 /***/ },
-/* 198 */
+/* 201 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

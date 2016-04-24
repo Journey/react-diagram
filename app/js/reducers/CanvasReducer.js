@@ -19,7 +19,8 @@ import {
     CREATE_SUB_PAPGER,
     DELETE_SUB_PAPGER,
     UPDATE_GEOMETRIC_DATA,
-    SWITCH_SUB_PAPER
+    SWITCH_SUB_PAPER,
+    SAVE_ELEMENT_PROPERTIES
 } from "../consts";
 import {generateUUID, StoreHelper, LineHelper,DefaultValues} from "../Utility";
 let _defaultProperties = DefaultValues.getSvgProperties();
@@ -116,6 +117,10 @@ const elements = (state={},action) => {
 	break;
     case SWITCH_SUB_PAPER:
 	newState = Object.assign({},action.paper.elements);
+	break;
+    case SAVE_ELEMENT_PROPERTIES:
+	debugger;
+	return state;
 	break;
     default:
 	newState = state;

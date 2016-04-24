@@ -219,12 +219,13 @@ export const undo = () => {
 	type: UNDO_OPERATION
     };  
 };
-export const createSubPage = ({name,type,key}) => {
+export const createSubPage = ({name,type,key,uuid}) => {
     return {
 	type: CREATE_SUB_PAPGER,
 	paperName: name,
 	paperType: type,
-	paperId: key
+	paperId: key,
+	uuid: uuid
     };
 };
 export const switchSubPage = (paper) => {

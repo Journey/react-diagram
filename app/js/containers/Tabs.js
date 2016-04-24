@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 import {generateUUID,StoreHelper} from "../Utility";
 import Tabs from "../components/Tabs.jsx";
-import {zoomIn,zoomOut,redo,undo,createSubPage,deleteSubPage,switchSubPage} from "../actions";
+import {zoomIn,zoomOut,redo,undo,createSubPage,deleteSubPage,switchSubPage,selectCanvas} from "../actions";
 
 const mapStateToProps = (state) => {
     return {
@@ -19,6 +19,7 @@ const mapDispatchtoProps = (dispatch) => {
 	    dispatch(deleteSubPage(paperId));
 	    var paper = StoreHelper.getSelectedPaper();
 	    dispatch(switchSubPage(paper));
+	    dispatch(selectCanvas());
 	},
 	clickPaper: (event)=>{
 	    var paperId = event.target.parentElement.getAttribute("data-paper-id");
@@ -26,6 +27,7 @@ const mapDispatchtoProps = (dispatch) => {
 		var paper = StoreHelper.getSelectedPaper(paperId);
 		StoreHelper.storeData();
 		dispatch(switchSubPage(paper));
+		dispatch(selectCanvas());
 	    }
 	},
 	onDeleteSubPage: (event) => {

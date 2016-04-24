@@ -124,6 +124,15 @@ g.link path{
 }
 .dia-tab>span:last-child{
     position:absolute;
-    right: -3px;
-    top: -3px;
+    right: 0px;
+    top: 0px;
+}
+.group-element rect{
+    fill: none;
+    stroke-dasharray: 5 10 5;
+    stroke: #666;
+}
+
+.text-element text,.placeholder-element text{
+    dominant-baseline: text-before-edge;
 }

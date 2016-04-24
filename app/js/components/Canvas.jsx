@@ -1,6 +1,9 @@
 import React from 'react';
 import {POSITION_TOP,POSITION_RIGHT,POSITION_BOTTOM,POSITION_LEFT} from "../consts";
-import {LineHelper,generateUUID} from "../Utility";
+import {LineHelper,generateUUID,ElementHelper} from "../Utility";
+import TextElement from "./TextElement.jsx";
+import PlaceholderElement from "./PlaceHolder.jsx";
+import GroupElement from "./GroupElement.jsx";
 const MagnetPorts = ({x,y,ownerKey,position,onPortMouseDown,onPortMouseUp}) => {
   return (
     <g draggable="false">
@@ -78,7 +81,17 @@ const Canvas = (data) =>(
       {
 	Object.keys(data.elements).map( (key) =>{
 	  let properties= data.elements[key];
-	  return <Element {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} onPortMouseUp={data.onPortMouseUp} onPortMouseDown={data.onPortMouseDown}/>
+	  let elementType = properties.id;
+	  if(ElementHelper.isText(elementType)){
+	    return <TextElement {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
+	  } else if(ElementHelper.isPlaceHolder(elementType)){
+	    return <PlaceholderElement  {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
+	  } else if(ElementHelper.isGroup(elementType)){
+	return <GroupElement {...properties}  id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
+	  } else {
+	    return <Element {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} onPortMouseUp={data.onPortMouseUp} onPortMouseDown={data.onPortMouseDown}/>
+	 }
+	  
 	})
       }
       </g>

@@ -50,23 +50,14 @@ const properties = (state={type:CANVAS,selectedProperties:{},properties:{}},acti
 	    y: selectedElement.y
 	};
 	if(selectedProperties) {
-	    let newDeviceInfo = Object.assign(selectedProperties.deviceInfo);
-	    let newMeasurePointInfos = selectedProperties.measurePointInfos.map((info)=>{
-		return Object.assign({},info);
+	    selectedProperties = Object.assign({},StoreHelper.getElementProperties(action.id),{
+		geometricData: geometricData
 	    });
-	    selectedProperties = {
-		key: action.id,
-		deviceInfo: newDeviceInfo,
-		measurePointInfos: newMeasurePointInfos,
-		geometricData: geometricData
-	    };
 	} else {
-	    selectedProperties = {
+	    selectedProperties = Object.assign({},StoreHelper.getElementProperties(action.id),{
 		key: action.id,
-		deviceInfo: DefaultValues.getDeviceInfo(),
-		measurePointInfos: [DefaultValues.getMeasurePointInfo()],
 		geometricData: geometricData
-	    };
+	    });
 	}
 	return Object.assign({},state,{selectedProperties,type: COMMON_ELEMENT});
 	break;

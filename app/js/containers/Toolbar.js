@@ -1,5 +1,5 @@
 import {connect} from 'react-redux';
-import {generateUUID} from "../Utility";
+import {generateUUID, StoreHelper} from "../Utility";
 import Toolbar from "../components/Toolbar.jsx";
 import {zoomIn,zoomOut,redo,undo,createSubPage,deleteSubPage} from "../actions";
 
@@ -38,14 +38,16 @@ const mapDispatchtoProps = (dispatch) => {
 		return;
 	    }
 	    var id = idEle.value;
+	    var uuid = generateUUID();
 	    if(!id){
-		id = generateUUID();
+		id = uuid;
 	    }
 	    
 	    dispatch(createSubPage({
 		name: name,
 		type: typeEle.value,
-		key: id
+		key: id,
+		uuid: uuid
 	    }));
 	    subCreateEle.style.display = "none";
 	    nameEle.value = "";
@@ -54,6 +56,11 @@ const mapDispatchtoProps = (dispatch) => {
 	onCancelSubPage: (event) => {
 	    var overlayEle = event.target.parentElement.parentElement.parentElement;
 	    overlayEle.style.display = "none";
+	},
+	onSave: (event) => {
+	    StoreHelper.storeData();
+	    //console.log(JSON.stringify(StoreHelper.getPapers()));
+	    console.log(StoreHelper.getPapers());
 	}
     };
 };
