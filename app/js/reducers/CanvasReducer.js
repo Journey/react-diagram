@@ -20,7 +20,8 @@ import {
     DELETE_SUB_PAPGER,
     UPDATE_GEOMETRIC_DATA,
     SWITCH_SUB_PAPER,
-    SAVE_ELEMENT_PROPERTIES
+    SAVE_ELEMENT_PROPERTIES,
+    UPDATE_TEXT_ELEMENT
 } from "../consts";
 import {generateUUID, StoreHelper, LineHelper,DefaultValues} from "../Utility";
 let _defaultProperties = DefaultValues.getSvgProperties();
@@ -118,9 +119,11 @@ const elements = (state={},action) => {
     case SWITCH_SUB_PAPER:
 	newState = Object.assign({},action.paper.elements);
 	break;
-    case SAVE_ELEMENT_PROPERTIES:
-	debugger;
-	return state;
+    case UPDATE_TEXT_ELEMENT:
+	let textElement = Object.assign({},state[action.elementId],{text: action.text});
+	newState = Object.assign({},state,{
+	    [textElement.key]: textElement
+	});
 	break;
     default:
 	newState = state;

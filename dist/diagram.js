@@ -21262,6 +21262,7 @@
 	var COMMON_ELEMENT = exports.COMMON_ELEMENT = "Common element which contains measure point info";
 	var UPDATE_GEOMETRIC_DATA = exports.UPDATE_GEOMETRIC_DATA = "Update geometric data from property area";
 	var SAVE_CHART = exports.SAVE_CHART = "Save Chart";
+	var UPDATE_TEXT_ELEMENT = exports.UPDATE_TEXT_ELEMENT = "Update text element values from properties";
 
 /***/ },
 /* 182 */
@@ -21783,7 +21784,7 @@
 	            var properties = _getProperties();
 	            var elements = _getElements();
 	            var element = elements[elementId];
-	            var elementProperty = properties[elementId];
+	            var elementProperty = properties.properties[elementId];
 	            var elementTypeId = element.id;
 	            if (elementProperty) {
 	                //todo::
@@ -21813,6 +21814,8 @@
 	                retElement.height = 20;
 	            } else if (ElementHelper.isGroup(iPalletelementid)) {
 	                retElement.bindingId = "";
+	                retElement.width = 150;
+	                retElement.height = 150;
 	            } else if (ElementHelper.isPlaceHolder(iPalletelementid)) {
 	                retElement.text = "没有值";
 	                retElement.width = 100;
@@ -22148,9 +22151,9 @@
 							case _consts.SWITCH_SUB_PAPER:
 										newState = Object.assign({}, action.paper.elements);
 										break;
-							case _consts.SAVE_ELEMENT_PROPERTIES:
-										debugger;
-										return state;
+							case _consts.UPDATE_TEXT_ELEMENT:
+										var textElement = Object.assign({}, state[action.elementId], { text: action.text });
+										newState = Object.assign({}, state, _defineProperty({}, textElement.key, textElement));
 										break;
 							default:
 										newState = state;
@@ -22657,7 +22660,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(181);
 
@@ -22878,6 +22881,14 @@
 	    return {
 	        type: _consts.DELETE_SUB_PAPGER,
 	        paperId: paperId
+	    };
+	};
+
+	var updateTextElement = exports.updateTextElement = function updateTextElement(elementId, text) {
+	    return {
+	        type: _consts.UPDATE_TEXT_ELEMENT,
+	        elementId: elementId,
+	        text: text
 	    };
 	};
 
@@ -23305,21 +23316,30 @@
 	};
 
 	var TextProperties = exports.TextProperties = function TextProperties(_ref2) {
-	  var key = _ref2.key;
+	  var elementKey = _ref2.elementKey;
 	  var text = _ref2.text;
 
 	  return _react2.default.createElement(
 	    "div",
-	    { className: "pro-text" },
+	    { className: "pro-deviceInfo", "data-element-key": elementKey },
 	    _react2.default.createElement(
 	      "div",
-	      { className: "pro-row" },
+	      { className: "pro-header" },
+	      "文本内容"
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-text" },
 	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "文字"
-	      ),
-	      _react2.default.createElement("input", { name: "text", "data-element-key": key, type: "text", defaultValue: text })
+	        "div",
+	        { className: "pro-row" },
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "文字"
+	        ),
+	        _react2.default.createElement("input", { name: "text", "data-element-key": elementKey, type: "text", defaultValue: text })
+	      )
 	    )
 	  );
 	};
@@ -23376,21 +23396,30 @@
 	};
 
 	var PlaceholderProperties = exports.PlaceholderProperties = function PlaceholderProperties(_ref2) {
-	  var key = _ref2.key;
+	  var elementKey = _ref2.elementKey;
 	  var bindingId = _ref2.bindingId;
 
 	  return _react2.default.createElement(
 	    "div",
-	    { className: "pro-placeholder" },
+	    { className: "pro-deviceInfo", "data-element-key": elementKey },
 	    _react2.default.createElement(
 	      "div",
-	      { className: "pro-row" },
+	      { className: "pro-header" },
+	      "绑定信息"
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-placeholder" },
 	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "id"
-	      ),
-	      _react2.default.createElement("input", { name: "binding-id", "data-element-key": key, type: "text", defaultValue: bindingId })
+	        "div",
+	        { className: "pro-row" },
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "id"
+	        ),
+	        _react2.default.createElement("input", { name: "binding-id", "data-element-key": elementKey, type: "text", defaultValue: bindingId })
+	      )
 	    )
 	  );
 	};
@@ -23442,21 +23471,30 @@
 	};
 
 	var GroupProperties = exports.GroupProperties = function GroupProperties(_ref2) {
-	  var key = _ref2.key;
+	  var elementKey = _ref2.elementKey;
 	  var bindingId = _ref2.bindingId;
 
 	  return _react2.default.createElement(
 	    "div",
-	    { className: "pro-group" },
+	    { className: "pro-deviceInfo", "data-element-key": elementKey },
 	    _react2.default.createElement(
 	      "div",
-	      { className: "pro-row" },
+	      { className: "pro-header" },
+	      "组信息"
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-group" },
 	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "id"
-	      ),
-	      _react2.default.createElement("input", { name: "binding-id", "data-element-key": key, type: "text", defaultValue: bindingId })
+	        "div",
+	        { className: "pro-row" },
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "id"
+	        ),
+	        _react2.default.createElement("input", { name: "binding-id", "data-element-key": elementKey, type: "text", defaultValue: bindingId })
+	      )
 	    )
 	  );
 	};
@@ -23523,7 +23561,6 @@
 					var containerElement = event.currentTarget.parentElement.parentElement;
 					var propertyElement = containerElement.querySelector("div.pro-deviceInfo");
 					var measurePointInfos = containerElement.querySelector("div.measure-info");
-					var geometricElement = containerElement.querySelector("div.pro-geo-data");
 					var key = propertyElement.getAttribute("data-element-key");
 					var measureInfoElements = measurePointInfos.querySelectorAll("div.measure-template");
 					var deviceInfo = {
@@ -23536,14 +23573,7 @@
 									var type = infoElement.querySelector("select").value;
 									return { name: name, identifier: identifier, type: type };
 					});
-					var geometricData = {
-									id: key,
-									width: parseInt(geometricElement.querySelector("input[name=width]").value),
-									height: parseInt(geometricElement.querySelector("input[name=height]").value),
-									x: parseInt(geometricElement.querySelector("input[name=xAxies]").value),
-									y: parseInt(geometricElement.querySelector("input[name=yAxies]").value)
-					};
-					return { key: key, deviceInfo: deviceInfo, measurePointInfos: measurePointInfoObject, geometricData: geometricData };
+					return { key: key, deviceInfo: deviceInfo, measurePointInfos: measurePointInfoObject };
 	}
 
 	function _getTextElementPropertiesByEvent(event) {
@@ -23598,16 +23628,16 @@
 	};
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
 					return {
-									onSave: function onSave(evt) {
+									onSave: function onSave(event) {
 													//todo:: collect all properties
 													//1. for canvas - width, height gridsize
 													//2. for element - width,height/id/name/binding info
-													var type = evt.currentTarget.getAttribute("data-selected-type");
+													var type = event.currentTarget.getAttribute("data-selected-type");
 													switch (type) {
 																	case _consts.CANVAS:
 																					//collect svg properties
 
-																					var _getSVGPropertiesByEv = _getSVGPropertiesByEvent(evt);
+																					var _getSVGPropertiesByEv = _getSVGPropertiesByEvent(event);
 
 																					var width = _getSVGPropertiesByEv.width;
 																					var height = _getSVGPropertiesByEv.height;
@@ -23619,14 +23649,24 @@
 																					//collect element properties
 																					//todo:: if text element, sync text value
 																					var elementType = _getElementType(event);
-																					var elementProperties = _getCommonElementPropertiesByEvent(evt);
-																					var geometricData = elementProperties.geometricData;
-																					//save element by type
-																					dispatch((0, _actions.saveElementProperties)(elementProperties));
+																					var geometricData = _getGeometricDataByEvent(event);
+																					var elementProperties;
+																					if (_Utility.ElementHelper.isText(elementType)) {
+																									elementProperties = _getTextElementPropertiesByEvent(event);
+																									dispatch((0, _actions.updateTextElement)(elementProperties.key, elementProperties.text));
+																					} else if (_Utility.ElementHelper.isGroup(elementType)) {
+																									elementProperties = _getGroupElementPropertiesByEvent(event);
+																					} else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
+																									elementProperties = _getPlaceholderElementPropertiesByEvent(event);
+																					} else {
+																									elementProperties = _getCommonElementPropertiesByEvent(event);
+																									setTimeout(function () {
+																													dispatch((0, _actions.updateLines)(geometricData.id));
+																									}, 100);
+																					}
+																					elementProperties.elementTypeId = elementType;
+																					dispatch((0, _actions.saveElementProperties)(Object.assign(elementProperties, { geometricData: geometricData })));
 																					dispatch((0, _actions.updateElementGeometricData)(geometricData.id, geometricData.width, geometricData.height, geometricData.x, geometricData.y));
-																					setTimeout(function () {
-																									dispatch((0, _actions.updateLines)(geometricData.id));
-																					}, 100);
 																					break;
 													}
 									},
@@ -23989,10 +24029,9 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "align-center" },
-	        _react2.default.createElement("input", { type: "button", "data-element-type-id": state.selectedProperties.elementTypeId, onClick: state.onSave, "data-key": state.key, "data-selected-type": state.type, value: "保存" })
+	        _react2.default.createElement("input", { type: "button", "data-element-type-id": state.selectedProperties.elementTypeId, onClick: state.onSave, "data-key": state.selectedProperties.key, "data-selected-type": state.type, value: "保存" })
 	      )
-	    ),
-	    _react2.default.createElement("div", { className: "dia-map-navigator" })
+	    )
 	  );
 	};
 

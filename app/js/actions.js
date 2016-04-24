@@ -24,7 +24,8 @@ import {
     CREATE_SUB_PAPGER,
     DELETE_SUB_PAPGER,
     UPDATE_GEOMETRIC_DATA,
-    SWITCH_SUB_PAPER
+    SWITCH_SUB_PAPER,
+    UPDATE_TEXT_ELEMENT
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -239,4 +240,12 @@ export const deleteSubPage = (paperId) => {
 	type: DELETE_SUB_PAPGER,
 	paperId: paperId
     };
+};
+
+export const updateTextElement = (elementId,text) => {
+    return {
+	type: UPDATE_TEXT_ELEMENT,
+	elementId: elementId,
+	text: text
+    };  
 };

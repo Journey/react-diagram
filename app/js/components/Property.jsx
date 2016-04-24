@@ -148,11 +148,8 @@ const Property = (state) =>(
     <div>
       {PropertyFactory(state)}
       <div className="align-center">
-	<input type="button" data-element-type-id={state.selectedProperties.elementTypeId} onClick={state.onSave} data-key={state.key} data-selected-type={state.type} value="保存" />
+	<input type="button" data-element-type-id={state.selectedProperties.elementTypeId} onClick={state.onSave} data-key={state.selectedProperties.key} data-selected-type={state.type} value="保存" />
       </div>
-    </div>
-    <div className="dia-map-navigator">
-      
     </div>
   </div>
 );

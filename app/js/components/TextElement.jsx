@@ -13,13 +13,16 @@ const TextElement = ({id,typeId,x,y,text,width,height,dbClick,dragElementStart})
   )
 };
 
-export const TextProperties = ({key,text}) => {
+export const TextProperties = ({elementKey,text}) => {
   return(
+    <div className="pro-deviceInfo" data-element-key={elementKey}>
+      <div className="pro-header">文本内容</div>
     <div className="pro-text">
       <div className="pro-row">
 	<label>文字</label>
-	<input name="text" data-element-key={key} type="text" defaultValue={text}/>
+	<input name="text" data-element-key={elementKey} type="text" defaultValue={text}/>
       </div>
+    </div>
     </div>
   )
 };

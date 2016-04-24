@@ -13,13 +13,16 @@ const PlaceholderElement = ({id,typeId,x,y,text,width,height,dbClick,dragElement
   )
 };
 
-export const PlaceholderProperties = ({key,bindingId}) => {
+export const PlaceholderProperties = ({elementKey,bindingId}) => {
   return (
+    <div className="pro-deviceInfo" data-element-key={elementKey}>
+      <div className="pro-header">绑定信息</div>
     <div className="pro-placeholder">
       <div className="pro-row">
 	<label>id</label>
-	<input name="binding-id" data-element-key={key} type="text" defaultValue={bindingId}/>
+	<input name="binding-id" data-element-key={elementKey} type="text" defaultValue={bindingId}/>
       </div>
+    </div>
     </div>
  )
 }

@@ -398,7 +398,7 @@ export const StoreHelper = (() => {
 	    var properties = _getProperties();
 	    var elements = _getElements();
 	    var element = elements[elementId];
-	    var elementProperty = properties[elementId];
+	    var elementProperty = properties.properties[elementId];
 	    var elementTypeId = element.id;
 	    if(elementProperty){
 		//todo::
@@ -428,7 +428,8 @@ export const StoreHelper = (() => {
 		retElement.height = 20;
 	    } else if(ElementHelper.isGroup(iPalletelementid)){
 		retElement.bindingId = "";
-		
+                retElement.width = 150;
+                retElement.height = 150;
 	    } else if(ElementHelper.isPlaceHolder(iPalletelementid)){
 		retElement.text = "没有值";
 		retElement.width = 100;

@@ -42,4 +42,5 @@ export const CANVAS = "Canvas";
 export const COMMON_ELEMENT="Common element which contains measure point info";
 export const UPDATE_GEOMETRIC_DATA= "Update geometric data from property area";
 export const SAVE_CHART = "Save Chart";
+export const UPDATE_TEXT_ELEMENT = "Update text element values from properties";
 

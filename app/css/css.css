@@ -128,7 +128,8 @@ g.link path{
     top: 0px;
 }
 .group-element rect{
-    fill: none;
+    fill: #fff;
+    fill-opacity: 0.01;
     stroke-dasharray: 5 10 5;
     stroke: #666;
 }

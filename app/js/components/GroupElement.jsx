@@ -13,14 +13,17 @@ const GroupElement = ({id,typeId,x,y,width,height,dbClick,dragElementStart}) => 
   )
 };
 
-export const GroupProperties = ({key,bindingId}) => {
+export const GroupProperties = ({elementKey,bindingId}) => {
   return (
+    <div className="pro-deviceInfo" data-element-key={elementKey}>
+      <div className="pro-header">组信息</div>
     <div className="pro-group">
       <div className="pro-row">
 	<label>id</label>
-	<input name="binding-id" data-element-key={key} type="text" defaultValue={bindingId}/>
+	<input name="binding-id" data-element-key={elementKey} type="text" defaultValue={bindingId}/>
       </div>
-  </div>
+    </div>
+    </div>
 )
 };
 
