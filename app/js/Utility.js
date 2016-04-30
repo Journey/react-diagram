@@ -49,6 +49,10 @@ export const PalletData = (() => {
     };
 })();
 
+export const dummyFunction = ()=>{
+  return false;
+}
+
 /**
  * todo::get the pallet element via the element  type id
  * @param {int} id the pallet element type id
@@ -709,6 +713,7 @@ export const ApiSingletone = (()=>{
     ];
   var _papers = null;
   var _fRender = null;
+  var _fStaticRender = null;
    let ret = {
      get palletGroup(){
        return _palletGroupData;
@@ -731,6 +736,12 @@ export const ApiSingletone = (()=>{
      },
      get Render(){
        return _fRender;
+     },
+     set StaticRender(fRender){
+       _fStaticRender = fRender;
+     },
+     get StaticRender(){
+       return _fStaticRender;
      },
      getDefaultSelectedPaper(){
        var papers = this.papers;
@@ -761,9 +772,6 @@ export const ApiSingletone = (()=>{
      get properties() {
        var paper = this.getDefaultSelectedPaper();
        return paper.properties;
-     },
-     Refresh(){
-       
      }
    };
   window.REACTDiagramApi = ret;

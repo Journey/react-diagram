@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import {generateUUID,StoreHelper} from "../Utility";
-import Tabs from "../components/Tabs.jsx";
+import {Tabs as TabsView,StaticTabs as StaticTabsView} from "../components/Tabs.jsx";
 import {zoomIn,zoomOut,redo,undo,createSubPage,deleteSubPage,switchSubPage,selectCanvas} from "../actions";
 
 const mapStateToProps = (state) => {
@@ -36,9 +36,17 @@ const mapDispatchtoProps = (dispatch) => {
     };
 };
 
-export default connect(
+const Tabs = connect(
     mapStateToProps,
     mapDispatchtoProps
-)(Tabs);
+)(TabsView);
+
+const StaticTabs = connect(
+    mapStateToProps,
+    mapDispatchtoProps
+)(StaticTabsView);
+
+export {Tabs,StaticTabs};
+
 
 

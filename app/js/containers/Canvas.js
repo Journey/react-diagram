@@ -1,5 +1,5 @@
 import {connect} from 'react-redux';
-import Canvas from "../components/Canvas.jsx";
+import {Canvas as CanvasView,StaticCanvas as StaticCanvasView } from "../components/Canvas.jsx";
 import {StoreHelper} from "../Utility";
 import {
     addElement,
@@ -163,7 +163,14 @@ const mapDispatchtoProps = (dispatch) => {
     };
 };
 
-export default connect(
+const Canvas = connect(
     mapStateToProps,
     mapDispatchtoProps
-)(Canvas);
+)(CanvasView);
+
+const StaticCanvas = connect(
+    mapStateToProps,
+    mapDispatchtoProps
+)(StaticCanvasView);
+
+export {Canvas,StaticCanvas};

@@ -34,6 +34,7 @@ const mapDispatchtoProps = (dispatch) => {
 	    var nameEle = subCreateEle.querySelector("input[name=name]");
 	    var idEle = subCreateEle.querySelector("input[name=identify]");
 	    var name = nameEle.value;
+	    var paperType = parseInt(typeEle.value);
 	    if(!name){
 		return;
 	    }
@@ -45,7 +46,7 @@ const mapDispatchtoProps = (dispatch) => {
 	    
 	    dispatch(createSubPage({
 		name: name,
-		type: typeEle.value,
+		type: paperType,
 		key: id,
 		uuid: uuid
 	    }));
