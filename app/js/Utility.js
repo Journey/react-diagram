@@ -392,7 +392,7 @@ export const StoreHelper = (() => {
 	    paper.svgProperties = _state.svgProperties;
 	    paper.elements = _state.elements;
 	    paper.links = _state.links;
-	    paper.properties = _state.properties;
+	    paper.properties = _state.properties.properties;
 	},
 	getElementProperties: (elementId) => {
 	    var properties = _getProperties();
@@ -520,11 +520,23 @@ export const StoreHelper = (() => {
 	},
         getPapers: () => {
             return _getPapers();
-        }
+        },
+      getNextPageOrder: () => {
+	var papers = StoreHelper.getPapers();
+	var largestPageOrder = Object.keys(papers).reduce((pre,curKey)=>{
+	  if(papers[curKey].order > pre){
+	    return papers[curKey].order;
+	  } else {
+	    return pre;
+	  }
+	},-1);
+	return largestPageOrder + 1;
+      },
     };
 })();
 
 export const DefaultValues = (() => {
+  var tabIndex = 1;
     return {
         getSvgProperties: () => {
             return {
@@ -552,7 +564,8 @@ export const DefaultValues = (() => {
 		return {
 			key: id,
 			paperName: "默认",
-			paperType: 1, // 普通页面
+		  paperType: 1, // 普通页面
+		  order: 0,
 			svgProperties: DefaultValues.getSvgProperties(),
 			elements:{},
 			links:{},
@@ -570,7 +583,8 @@ export const DefaultValues = (() => {
 		elements:{},
 		links:{},
 		properties:{},
-		operator: DefaultValues.getOperator()
+	      operator: DefaultValues.getOperator(),
+	      order: StoreHelper.getNextPageOrder()
 	    };
 	},
 	getDefaultPapers: () => {
@@ -578,9 +592,6 @@ export const DefaultValues = (() => {
 	    return {
 		[defaultPaper.key]: defaultPaper
 	    };  
-	},
-	getDefaultSelectedPaperId: (papers)=> {
-	    return Object.keys(papers)[0];
 	},
 	getDefaultState: () => {
 	    var defaultPaper = DefaultValues.getDefaultPaper();
@@ -637,4 +648,124 @@ export const DefaultValues = (() => {
 	    };
 	}
     };
+})();
+
+/**
+ * ApiSingletone: used to store global data of the Component- e.g palletGroup,papers
+ */
+export const ApiSingletone = (()=>{
+  var _palletGroupData = [
+	{
+	    id:1,
+	    groupName:"Group 1",
+	    items:[
+		{
+		    id:1,
+		    name:"element one",
+		    image:"css/1.jpg",
+		    width: 50,
+		    height: 50
+		},
+		{
+		    id:2,
+		    name:"element two",
+		    image:"css/2.jpg",
+		    width: 50,
+		    height: 50
+		}
+	    ]
+	},
+	{
+	    id: 2,
+	    groupName:"Group 2",
+	    items:[{
+		id:3,
+		name:"element three",
+		image:"css/3.jpg",
+		width: 50,
+		height: 50
+	    },
+		  {
+		id:10,
+		name:"text",
+		image:"css/3.jpg",
+		width: 50,
+		height: 50
+		  },
+		  {
+		id:11,
+		name:"place holder",
+		image:"css/3.jpg",
+		width: 50,
+		height: 50
+		  },{
+		id:12,
+		name:"group",
+		image:"css/3.jpg",
+		width: 50,
+		height: 50
+	    }]
+	}
+    ];
+  var _papers = null;
+  var _fRender = null;
+   let ret = {
+     get palletGroup(){
+       return _palletGroupData;
+      },
+     set palletGroup(data){
+       _palletGroupData = data;
+     },
+     get papers(){
+       if(_papers){
+	 return _papers;
+       } else {
+	 return DefaultValues.getDefaultPapers();
+       }
+     },
+     set papers(papers){
+       _papers = papers;
+     },
+     set Render(fRender){
+       _fRender = fRender;
+     },
+     get Render(){
+       return _fRender;
+     },
+     getDefaultSelectedPaper(){
+       var papers = this.papers;
+       var _paper;
+       var paperKeys = Object.keys(papers);
+       paperKeys.reduce((pre,curObj)=>{
+	 var curPaper = papers[curObj];
+	 if(pre > curPaper.order){
+	   _paper = curPaper;
+	   return curPaper.order;
+	 }
+	 return pre;
+       },10000000);
+       return _paper;
+     },
+     get svgProperties(){
+       var paper = this.getDefaultSelectedPaper();
+       return paper.svgProperties;
+     },
+     get elements(){
+       var paper = this.getDefaultSelectedPaper();
+       return paper.elements;
+     },
+     get links(){
+       var paper = this.getDefaultSelectedPaper();
+       return paper.links;
+     },
+     get properties() {
+       var paper = this.getDefaultSelectedPaper();
+       return paper.properties;
+     },
+     Refresh(){
+       
+     }
+   };
+  window.REACTDiagramApi = ret;
+  return ret;
 })();

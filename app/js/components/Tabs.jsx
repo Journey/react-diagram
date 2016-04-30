@@ -8,7 +8,9 @@ const Tab = ({paperId,paperName,paperType,deletePaper,selectPaper,isSelected}) =
 const Tabs = (data) =>(
   <div className="dia-tabs">
     {
-      Object.keys(data.papers).map((key)=>{
+      Object.keys(data.papers).sort((pre,next)=>{
+	return data.papers[pre].order - data.papers[next].order;
+      }).map((key)=>{
 	var paper = data.papers[key];
 	return <Tab
 		       key={generateUUID()}

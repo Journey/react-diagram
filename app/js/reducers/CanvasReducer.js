@@ -23,8 +23,7 @@ import {
     SAVE_ELEMENT_PROPERTIES,
     UPDATE_TEXT_ELEMENT
 } from "../consts";
-import {generateUUID, StoreHelper, LineHelper,DefaultValues} from "../Utility";
-let _defaultProperties = DefaultValues.getSvgProperties();
+import {generateUUID, StoreHelper, LineHelper,DefaultValues,ApiSingletone} from "../Utility";
 
 /**
  * The States for the whole canvas
@@ -32,7 +31,7 @@ let _defaultProperties = DefaultValues.getSvgProperties();
  * @param {} action
  * @returns {} 
  */
-const svgProperties = (state=_defaultProperties, action) => {
+const svgProperties = (state=ApiSingletone.svgProperties, action) => {
     var newState;
     let _origZoomLevel = state.zoomLevel;
     let _newZoomLevel;
@@ -81,7 +80,7 @@ const svgProperties = (state=_defaultProperties, action) => {
  * @param {} action
  * @returns {} 
  */
-const elements = (state={},action) => {
+const elements = (state=ApiSingletone.elements,action) => {
     let newState,newElement;
     switch(action.type){
     case UPDATE_GEOMETRIC_DATA: //save geometric data to elements
@@ -136,7 +135,7 @@ const elements = (state={},action) => {
  * @param {} action
  * @returns {} 
  */
-const links = (state={},action) => {
+const links = (state=ApiSingletone.links,action) => {
     switch(action.type){
     case UPDATE_LINES:
 	//todo update lines which related to the element

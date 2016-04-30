@@ -59,7 +59,9 @@ const mapDispatchtoProps = (dispatch) => {
 	},
 	onSave: (event) => {
 	    StoreHelper.storeData();
-	    //console.log(JSON.stringify(StoreHelper.getPapers()));
+	    console.log(JSON.stringify(StoreHelper.getPapers(),function(key,value){
+		return value;
+	    }));
 	    console.log(StoreHelper.getPapers());
 	}
     };

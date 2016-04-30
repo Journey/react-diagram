@@ -1,12 +1,9 @@
-import {generateUUID, StoreHelper, DefaultValues} from "../Utility";
+import {generateUUID, StoreHelper, DefaultValues,ApiSingletone} from "../Utility";
 import {
     CREATE_SUB_PAPGER,DELETE_SUB_PAPGER,SWITCH_SUB_PAPER,SAVE_CHART
 } from "../consts";
 
-var _papers = DefaultValues.getDefaultPapers();
-var _selectedPaperId = DefaultValues.getDefaultSelectedPaperId(_papers);
-
-const papers = (state = _papers, action) => {
+const papers = (state = ApiSingletone.papers, action) => {
     switch(action.type){
     case CREATE_SUB_PAPGER:
 	state = Object.assign({},state,{
@@ -21,7 +18,7 @@ const papers = (state = _papers, action) => {
     return state;
 };
 
-const selectedPaperId = (state= _selectedPaperId,action) => {
+const selectedPaperId = (state= ApiSingletone.getDefaultSelectedPaper().key,action) => {
     switch(action.type){
     case SWITCH_SUB_PAPER:
 	return action.paper.key;

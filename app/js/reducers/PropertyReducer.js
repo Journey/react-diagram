@@ -1,4 +1,4 @@
-import {generateUUID, StoreHelper, DefaultValues} from "../Utility";
+import {generateUUID, StoreHelper, DefaultValues,ApiSingletone} from "../Utility";
 import {
     ADD_MEASURE_POINT,
     REMOVE_MEASURE_POINT,
@@ -14,7 +14,7 @@ import {
 } from "../consts";
 
 //{selectedProperties:{},properties:{}}
-const properties = (state={type:CANVAS,selectedProperties:{},properties:{}},action) => {
+const properties = (state={type:CANVAS,selectedProperties:ApiSingletone.svgProperties,properties:ApiSingletone.properties},action) => {
     let selectedProperties = null;
     let geometricData = {};
     switch(action.type){
@@ -99,6 +99,9 @@ const properties = (state={type:CANVAS,selectedProperties:{},properties:{}},acti
 	measurePointInfos = state.selectedProperties.measurePointInfos;
 	measurePointInfos[action.index][action.key] = action.value;
 	return state;
+	break;
+    case SWITCH_SUB_PAPER:
+	return Object.assign({},{type:CANVAS,selectedProperties: action.paper.svgProperties,properties: action.paper.properties});
 	break;
     default:
 	return state;

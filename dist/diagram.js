@@ -67,12 +67,14 @@
 	var _Utility = __webpack_require__(183);
 
 	function _interopRequireDefault(obj) {
-	       return obj && obj.__esModule ? obj : { default: obj };
+	    return obj && obj.__esModule ? obj : { default: obj };
 	}
 
-	var store = (0, _redux.createStore)(_reducers2.default);
-	_Utility.StoreHelper.setStore(store);;
-	(0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App2.default, null)), document.getElementById("diagram"));
+	_Utility.ApiSingletone.Render = function (domId) {
+	    var store = (0, _redux.createStore)(_reducers2.default);
+	    _Utility.StoreHelper.setStore(store);;
+	    (0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App2.default, null)), document.getElementById(domId));
+	};
 
 /***/ },
 /* 1 */
@@ -21271,69 +21273,21 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 
 	var _Utility = __webpack_require__(183);
 
-	var _defaultGroups = [{
-		id: 1,
-		groupName: "Group 1",
-		items: [{
-			id: 1,
-			name: "element one",
-			image: "css/1.jpg",
-			width: 50,
-			height: 50
-		}, {
-			id: 2,
-			name: "element two",
-			image: "css/2.jpg",
-			width: 50,
-			height: 50
-		}]
-	}, {
-		id: 2,
-		groupName: "Group 2",
-		items: [{
-			id: 3,
-			name: "element three",
-			image: "css/3.jpg",
-			width: 50,
-			height: 50
-		}, {
-			id: 10,
-			name: "text",
-			image: "css/3.jpg",
-			width: 50,
-			height: 50
-		}, {
-			id: 11,
-			name: "place holder",
-			image: "css/3.jpg",
-			width: 50,
-			height: 50
-		}, {
-			id: 12,
-			name: "group",
-			image: "css/3.jpg",
-			width: 50,
-			height: 50
-		}]
-	}];
 	/**
 	 * the data of the pallet component
 	 * @param {Object} state the data of the pallet element includes group infomation
 	 * @param {null} action no action
 	 * @returns {Object} the pallet element infomation
 	 */
-	var groups = function groups() {
-		var state = arguments.length <= 0 || arguments[0] === undefined ? _defaultGroups : arguments[0];
-		var action = arguments[1];
-
-		//todo::should request from from the server
-		_Utility.PalletData.set(state);
-		return state;
+	var groups = function groups(state, action) {
+	  //comes from Utilit.ApiSingletone.palletGroup
+	  _Utility.PalletData.set(_Utility.ApiSingletone.palletGroup);
+	  return _Utility.ApiSingletone.palletGroup;
 	};
 	exports.default = groups;
 
@@ -21346,7 +21300,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.DefaultValues = exports.StoreHelper = exports.ElementHelper = exports.RectHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
+	exports.ApiSingletone = exports.DefaultValues = exports.StoreHelper = exports.ElementHelper = exports.RectHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
 
 	var _slicedToArray = function () {
 	    function sliceIterator(arr, i) {
@@ -21778,7 +21732,7 @@
 	            paper.svgProperties = _state.svgProperties;
 	            paper.elements = _state.elements;
 	            paper.links = _state.links;
-	            paper.properties = _state.properties;
+	            paper.properties = _state.properties.properties;
 	        },
 	        getElementProperties: function getElementProperties(elementId) {
 	            var properties = _getProperties();
@@ -21910,11 +21864,23 @@
 	        },
 	        getPapers: function getPapers() {
 	            return _getPapers();
+	        },
+	        getNextPageOrder: function getNextPageOrder() {
+	            var papers = StoreHelper.getPapers();
+	            var largestPageOrder = Object.keys(papers).reduce(function (pre, curKey) {
+	                if (papers[curKey].order > pre) {
+	                    return papers[curKey].order;
+	                } else {
+	                    return pre;
+	                }
+	            }, -1);
+	            return largestPageOrder + 1;
 	        }
 	    };
 	}();
 
 	var DefaultValues = exports.DefaultValues = function () {
+	    var tabIndex = 1;
 	    return {
 	        getSvgProperties: function getSvgProperties() {
 	            return {
@@ -21943,6 +21909,7 @@
 	                    key: id,
 	                    paperName: "默认",
 	                    paperType: 1, // 普通页面
+	                    order: 0,
 	                    svgProperties: DefaultValues.getSvgProperties(),
 	                    elements: {},
 	                    links: {},
@@ -21960,15 +21927,13 @@
 	                elements: {},
 	                links: {},
 	                properties: {},
-	                operator: DefaultValues.getOperator()
+	                operator: DefaultValues.getOperator(),
+	                order: StoreHelper.getNextPageOrder()
 	            };
 	        },
 	        getDefaultPapers: function getDefaultPapers() {
 	            var defaultPaper = DefaultValues.getDefaultPaper();
 	            return _defineProperty({}, defaultPaper.key, defaultPaper);
-	        },
-	        getDefaultSelectedPaperId: function getDefaultSelectedPaperId(papers) {
-	            return Object.keys(papers)[0];
 	        },
 	        getDefaultState: function getDefaultState() {
 	            var defaultPaper = DefaultValues.getDefaultPaper();
@@ -22025,6 +21990,117 @@
 	    };
 	}();
 
+	/**
+	 * ApiSingletone: used to store global data of the Component- e.g palletGroup,papers
+	 */
+	var ApiSingletone = exports.ApiSingletone = function () {
+	    var _palletGroupData = [{
+	        id: 1,
+	        groupName: "Group 1",
+	        items: [{
+	            id: 1,
+	            name: "element one",
+	            image: "css/1.jpg",
+	            width: 50,
+	            height: 50
+	        }, {
+	            id: 2,
+	            name: "element two",
+	            image: "css/2.jpg",
+	            width: 50,
+	            height: 50
+	        }]
+	    }, {
+	        id: 2,
+	        groupName: "Group 2",
+	        items: [{
+	            id: 3,
+	            name: "element three",
+	            image: "css/3.jpg",
+	            width: 50,
+	            height: 50
+	        }, {
+	            id: 10,
+	            name: "text",
+	            image: "css/3.jpg",
+	            width: 50,
+	            height: 50
+	        }, {
+	            id: 11,
+	            name: "place holder",
+	            image: "css/3.jpg",
+	            width: 50,
+	            height: 50
+	        }, {
+	            id: 12,
+	            name: "group",
+	            image: "css/3.jpg",
+	            width: 50,
+	            height: 50
+	        }]
+	    }];
+	    var _papers = null;
+	    var _fRender = null;
+	    var ret = {
+	        get palletGroup() {
+	            return _palletGroupData;
+	        },
+	        set palletGroup(data) {
+	            _palletGroupData = data;
+	        },
+	        get papers() {
+	            if (_papers) {
+	                return _papers;
+	            } else {
+	                return DefaultValues.getDefaultPapers();
+	            }
+	        },
+	        set papers(papers) {
+	            _papers = papers;
+	        },
+	        set Render(fRender) {
+	            _fRender = fRender;
+	        },
+	        get Render() {
+	            return _fRender;
+	        },
+	        getDefaultSelectedPaper: function getDefaultSelectedPaper() {
+	            var papers = this.papers;
+	            var _paper;
+	            var paperKeys = Object.keys(papers);
+	            paperKeys.reduce(function (pre, curObj) {
+	                var curPaper = papers[curObj];
+	                if (pre > curPaper.order) {
+	                    _paper = curPaper;
+	                    return curPaper.order;
+	                }
+	                return pre;
+	            }, 10000000);
+	            return _paper;
+	        },
+
+	        get svgProperties() {
+	            var paper = this.getDefaultSelectedPaper();
+	            return paper.svgProperties;
+	        },
+	        get elements() {
+	            var paper = this.getDefaultSelectedPaper();
+	            return paper.elements;
+	        },
+	        get links() {
+	            var paper = this.getDefaultSelectedPaper();
+	            return paper.links;
+	        },
+	        get properties() {
+	            var paper = this.getDefaultSelectedPaper();
+	            return paper.properties;
+	        },
+	        Refresh: function Refresh() {}
+	    };
+	    window.REACTDiagramApi = ret;
+	    return ret;
+	}();
+
 /***/ },
 /* 184 */
 /***/ function(module, exports, __webpack_require__) {
@@ -22050,8 +22126,6 @@
 				}return obj;
 	}
 
-	var _defaultProperties = _Utility.DefaultValues.getSvgProperties();
-
 	/**
 	 * The States for the whole canvas
 	 * @param {} _defaultProperties
@@ -22059,7 +22133,7 @@
 	 * @returns {} 
 	 */
 	var svgProperties = function svgProperties() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _defaultProperties : arguments[0];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.ApiSingletone.svgProperties : arguments[0];
 				var action = arguments[1];
 
 				var newState;
@@ -22111,7 +22185,7 @@
 	 * @returns {} 
 	 */
 	var elements = function elements() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.ApiSingletone.elements : arguments[0];
 				var action = arguments[1];
 
 				var newState = void 0,
@@ -22167,7 +22241,7 @@
 	 * @returns {} 
 	 */
 	var links = function links() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.ApiSingletone.links : arguments[0];
 				var action = arguments[1];
 
 				switch (action.type) {
@@ -22285,7 +22359,7 @@
 
 	//{selectedProperties:{},properties:{}}
 	var properties = function properties() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? { type: _consts.CANVAS, selectedProperties: {}, properties: {} } : arguments[0];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? { type: _consts.CANVAS, selectedProperties: _Utility.ApiSingletone.svgProperties, properties: _Utility.ApiSingletone.properties } : arguments[0];
 				var action = arguments[1];
 
 				var selectedProperties = null;
@@ -22373,6 +22447,9 @@
 										measurePointInfos[action.index][action.key] = action.value;
 										return state;
 										break;
+							case _consts.SWITCH_SUB_PAPER:
+										return Object.assign({}, { type: _consts.CANVAS, selectedProperties: action.paper.svgProperties, properties: action.paper.properties });
+										break;
 							default:
 										return state;
 										break;
@@ -22403,11 +22480,8 @@
 	    }return obj;
 	}
 
-	var _papers = _Utility.DefaultValues.getDefaultPapers();
-	var _selectedPaperId = _Utility.DefaultValues.getDefaultSelectedPaperId(_papers);
-
 	var papers = function papers() {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? _papers : arguments[0];
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.ApiSingletone.papers : arguments[0];
 	    var action = arguments[1];
 
 	    switch (action.type) {
@@ -22423,7 +22497,7 @@
 	};
 
 	var selectedPaperId = function selectedPaperId() {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? _selectedPaperId : arguments[0];
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.ApiSingletone.getDefaultSelectedPaper().key : arguments[0];
 	    var action = arguments[1];
 
 	    switch (action.type) {
@@ -24117,7 +24191,9 @@
 			},
 			onSave: function onSave(event) {
 				_Utility.StoreHelper.storeData();
-				//console.log(JSON.stringify(StoreHelper.getPapers()));
+				console.log(JSON.stringify(_Utility.StoreHelper.getPapers(), function (key, value) {
+					return value;
+				}));
 				console.log(_Utility.StoreHelper.getPapers());
 			}
 		};
@@ -24365,7 +24441,9 @@
 			return _react2.default.createElement(
 					"div",
 					{ className: "dia-tabs" },
-					Object.keys(data.papers).map(function (key) {
+					Object.keys(data.papers).sort(function (pre, next) {
+							return data.papers[pre].order - data.papers[next].order;
+					}).map(function (key) {
 							var paper = data.papers[key];
 							return _react2.default.createElement(Tab, {
 									key: (0, _Utility.generateUUID)(),

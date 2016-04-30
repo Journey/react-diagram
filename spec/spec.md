@@ -7,8 +7,10 @@
 * 信号类型需要从后端获得
 * 
 
-
-# property
-* when save collect all properties
-* if text element sync text value to canvas element
-
+# todo
+* pass pallet element
+* pass canvas elements to the canvas
+* static canvas
+  + sync values to placeholders
+  + sync image status to element
+  + event handling for subpages
