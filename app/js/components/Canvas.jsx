@@ -1,6 +1,6 @@
 import React from 'react';
 import {POSITION_TOP,POSITION_RIGHT,POSITION_BOTTOM,POSITION_LEFT} from "../consts";
-import {LineHelper,generateUUID,ElementHelper} from "../Utility";
+import {LineHelper,generateUUID,ElementHelper,dummyFunction} from "../Utility";
 import TextElement from "./TextElement.jsx";
 import PlaceholderElement from "./PlaceHolder.jsx";
 import GroupElement from "./GroupElement.jsx";
@@ -68,7 +68,7 @@ const ElementOperator = ({id,x,y,width,height,onRemoveClick}) => {
 const Canvas = (data) =>(
   <div className="canvas">
     <svg width={data.width} height={data.height} onDrop={data.onDrop} onDragOver={data.dragOver} onDragEnd={data.onDragEnd} onDoubleClick={data.dbClickCanvas}>
-      <g transform={`scale(${data.scaleX},${data.scaleY})`}>
+    <g transform={`scale(${data.scaleX},${data.scaleY})`}>
       <g className="links">
 	{
 	  Object.keys(data.links).map(key =>{
@@ -78,22 +78,22 @@ const Canvas = (data) =>(
 	}
       </g>
       <g className="elements">
-      {
-	Object.keys(data.elements).map( (key) =>{
-	  let properties= data.elements[key];
-	  let elementType = properties.id;
-	  if(ElementHelper.isText(elementType)){
-	    return <TextElement {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
-	  } else if(ElementHelper.isPlaceHolder(elementType)){
-	    return <PlaceholderElement  {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
-	  } else if(ElementHelper.isGroup(elementType)){
-	return <GroupElement {...properties}  id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
-	  } else {
-	    return <Element {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} onPortMouseUp={data.onPortMouseUp} onPortMouseDown={data.onPortMouseDown}/>
-	 }
-	  
-	})
-      }
+	{
+	  Object.keys(data.elements).map( (key) =>{
+	    let properties= data.elements[key];
+	    let elementType = properties.id;
+	    if(ElementHelper.isText(elementType)){
+	      return <TextElement {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
+	    } else if(ElementHelper.isPlaceHolder(elementType)){
+	      return <PlaceholderElement  {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
+	    } else if(ElementHelper.isGroup(elementType)){
+	      return <GroupElement {...properties}  id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
+	    } else {
+	      return <Element {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} onPortMouseUp={data.onPortMouseUp} onPortMouseDown={data.onPortMouseDown}/>
+	    }
+	    
+	  })
+	}
       </g>
       <ElementOperator key={generateUUID()} {...data.operator} onRemoveClick={data.removeElement}></ElementOperator>
       <LineOperator key={generateUUID()} lineId={data.operator.lineId} onRemoveClick={data.removeLine}></LineOperator>
@@ -102,4 +102,39 @@ const Canvas = (data) =>(
   </div>
 );
 
-export default Canvas;
+const StaticCanvas = (data) => (
+  <div className="canvas">
+    <svg width={data.width} height={data.height} onDrop={dummyFunction} onDragOver={dummyFunction} onDragEnd={dummyFunction} onDoubleClick={dummyFunction}>
+      <g transform={`scale(${data.scaleX},${data.scaleY})`}>
+	<g className="links">
+	  {
+	    Object.keys(data.links).map(key =>{
+	      let properties = data.links[key];
+	      return <Link path={properties.path} key={properties.key} dbClick={dummyFunction} id={properties.key}/>
+	    })
+	  }
+	</g>
+	<g className="elements">
+	  {
+	    Object.keys(data.elements).map( (key) =>{
+	      let properties= data.elements[key];
+	      let elementType = properties.id;
+	      if(ElementHelper.isText(elementType)){
+		return <TextElement {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction}/>
+	      } else if(ElementHelper.isPlaceHolder(elementType)){
+		return <PlaceholderElement  {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction}/>
+	      } else if(ElementHelper.isGroup(elementType)){
+		return <GroupElement {...properties}  id={properties.key} dbClick={data.dbClickElement} dragElementStart={dummyFunction}/>
+	      } else {
+		return <Element {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={dummyFunction} onPortMouseUp={dummyFunction} onPortMouseDown={dummyFunction}/>
+	      }
+	      
+	    })
+	  }
+	</g>
+      </g>
+    </svg>
+  </div>
+);
+
+export {Canvas,StaticCanvas};

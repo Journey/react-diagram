@@ -62,8 +62,6 @@
 
 	var _App = __webpack_require__(187);
 
-	var _App2 = _interopRequireDefault(_App);
-
 	var _Utility = __webpack_require__(183);
 
 	function _interopRequireDefault(obj) {
@@ -73,7 +71,12 @@
 	_Utility.ApiSingletone.Render = function (domId) {
 	    var store = (0, _redux.createStore)(_reducers2.default);
 	    _Utility.StoreHelper.setStore(store);;
-	    (0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App2.default, null)), document.getElementById(domId));
+	    (0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.App, null)), document.getElementById(domId));
+	};
+	_Utility.ApiSingletone.StaticRender = function (domId) {
+	    var store = (0, _redux.createStore)(_reducers2.default);
+	    _Utility.StoreHelper.setStore(store);;
+	    (0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.StaticApp, null)), document.getElementById(domId));
 	};
 
 /***/ },
@@ -21300,7 +21303,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.ApiSingletone = exports.DefaultValues = exports.StoreHelper = exports.ElementHelper = exports.RectHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
+	exports.ApiSingletone = exports.DefaultValues = exports.StoreHelper = exports.ElementHelper = exports.RectHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.dummyFunction = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
 
 	var _slicedToArray = function () {
 	    function sliceIterator(arr, i) {
@@ -21377,6 +21380,10 @@
 	        }
 	    };
 	}();
+
+	var dummyFunction = exports.dummyFunction = function dummyFunction() {
+	    return false;
+	};
 
 	/**
 	 * todo::get the pallet element via the element  type id
@@ -22041,6 +22048,7 @@
 	    }];
 	    var _papers = null;
 	    var _fRender = null;
+	    var _fStaticRender = null;
 	    var ret = {
 	        get palletGroup() {
 	            return _palletGroupData;
@@ -22063,6 +22071,12 @@
 	        },
 	        get Render() {
 	            return _fRender;
+	        },
+	        set StaticRender(fRender) {
+	            _fStaticRender = fRender;
+	        },
+	        get StaticRender() {
+	            return _fStaticRender;
 	        },
 	        getDefaultSelectedPaper: function getDefaultSelectedPaper() {
 	            var papers = this.papers;
@@ -22094,8 +22108,7 @@
 	        get properties() {
 	            var paper = this.getDefaultSelectedPaper();
 	            return paper.properties;
-	        },
-	        Refresh: function Refresh() {}
+	        }
 	    };
 	    window.REACTDiagramApi = ret;
 	    return ret;
@@ -22519,6 +22532,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.StaticApp = exports.App = undefined;
 
 	var _react = __webpack_require__(1);
 
@@ -22530,8 +22544,6 @@
 
 	var _Canvas = __webpack_require__(191);
 
-	var _Canvas2 = _interopRequireDefault(_Canvas);
-
 	var _Property = __webpack_require__(196);
 
 	var _Property2 = _interopRequireDefault(_Property);
@@ -22541,8 +22553,6 @@
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
 	var _Tabs = __webpack_require__(200);
-
-	var _Tabs2 = _interopRequireDefault(_Tabs);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22557,28 +22567,42 @@
 	    ),
 	    _react2.default.createElement(
 	      "div",
-	      { className: "diagram-component" },
+	      { className: "diagram-component dia-flex" },
 	      _react2.default.createElement(
 	        "div",
-	        { className: "first-col" },
+	        { className: "first-col dia-border" },
 	        _react2.default.createElement(_Pallet2.default, null)
 	      ),
 	      _react2.default.createElement(
 	        "div",
-	        { className: "mid-col" },
-	        _react2.default.createElement(_Tabs2.default, null),
-	        _react2.default.createElement(_Canvas2.default, null)
+	        { className: "mid-col dia-border" },
+	        _react2.default.createElement(_Tabs.Tabs, null),
+	        _react2.default.createElement(_Canvas.Canvas, null)
 	      ),
 	      _react2.default.createElement(
 	        "div",
-	        { className: "lat-col" },
+	        { className: "lat-col dia-border" },
 	        _react2.default.createElement(_Property2.default, null)
 	      )
 	    )
 	  );
 	};
 
-	exports.default = App;
+	var StaticApp = function StaticApp() {
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "diagram" },
+	    _react2.default.createElement(
+	      "div",
+	      { className: "diagram-component" },
+	      _react2.default.createElement(_Tabs.StaticTabs, null),
+	      _react2.default.createElement(_Canvas.StaticCanvas, null)
+	    )
+	  );
+	};
+
+	exports.App = App;
+	exports.StaticApp = StaticApp;
 
 /***/ },
 /* 188 */
@@ -22975,22 +22999,17 @@
 	Object.defineProperty(exports, "__esModule", {
 					value: true
 	});
+	exports.StaticCanvas = exports.Canvas = undefined;
 
 	var _reactRedux = __webpack_require__(159);
 
 	var _Canvas = __webpack_require__(192);
-
-	var _Canvas2 = _interopRequireDefault(_Canvas);
 
 	var _Utility = __webpack_require__(183);
 
 	var _actions = __webpack_require__(190);
 
 	var _consts = __webpack_require__(181);
-
-	function _interopRequireDefault(obj) {
-					return obj && obj.__esModule ? obj : { default: obj };
-	}
 
 	var mapStateToProps = function mapStateToProps(state) {
 					return {
@@ -23146,7 +23165,12 @@
 					};
 	};
 
-	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Canvas2.default);
+	var Canvas = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Canvas.Canvas);
+
+	var StaticCanvas = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Canvas.StaticCanvas);
+
+	exports.Canvas = Canvas;
+	exports.StaticCanvas = StaticCanvas;
 
 /***/ },
 /* 192 */
@@ -23155,8 +23179,9 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+			value: true
 	});
+	exports.StaticCanvas = exports.Canvas = undefined;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -23183,162 +23208,203 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var MagnetPorts = function MagnetPorts(_ref) {
-	  var x = _ref.x;
-	  var y = _ref.y;
-	  var ownerKey = _ref.ownerKey;
-	  var position = _ref.position;
-	  var onPortMouseDown = _ref.onPortMouseDown;
-	  var onPortMouseUp = _ref.onPortMouseUp;
+			var x = _ref.x;
+			var y = _ref.y;
+			var ownerKey = _ref.ownerKey;
+			var position = _ref.position;
+			var onPortMouseDown = _ref.onPortMouseDown;
+			var onPortMouseUp = _ref.onPortMouseUp;
 
-	  return _react2.default.createElement(
-	    "g",
-	    { draggable: "false" },
-	    _react2.default.createElement("circle", { r: "6", transform: "translate(" + x + "," + y + ")", "data-owner-key": ownerKey, "data-position": position, onMouseUp: onPortMouseUp, onMouseDown: onPortMouseDown })
-	  );
+			return _react2.default.createElement(
+					"g",
+					{ draggable: "false" },
+					_react2.default.createElement("circle", { r: "6", transform: "translate(" + x + "," + y + ")", "data-owner-key": ownerKey, "data-position": position, onMouseUp: onPortMouseUp, onMouseDown: onPortMouseDown })
+			);
 	};
 	var Element = function Element(_ref2) {
-	  var id = _ref2.id;
-	  var typeId = _ref2.typeId;
-	  var image = _ref2.image;
-	  var x = _ref2.x;
-	  var y = _ref2.y;
-	  var width = _ref2.width;
-	  var height = _ref2.height;
-	  var dbclick = _ref2.dbclick;
-	  var dragElementStart = _ref2.dragElementStart;
-	  var onPortMouseUp = _ref2.onPortMouseUp;
-	  var onPortMouseDown = _ref2.onPortMouseDown;
-	  var dbClick = _ref2.dbClick;
-	  var midHorizontal = width / 2;
-	  var midVertical = height / 2;
-	  var top = { x: midHorizontal, y: 0 };
-	  var right = { x: width, y: midVertical };
-	  var bottom = { x: midHorizontal, y: height };
-	  var left = { x: 0, y: midVertical };
+			var id = _ref2.id;
+			var typeId = _ref2.typeId;
+			var image = _ref2.image;
+			var x = _ref2.x;
+			var y = _ref2.y;
+			var width = _ref2.width;
+			var height = _ref2.height;
+			var dbclick = _ref2.dbclick;
+			var dragElementStart = _ref2.dragElementStart;
+			var onPortMouseUp = _ref2.onPortMouseUp;
+			var onPortMouseDown = _ref2.onPortMouseDown;
+			var dbClick = _ref2.dbClick;
+			var midHorizontal = width / 2;
+			var midVertical = height / 2;
+			var top = { x: midHorizontal, y: 0 };
+			var right = { x: width, y: midVertical };
+			var bottom = { x: midHorizontal, y: height };
+			var left = { x: 0, y: midVertical };
 
-	  return _react2.default.createElement(
-	    "g",
-	    { className: "ca-element", transform: "translate(" + x + "," + y + ")" },
-	    _react2.default.createElement(
-	      "g",
-	      { draggable: "true", onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
-	      _react2.default.createElement(
-	        "g",
-	        { className: "ca-border" },
-	        _react2.default.createElement("rect", { width: width + 2, height: height + 2 })
-	      ),
-	      _react2.default.createElement(
-	        "g",
-	        { className: "ca-img" },
-	        _react2.default.createElement("image", { x: "0", y: "0", height: height, width: width, xlinkHref: image })
-	      )
-	    ),
-	    _react2.default.createElement(
-	      "g",
-	      { className: "magnet-ports" },
-	      _react2.default.createElement(MagnetPorts, _extends({}, top, { ownerKey: id, position: _consts.POSITION_TOP, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
-	      _react2.default.createElement(MagnetPorts, _extends({}, right, { ownerKey: id, position: _consts.POSITION_RIGHT, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
-	      _react2.default.createElement(MagnetPorts, _extends({}, bottom, { ownerKey: id, position: _consts.POSITION_BOTTOM, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
-	      _react2.default.createElement(MagnetPorts, _extends({}, left, { ownerKey: id, position: _consts.POSITION_LEFT, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp }))
-	    )
-	  );
+			return _react2.default.createElement(
+					"g",
+					{ className: "ca-element", transform: "translate(" + x + "," + y + ")" },
+					_react2.default.createElement(
+							"g",
+							{ draggable: "true", onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
+							_react2.default.createElement(
+									"g",
+									{ className: "ca-border" },
+									_react2.default.createElement("rect", { width: width + 2, height: height + 2 })
+							),
+							_react2.default.createElement(
+									"g",
+									{ className: "ca-img" },
+									_react2.default.createElement("image", { x: "0", y: "0", height: height, width: width, xlinkHref: image })
+							)
+					),
+					_react2.default.createElement(
+							"g",
+							{ className: "magnet-ports" },
+							_react2.default.createElement(MagnetPorts, _extends({}, top, { ownerKey: id, position: _consts.POSITION_TOP, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
+							_react2.default.createElement(MagnetPorts, _extends({}, right, { ownerKey: id, position: _consts.POSITION_RIGHT, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
+							_react2.default.createElement(MagnetPorts, _extends({}, bottom, { ownerKey: id, position: _consts.POSITION_BOTTOM, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
+							_react2.default.createElement(MagnetPorts, _extends({}, left, { ownerKey: id, position: _consts.POSITION_LEFT, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp }))
+					)
+			);
 	};
 	var Link = function Link(_ref3) {
-	  var path = _ref3.path;
-	  var id = _ref3.id;
-	  var dbClick = _ref3.dbClick;
+			var path = _ref3.path;
+			var id = _ref3.id;
+			var dbClick = _ref3.dbClick;
 
-	  return _react2.default.createElement(
-	    "g",
-	    { className: "link", "data-key": id, onDoubleClick: dbClick },
-	    _react2.default.createElement("path", { id: id, d: path }),
-	    _react2.default.createElement("path", { className: "path-hover", d: _Utility.LineHelper.getPathHoverRect(path) })
-	  );
+			return _react2.default.createElement(
+					"g",
+					{ className: "link", "data-key": id, onDoubleClick: dbClick },
+					_react2.default.createElement("path", { id: id, d: path }),
+					_react2.default.createElement("path", { className: "path-hover", d: _Utility.LineHelper.getPathHoverRect(path) })
+			);
 	};
 	var LineOperator = function LineOperator(_ref4) {
-	  var lineId = _ref4.lineId;
-	  var onRemoveClick = _ref4.onRemoveClick;
+			var lineId = _ref4.lineId;
+			var onRemoveClick = _ref4.onRemoveClick;
 
-	  return _react2.default.createElement(
-	    "g",
-	    { className: "line-operator" },
-	    _react2.default.createElement(
-	      "text",
-	      null,
-	      _react2.default.createElement(
-	        "textPath",
-	        { xlinkHref: "#" + lineId, "data-line-key": lineId, onClick: onRemoveClick },
-	        "删除"
-	      )
-	    )
-	  );
+			return _react2.default.createElement(
+					"g",
+					{ className: "line-operator" },
+					_react2.default.createElement(
+							"text",
+							null,
+							_react2.default.createElement(
+									"textPath",
+									{ xlinkHref: "#" + lineId, "data-line-key": lineId, onClick: onRemoveClick },
+									"删除"
+							)
+					)
+			);
 	};
 	var ElementOperator = function ElementOperator(_ref5) {
-	  var id = _ref5.id;
-	  var x = _ref5.x;
-	  var y = _ref5.y;
-	  var width = _ref5.width;
-	  var height = _ref5.height;
-	  var onRemoveClick = _ref5.onRemoveClick;
+			var id = _ref5.id;
+			var x = _ref5.x;
+			var y = _ref5.y;
+			var width = _ref5.width;
+			var height = _ref5.height;
+			var onRemoveClick = _ref5.onRemoveClick;
 
-	  return _react2.default.createElement(
-	    "g",
-	    { className: "operator", transform: "translate(" + (x - 3) + "," + (y - 3) + ")" },
-	    _react2.default.createElement(
-	      "g",
-	      { className: "operator-del" },
-	      _react2.default.createElement(
-	        "text",
-	        { "data-element-key": id, onClick: onRemoveClick, x: width / 2, y: "-5", textAnchor: "middle" },
-	        "删除"
-	      )
-	    ),
-	    _react2.default.createElement("rect", { className: "operator-hightlight", width: width + 8, height: height + 8 })
-	  );
+			return _react2.default.createElement(
+					"g",
+					{ className: "operator", transform: "translate(" + (x - 3) + "," + (y - 3) + ")" },
+					_react2.default.createElement(
+							"g",
+							{ className: "operator-del" },
+							_react2.default.createElement(
+									"text",
+									{ "data-element-key": id, onClick: onRemoveClick, x: width / 2, y: "-5", textAnchor: "middle" },
+									"删除"
+							)
+					),
+					_react2.default.createElement("rect", { className: "operator-hightlight", width: width + 8, height: height + 8 })
+			);
 	};
 	var Canvas = function Canvas(data) {
-	  return _react2.default.createElement(
-	    "div",
-	    { className: "canvas" },
-	    _react2.default.createElement(
-	      "svg",
-	      { width: data.width, height: data.height, onDrop: data.onDrop, onDragOver: data.dragOver, onDragEnd: data.onDragEnd, onDoubleClick: data.dbClickCanvas },
-	      _react2.default.createElement(
-	        "g",
-	        { transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
-	        _react2.default.createElement(
-	          "g",
-	          { className: "links" },
-	          Object.keys(data.links).map(function (key) {
-	            var properties = data.links[key];
-	            return _react2.default.createElement(Link, { path: properties.path, key: properties.key, dbClick: data.dbClickLine, id: properties.key });
-	          })
-	        ),
-	        _react2.default.createElement(
-	          "g",
-	          { className: "elements" },
-	          Object.keys(data.elements).map(function (key) {
-	            var properties = data.elements[key];
-	            var elementType = properties.id;
-	            if (_Utility.ElementHelper.isText(elementType)) {
-	              return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
-	            } else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
-	              return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
-	            } else if (_Utility.ElementHelper.isGroup(elementType)) {
-	              return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
-	            } else {
-	              return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown }));
-	            }
-	          })
-	        ),
-	        _react2.default.createElement(ElementOperator, _extends({ key: (0, _Utility.generateUUID)() }, data.operator, { onRemoveClick: data.removeElement })),
-	        _react2.default.createElement(LineOperator, { key: (0, _Utility.generateUUID)(), lineId: data.operator.lineId, onRemoveClick: data.removeLine })
-	      )
-	    )
-	  );
+			return _react2.default.createElement(
+					"div",
+					{ className: "canvas" },
+					_react2.default.createElement(
+							"svg",
+							{ width: data.width, height: data.height, onDrop: data.onDrop, onDragOver: data.dragOver, onDragEnd: data.onDragEnd, onDoubleClick: data.dbClickCanvas },
+							_react2.default.createElement(
+									"g",
+									{ transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
+									_react2.default.createElement(
+											"g",
+											{ className: "links" },
+											Object.keys(data.links).map(function (key) {
+													var properties = data.links[key];
+													return _react2.default.createElement(Link, { path: properties.path, key: properties.key, dbClick: data.dbClickLine, id: properties.key });
+											})
+									),
+									_react2.default.createElement(
+											"g",
+											{ className: "elements" },
+											Object.keys(data.elements).map(function (key) {
+													var properties = data.elements[key];
+													var elementType = properties.id;
+													if (_Utility.ElementHelper.isText(elementType)) {
+															return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+													} else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
+															return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+													} else if (_Utility.ElementHelper.isGroup(elementType)) {
+															return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+													} else {
+															return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown }));
+													}
+											})
+									),
+									_react2.default.createElement(ElementOperator, _extends({ key: (0, _Utility.generateUUID)() }, data.operator, { onRemoveClick: data.removeElement })),
+									_react2.default.createElement(LineOperator, { key: (0, _Utility.generateUUID)(), lineId: data.operator.lineId, onRemoveClick: data.removeLine })
+							)
+					)
+			);
 	};
 
-	exports.default = Canvas;
+	var StaticCanvas = function StaticCanvas(data) {
+			return _react2.default.createElement(
+					"div",
+					{ className: "canvas" },
+					_react2.default.createElement(
+							"svg",
+							{ width: data.width, height: data.height, onDrop: _Utility.dummyFunction, onDragOver: _Utility.dummyFunction, onDragEnd: _Utility.dummyFunction, onDoubleClick: _Utility.dummyFunction },
+							_react2.default.createElement(
+									"g",
+									{ transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
+									_react2.default.createElement(
+											"g",
+											{ className: "links" },
+											Object.keys(data.links).map(function (key) {
+													var properties = data.links[key];
+													return _react2.default.createElement(Link, { path: properties.path, key: properties.key, dbClick: _Utility.dummyFunction, id: properties.key });
+											})
+									),
+									_react2.default.createElement(
+											"g",
+											{ className: "elements" },
+											Object.keys(data.elements).map(function (key) {
+													var properties = data.elements[key];
+													var elementType = properties.id;
+													if (_Utility.ElementHelper.isText(elementType)) {
+															return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: _Utility.dummyFunction, dragElementStart: _Utility.dummyFunction }));
+													} else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
+															return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: _Utility.dummyFunction, dragElementStart: _Utility.dummyFunction }));
+													} else if (_Utility.ElementHelper.isGroup(elementType)) {
+															return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: _Utility.dummyFunction }));
+													} else {
+															return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: _Utility.dummyFunction, onPortMouseUp: _Utility.dummyFunction, onPortMouseDown: _Utility.dummyFunction }));
+													}
+											})
+									)
+							)
+					)
+			);
+	};
+
+	exports.Canvas = Canvas;
+	exports.StaticCanvas = StaticCanvas;
 
 /***/ },
 /* 193 */
@@ -24166,6 +24232,7 @@
 				var nameEle = subCreateEle.querySelector("input[name=name]");
 				var idEle = subCreateEle.querySelector("input[name=identify]");
 				var name = nameEle.value;
+				var paperType = parseInt(typeEle.value);
 				if (!name) {
 					return;
 				}
@@ -24177,7 +24244,7 @@
 
 				dispatch((0, _actions.createSubPage)({
 					name: name,
-					type: typeEle.value,
+					type: paperType,
 					key: id,
 					uuid: uuid
 				}));
@@ -24347,6 +24414,7 @@
 	Object.defineProperty(exports, "__esModule", {
 					value: true
 	});
+	exports.StaticTabs = exports.Tabs = undefined;
 
 	var _reactRedux = __webpack_require__(159);
 
@@ -24354,13 +24422,7 @@
 
 	var _Tabs = __webpack_require__(201);
 
-	var _Tabs2 = _interopRequireDefault(_Tabs);
-
 	var _actions = __webpack_require__(190);
-
-	function _interopRequireDefault(obj) {
-					return obj && obj.__esModule ? obj : { default: obj };
-	}
 
 	var mapStateToProps = function mapStateToProps(state) {
 					return {
@@ -24395,7 +24457,12 @@
 					};
 	};
 
-	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Tabs2.default);
+	var Tabs = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Tabs.Tabs);
+
+	var StaticTabs = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Tabs.StaticTabs);
+
+	exports.Tabs = Tabs;
+	exports.StaticTabs = StaticTabs;
 
 /***/ },
 /* 201 */
@@ -24406,6 +24473,7 @@
 	Object.defineProperty(exports, "__esModule", {
 			value: true
 	});
+	exports.StaticTabs = exports.Tabs = undefined;
 
 	var _react = __webpack_require__(1);
 
@@ -24432,8 +24500,24 @@
 					),
 					_react2.default.createElement(
 							"span",
-							{ onClick: deletePaper },
+							{ className: "dia-del-tab", onClick: deletePaper },
 							"x"
+					)
+			);
+	};
+	var StaticTab = function StaticTab(_ref2) {
+			var paperId = _ref2.paperId;
+			var paperName = _ref2.paperName;
+			var paperType = _ref2.paperType;
+			var selectPaper = _ref2.selectPaper;
+			var isSelected = _ref2.isSelected;
+			return _react2.default.createElement(
+					"div",
+					{ className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
+					_react2.default.createElement(
+							"span",
+							{ onClick: selectPaper },
+							paperName
 					)
 			);
 	};
@@ -24457,7 +24541,29 @@
 			);
 	};
 
-	exports.default = Tabs;
+	var StaticTabs = function StaticTabs(data) {
+			return _react2.default.createElement(
+					"div",
+					{ className: "dia-tabs" },
+					Object.keys(data.papers).sort(function (pre, next) {
+							return data.papers[pre].order - data.papers[next].order;
+					}).filter(function (key) {
+							return data.papers[key].paperType == 1;
+					}).map(function (key) {
+							var paper = data.papers[key];
+							return _react2.default.createElement(StaticTab, {
+									key: (0, _Utility.generateUUID)(),
+									paperId: key,
+									paperName: paper.paperName,
+									paperType: paper.paperType,
+									selectPaper: data.clickPaper,
+									isSelected: data.selectedPaperId === key ? true : false });
+					})
+			);
+	};
+
+	exports.Tabs = Tabs;
+	exports.StaticTabs = StaticTabs;
 
 /***/ }
 /******/ ]);
