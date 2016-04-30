@@ -21210,7 +21210,8 @@
 	   properties: _PropertyReducer2.default,
 	   operator: _CanvasReducer.operator,
 	   papers: _TabsReducer.papers,
-	   selectedPaperId: _TabsReducer.selectedPaperId
+	   selectedPaperId: _TabsReducer.selectedPaperId,
+	   secondLevelPage: _CanvasReducer.secondLevelPage
 	});
 	exports.default = componentReducers;
 
@@ -21257,6 +21258,9 @@
 	var CREATE_SUB_PAPGER = exports.CREATE_SUB_PAPGER = "Create Sub page operation";
 	var DELETE_SUB_PAPGER = exports.DELETE_SUB_PAPGER = "Delete Sub page operation";
 	var SWITCH_SUB_PAPER = exports.SWITCH_SUB_PAPER = "Switch sub page operation";
+	var OPEN_SUB_PAGE = exports.OPEN_SUB_PAGE = "Open Seconde Level Page for Static App";
+	var CLOSE_SUB_PAGE = exports.CLOSE_SUB_PAGE = "Close Seond Level Page for Static App";
+	var UPDATE_ELMENT_DATAS = exports.UPDATE_ELMENT_DATAS = "Update element image by status and place holder values";
 
 	var SAVE_SVG_PROPERTIES = exports.SAVE_SVG_PROPERTIES = "Save SVG Properties";
 	var SAVE_ELEMENT_PROPERTIES = exports.SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
@@ -21718,6 +21722,9 @@
 	    function _getProperties() {
 	        return _store.getState().properties;
 	    }
+	    function _getSelectedPageId() {
+	        return _store.getState().selectedPaperId;
+	    }
 	    return {
 	        /**
 	         * the setting method to store
@@ -21836,6 +21843,16 @@
 	            });
 	            return aRefLinks;
 	        },
+	        getSelectedPaperId: function getSelectedPaperId() {
+	            return _getSelectedPageId();
+	        },
+	        hasSubPage: function hasSubPage(elementKey) {
+	            var papers = _getPapers();
+	            if (papers[elementKey]) {
+	                return true;
+	            }
+	            return false;
+	        },
 	        getUpdatedLinks: function getUpdatedLinks(aLinkKeys) {
 	            var oLinks = _getLinks();
 	            var oUpdatedLinks = {};
@@ -21859,6 +21876,13 @@
 	                if (keys) {
 	                    return _papers[keys[0]];
 	                }
+	            }
+	            return null;
+	        },
+	        getPaperIdentifier: function getPaperIdentifier(paper, elementKey) {
+	            var property = paper.properties[elementKey];
+	            if (property) {
+	                return property.deviceInfo && property.deviceInfo.identifier;
 	            }
 	            return null;
 	        },
@@ -22049,6 +22073,7 @@
 	    var _papers = null;
 	    var _fRender = null;
 	    var _fStaticRender = null;
+	    var _fUpdateBindingData = null;
 	    var ret = {
 	        get palletGroup() {
 	            return _palletGroupData;
@@ -22077,6 +22102,12 @@
 	        },
 	        get StaticRender() {
 	            return _fStaticRender;
+	        },
+	        set UpdateBindingData(fUpdate) {
+	            _fUpdateBindingData = fUpdate;
+	        },
+	        get UpdateBindingData() {
+	            return _fUpdateBindingData;
 	        },
 	        getDefaultSelectedPaper: function getDefaultSelectedPaper() {
 	            var papers = this.papers;
@@ -22109,6 +22140,7 @@
 	            var paper = this.getDefaultSelectedPaper();
 	            return paper.properties;
 	        }
+
 	    };
 	    window.REACTDiagramApi = ret;
 	    return ret;
@@ -22123,7 +22155,7 @@
 	Object.defineProperty(exports, "__esModule", {
 				value: true
 	});
-	exports.operator = exports.links = exports.elements = exports.svgProperties = undefined;
+	exports.secondLevelPage = exports.operator = exports.links = exports.elements = exports.svgProperties = undefined;
 
 	var _redux = __webpack_require__(165);
 
@@ -22333,10 +22365,24 @@
 										return state;
 				}
 	};
+	var secondLevelPage = function secondLevelPage() {
+				var state = arguments.length <= 0 || arguments[0] === undefined ? { hide: true, svgProperties: _Utility.DefaultValues.getSvgProperties(), elements: {}, links: {}, properties: {} } : arguments[0];
+				var action = arguments[1];
+
+				switch (action.type) {
+							case _consts.OPEN_SUB_PAGE:
+										return Object.assign({}, action.paper, { hide: false });
+										break;
+							case _consts.CLOSE_SUB_PAGE:
+										return Object.assign({}, state, { hide: true });
+				}
+				return state;
+	};
 	exports.svgProperties = svgProperties;
 	exports.elements = elements;
 	exports.links = links;
 	exports.operator = operator;
+	exports.secondLevelPage = secondLevelPage;
 
 /***/ },
 /* 185 */
@@ -22591,12 +22637,17 @@
 	var StaticApp = function StaticApp() {
 	  return _react2.default.createElement(
 	    "div",
-	    { className: "diagram" },
+	    { className: "diagram dia-static" },
 	    _react2.default.createElement(
 	      "div",
 	      { className: "diagram-component" },
 	      _react2.default.createElement(_Tabs.StaticTabs, null),
 	      _react2.default.createElement(_Canvas.StaticCanvas, null)
+	    ),
+	    _react2.default.createElement(
+	      "div",
+	      { className: "dia-sub-page-popup" },
+	      _react2.default.createElement(_Canvas.StaticSecondLevelCanvas, null)
 	    )
 	  );
 	};
@@ -22758,7 +22809,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(181);
 
@@ -22990,6 +23041,26 @@
 	    };
 	};
 
+	var openSubPage = exports.openSubPage = function openSubPage(paper) {
+	    return {
+	        type: _consts.OPEN_SUB_PAGE,
+	        paper: paper
+	    };
+	};
+
+	var closeSubPage = exports.closeSubPage = function closeSubPage() {
+	    return {
+	        type: _consts.CLOSE_SUB_PAGE
+	    };
+	};
+
+	var updateElementDatas = exports.updateElementDatas = function updateElementDatas(data) {
+	    return {
+	        type: _consts.UPDATE_ELEMENT_DATAS,
+	        data: data
+	    };
+	};
+
 /***/ },
 /* 191 */
 /***/ function(module, exports, __webpack_require__) {
@@ -22997,9 +23068,9 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-					value: true
+	    value: true
 	});
-	exports.StaticCanvas = exports.Canvas = undefined;
+	exports.StaticSecondLevelCanvas = exports.StaticCanvas = exports.Canvas = undefined;
 
 	var _reactRedux = __webpack_require__(159);
 
@@ -23012,165 +23083,202 @@
 	var _consts = __webpack_require__(181);
 
 	var mapStateToProps = function mapStateToProps(state) {
-					return {
-									width: state.svgProperties.width,
-									height: state.svgProperties.height,
-									gridSize: state.svgProperties.gridSize,
-									scaleX: state.svgProperties.scaleX,
-									scaleY: state.svgProperties.scaleY,
-									zoomLevel: state.svgProperties.zoomLevel,
-									elements: state.elements,
-									links: state.links,
-									properties: state.properties,
-									operator: state.operator
-					};
+	    return {
+	        width: state.svgProperties.width,
+	        height: state.svgProperties.height,
+	        gridSize: state.svgProperties.gridSize,
+	        scaleX: state.svgProperties.scaleX,
+	        scaleY: state.svgProperties.scaleY,
+	        zoomLevel: state.svgProperties.zoomLevel,
+	        elements: state.elements,
+	        links: state.links,
+	        properties: state.properties,
+	        operator: state.operator
+	    };
 	};
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
-					return {
-									/**
+	    return {
+	        /**
 	         * add/move element, will be triggered when add an element by drop the element from the pallet,
 	         * or move an canvas element
 	         * 1. add an element - 
 	         * 2. move an element - 
 	         * @param {} evt
 	         */
-									onDrop: function onDrop(evt) {
-													var svgElement = evt.currentTarget;
-													var position = _Utility.Position.getMousePostionRelativeToElement(evt, svgElement, window, document);
-													position = _Utility.Position.correctElementPosition(position);
-													var oContext = (0, _Utility.getDragContextObject)(evt);
-													switch (oContext.type) {
-																	case _consts.TYPE_PALLETELEMENT:
-																					dispatch((0, _actions.addElement)(oContext.id, position.x, position.y));
-																					break;
-																	case _consts.TYPE_CANVASELEMENT:
-																					dispatch((0, _actions.moveElement)(oContext.id, position.x, position.y));
-																					setTimeout(function () {
-																									dispatch((0, _actions.updateLines)(oContext.id));
-																					}, 100);
-																					break;
-													}
-													evt.preventDefault();
-													//todo:: throw eorro on firefox
-													//evt.dataTransfer.clearData();
-									},
-									onDragEnd: function onDragEnd(evt) {
-													evt.preventDefault();
-									},
-									/**
+	        onDrop: function onDrop(evt) {
+	            var svgElement = evt.currentTarget;
+	            var position = _Utility.Position.getMousePostionRelativeToElement(evt, svgElement, window, document);
+	            position = _Utility.Position.correctElementPosition(position);
+	            var oContext = (0, _Utility.getDragContextObject)(evt);
+	            switch (oContext.type) {
+	                case _consts.TYPE_PALLETELEMENT:
+	                    dispatch((0, _actions.addElement)(oContext.id, position.x, position.y));
+	                    break;
+	                case _consts.TYPE_CANVASELEMENT:
+	                    dispatch((0, _actions.moveElement)(oContext.id, position.x, position.y));
+	                    setTimeout(function () {
+	                        dispatch((0, _actions.updateLines)(oContext.id));
+	                    }, 100);
+	                    break;
+	            }
+	            evt.preventDefault();
+	            //todo:: throw eorr on firefox
+	            //evt.dataTransfer.clearData();
+	        },
+	        onDragEnd: function onDragEnd(evt) {
+	            evt.preventDefault();
+	        },
+	        /**
 	         * todo:: remove an element
 	         * @param {} evt
 	         */
-									removeElement: function removeElement(evt) {
-													var key = evt.currentTarget.getAttribute("data-element-key");
-													dispatch((0, _actions.removeLines)(key));
-													dispatch((0, _actions.removeElement)(key));
+	        removeElement: function removeElement(evt) {
+	            var key = evt.currentTarget.getAttribute("data-element-key");
+	            dispatch((0, _actions.removeLines)(key));
+	            dispatch((0, _actions.removeElement)(key));
 
-													var _StoreHelper$getSvgPr = _Utility.StoreHelper.getSvgProperties();
+	            var _StoreHelper$getSvgPr = _Utility.StoreHelper.getSvgProperties();
 
-													var width = _StoreHelper$getSvgPr.width;
-													var height = _StoreHelper$getSvgPr.height;
-													var gridSize = _StoreHelper$getSvgPr.gridSize;
+	            var width = _StoreHelper$getSvgPr.width;
+	            var height = _StoreHelper$getSvgPr.height;
+	            var gridSize = _StoreHelper$getSvgPr.gridSize;
 
-													dispatch((0, _actions.selectCanvas)(width, height, gridSize));
-									},
-									removeLine: function removeLine(event) {
-													var key = event.currentTarget.getAttribute("data-line-key");
-													dispatch((0, _actions.removeLine)(key));
-									},
-									/**
+	            dispatch((0, _actions.selectCanvas)(width, height, gridSize));
+	        },
+	        removeLine: function removeLine(event) {
+	            var key = event.currentTarget.getAttribute("data-line-key");
+	            dispatch((0, _actions.removeLine)(key));
+	        },
+	        /**
 	         * drag an element over the canvas area
 	         * @param {} evt
 	         */
-									dragOver: function dragOver(evt) {
-													evt.dataTransfer.dropEffect = "move";
-													evt.preventDefault();
-									},
-									/**
+	        dragOver: function dragOver(evt) {
+	            evt.dataTransfer.dropEffect = "move";
+	            evt.preventDefault();
+	        },
+	        /**
 	         * drag an elements
 	         * @param {} evt
 	         */
-									dragElementStart: function dragElementStart(evt) {
-													var key = evt.currentTarget.getAttribute("data-key");
-													(0, _Utility.setDragContext)(evt, _consts.TYPE_CANVASELEMENT, key);
-													evt.dataTransfer.dropEffect = "copy";
-													evt.dataTransfer.effectAllowed = "copyMove";
-													_Utility.Position.logElementMistake(evt, evt.target, window, document);
-									},
-									/**
+	        dragElementStart: function dragElementStart(evt) {
+	            var key = evt.currentTarget.getAttribute("data-key");
+	            (0, _Utility.setDragContext)(evt, _consts.TYPE_CANVASELEMENT, key);
+	            evt.dataTransfer.dropEffect = "copy";
+	            evt.dataTransfer.effectAllowed = "copyMove";
+	            _Utility.Position.logElementMistake(evt, evt.target, window, document);
+	        },
+	        /**
 	         * todo::double click on an elements
 	         * @param {} evt
 	         */
-									dbClickElement: function dbClickElement(evt) {
-													var key = evt.currentTarget.getAttribute("data-key");
-													var elementInfo = _Utility.StoreHelper.getCanvasElmentInfoById(key);
-													var x = elementInfo.x;
-													var y = elementInfo.y;
-													var width = elementInfo.width;
-													var height = elementInfo.height;
+	        dbClickElement: function dbClickElement(evt) {
+	            var key = evt.currentTarget.getAttribute("data-key");
+	            var elementInfo = _Utility.StoreHelper.getCanvasElmentInfoById(key);
+	            var x = elementInfo.x;
+	            var y = elementInfo.y;
+	            var width = elementInfo.width;
+	            var height = elementInfo.height;
 
-													dispatch((0, _actions.selectElement)(key, x, y, width, height));
-													evt.preventDefault();
-													evt.stopPropagation();
-									},
-									/**
+	            dispatch((0, _actions.selectElement)(key, x, y, width, height));
+	            evt.preventDefault();
+	            evt.stopPropagation();
+	        },
+	        /**
 	         * dbclick on the blan area, will trigger the whole canvas selected
 	         * @param {} evt
 	         */
-									dbClickCanvas: function dbClickCanvas(evt) {
-													var _StoreHelper$getSvgPr2 = _Utility.StoreHelper.getSvgProperties();
+	        dbClickCanvas: function dbClickCanvas(evt) {
+	            var _StoreHelper$getSvgPr2 = _Utility.StoreHelper.getSvgProperties();
 
-													var width = _StoreHelper$getSvgPr2.width;
-													var height = _StoreHelper$getSvgPr2.height;
-													var gridSize = _StoreHelper$getSvgPr2.gridSize;
+	            var width = _StoreHelper$getSvgPr2.width;
+	            var height = _StoreHelper$getSvgPr2.height;
+	            var gridSize = _StoreHelper$getSvgPr2.gridSize;
 
-													dispatch((0, _actions.selectCanvas)(width, height, gridSize));
-													evt.preventDefault();
-													evt.stopPropagation();
-									},
-									dbClickLine: function dbClickLine(evt) {
-													var lineId = evt.currentTarget.getAttribute("data-key");
-													console.log("line clicked:" + lineId);
-													dispatch((0, _actions.selectLine)(lineId));
-													evt.preventDefault();
-													evt.stopPropagation();
-									},
-									/**
+	            dispatch((0, _actions.selectCanvas)(width, height, gridSize));
+	            evt.preventDefault();
+	            evt.stopPropagation();
+	        },
+	        dbClickLine: function dbClickLine(evt) {
+	            var lineId = evt.currentTarget.getAttribute("data-key");
+	            console.log("line clicked:" + lineId);
+	            dispatch((0, _actions.selectLine)(lineId));
+	            evt.preventDefault();
+	            evt.stopPropagation();
+	        },
+	        /**
 	         * log the port&owenr element info when mousedown on an port, currently used to draw line
 	         * @param {} event
 	         */
-									onPortMouseDown: function onPortMouseDown(event) {
-													var target = event.target;
-													var ownerKey = target.getAttribute("data-owner-key");
-													var portPosition = target.getAttribute("data-position");
-													_Utility.LineHelper.logStartInfo(ownerKey, portPosition);
-									},
-									/**
+	        onPortMouseDown: function onPortMouseDown(event) {
+	            var target = event.target;
+	            var ownerKey = target.getAttribute("data-owner-key");
+	            var portPosition = target.getAttribute("data-position");
+	            _Utility.LineHelper.logStartInfo(ownerKey, portPosition);
+	        },
+	        /**
 	         * log the port&owner element info when mouseup on an port. if it is the same port with the 
 	         * port triggered onPortMouseDown, then do nothing; otherwise drawline
 	         * @param {} event
 	         */
-									onPortMouseUp: function onPortMouseUp(event) {
-													var target = event.target;
-													var ownerKey = target.getAttribute("data-owner-key");
-													var portPosition = target.getAttribute("data-position");
-													var startInfo = _Utility.LineHelper.getStartInfo();
-													var endInfo = _Utility.LineHelper.portInfo(ownerKey, portPosition);
-													if (_Utility.LineHelper.isSamePort(startInfo, endInfo)) {
-																	_Utility.LineHelper.clearStartInfo();
-													} else {
-																	dispatch((0, _actions.addLine)(startInfo, endInfo));
-													}
-									}
-					};
+	        onPortMouseUp: function onPortMouseUp(event) {
+	            var target = event.target;
+	            var ownerKey = target.getAttribute("data-owner-key");
+	            var portPosition = target.getAttribute("data-position");
+	            var startInfo = _Utility.LineHelper.getStartInfo();
+	            var endInfo = _Utility.LineHelper.portInfo(ownerKey, portPosition);
+	            if (_Utility.LineHelper.isSamePort(startInfo, endInfo)) {
+	                _Utility.LineHelper.clearStartInfo();
+	            } else {
+	                dispatch((0, _actions.addLine)(startInfo, endInfo));
+	            }
+	        },
+	        /**
+	         * used for static canvas to open subpages if has
+	         * @param {} event
+	         */
+	        openSubPage: function openSubPage(event) {
+	            var target = event.currentTarget;
+	            var elementKey = target.getAttribute("data-key");
+	            var paper = _Utility.StoreHelper.getSelectedPaper(_Utility.StoreHelper.getSelectedPaperId());
+	            var identifier = _Utility.StoreHelper.getPaperIdentifier(paper, elementKey);
+	            if (_Utility.StoreHelper.hasSubPage(identifier)) {
+	                dispatch((0, _actions.openSubPage)(_Utility.StoreHelper.getSelectedPaper(identifier)));
+	            }
+	        },
+	        closeSubPage: function closeSubPage(event) {
+	            dispatch((0, _actions.closeSubPage)());
+	        },
+	        /**
+	         * used for static canvas to update the values of place holder
+	         * @param {} event
+	         */
+	        updatePlaceHolderData: function updatePlaceHolderData(event) {}
+	    };
 	};
 
 	var Canvas = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Canvas.Canvas);
 
 	var StaticCanvas = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Canvas.StaticCanvas);
 
+	var StaticSecondLevelCanvas = (0, _reactRedux.connect)(function (state) {
+	    return {
+	        hide: state.secondLevelPage.hide,
+	        width: state.secondLevelPage.svgProperties.width,
+	        height: state.secondLevelPage.svgProperties.height,
+	        gridSize: state.secondLevelPage.svgProperties.gridSize,
+	        scaleX: state.secondLevelPage.svgProperties.scaleX,
+	        scaleY: state.secondLevelPage.svgProperties.scaleY,
+	        zoomLevel: state.secondLevelPage.svgProperties.zoomLevel,
+	        elements: state.secondLevelPage.elements,
+	        links: state.secondLevelPage.links,
+	        properties: state.secondLevelPage.properties
+	    };
+	}, mapDispatchtoProps)(_Canvas.StaticCanvasWithClose);
+
 	exports.Canvas = Canvas;
 	exports.StaticCanvas = StaticCanvas;
+	exports.StaticSecondLevelCanvas = StaticSecondLevelCanvas;
 
 /***/ },
 /* 192 */
@@ -23179,9 +23287,9 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-			value: true
+	  value: true
 	});
-	exports.StaticCanvas = exports.Canvas = undefined;
+	exports.StaticCanvas = exports.Canvas = exports.StaticCanvasWithClose = undefined;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -23208,203 +23316,221 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var MagnetPorts = function MagnetPorts(_ref) {
-			var x = _ref.x;
-			var y = _ref.y;
-			var ownerKey = _ref.ownerKey;
-			var position = _ref.position;
-			var onPortMouseDown = _ref.onPortMouseDown;
-			var onPortMouseUp = _ref.onPortMouseUp;
+	  var x = _ref.x;
+	  var y = _ref.y;
+	  var ownerKey = _ref.ownerKey;
+	  var position = _ref.position;
+	  var onPortMouseDown = _ref.onPortMouseDown;
+	  var onPortMouseUp = _ref.onPortMouseUp;
 
-			return _react2.default.createElement(
-					"g",
-					{ draggable: "false" },
-					_react2.default.createElement("circle", { r: "6", transform: "translate(" + x + "," + y + ")", "data-owner-key": ownerKey, "data-position": position, onMouseUp: onPortMouseUp, onMouseDown: onPortMouseDown })
-			);
+	  return _react2.default.createElement(
+	    "g",
+	    { draggable: "false" },
+	    _react2.default.createElement("circle", { r: "6", transform: "translate(" + x + "," + y + ")", "data-owner-key": ownerKey, "data-position": position, onMouseUp: onPortMouseUp, onMouseDown: onPortMouseDown })
+	  );
 	};
 	var Element = function Element(_ref2) {
-			var id = _ref2.id;
-			var typeId = _ref2.typeId;
-			var image = _ref2.image;
-			var x = _ref2.x;
-			var y = _ref2.y;
-			var width = _ref2.width;
-			var height = _ref2.height;
-			var dbclick = _ref2.dbclick;
-			var dragElementStart = _ref2.dragElementStart;
-			var onPortMouseUp = _ref2.onPortMouseUp;
-			var onPortMouseDown = _ref2.onPortMouseDown;
-			var dbClick = _ref2.dbClick;
-			var midHorizontal = width / 2;
-			var midVertical = height / 2;
-			var top = { x: midHorizontal, y: 0 };
-			var right = { x: width, y: midVertical };
-			var bottom = { x: midHorizontal, y: height };
-			var left = { x: 0, y: midVertical };
+	  var id = _ref2.id;
+	  var typeId = _ref2.typeId;
+	  var image = _ref2.image;
+	  var x = _ref2.x;
+	  var y = _ref2.y;
+	  var width = _ref2.width;
+	  var height = _ref2.height;
+	  var dbclick = _ref2.dbclick;
+	  var dragElementStart = _ref2.dragElementStart;
+	  var onPortMouseUp = _ref2.onPortMouseUp;
+	  var onPortMouseDown = _ref2.onPortMouseDown;
+	  var dbClick = _ref2.dbClick;
+	  var draggable = _ref2.draggable;
+	  var midHorizontal = width / 2;
+	  var midVertical = height / 2;
+	  var top = { x: midHorizontal, y: 0 };
+	  var right = { x: width, y: midVertical };
+	  var bottom = { x: midHorizontal, y: height };
+	  var left = { x: 0, y: midVertical };
 
-			return _react2.default.createElement(
-					"g",
-					{ className: "ca-element", transform: "translate(" + x + "," + y + ")" },
-					_react2.default.createElement(
-							"g",
-							{ draggable: "true", onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
-							_react2.default.createElement(
-									"g",
-									{ className: "ca-border" },
-									_react2.default.createElement("rect", { width: width + 2, height: height + 2 })
-							),
-							_react2.default.createElement(
-									"g",
-									{ className: "ca-img" },
-									_react2.default.createElement("image", { x: "0", y: "0", height: height, width: width, xlinkHref: image })
-							)
-					),
-					_react2.default.createElement(
-							"g",
-							{ className: "magnet-ports" },
-							_react2.default.createElement(MagnetPorts, _extends({}, top, { ownerKey: id, position: _consts.POSITION_TOP, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
-							_react2.default.createElement(MagnetPorts, _extends({}, right, { ownerKey: id, position: _consts.POSITION_RIGHT, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
-							_react2.default.createElement(MagnetPorts, _extends({}, bottom, { ownerKey: id, position: _consts.POSITION_BOTTOM, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
-							_react2.default.createElement(MagnetPorts, _extends({}, left, { ownerKey: id, position: _consts.POSITION_LEFT, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp }))
-					)
-			);
+	  return _react2.default.createElement(
+	    "g",
+	    { className: "ca-element", transform: "translate(" + x + "," + y + ")" },
+	    _react2.default.createElement(
+	      "g",
+	      { draggable: draggable, onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
+	      _react2.default.createElement(
+	        "g",
+	        { className: "ca-border" },
+	        _react2.default.createElement("rect", { width: width + 2, height: height + 2 })
+	      ),
+	      _react2.default.createElement(
+	        "g",
+	        { className: "ca-img" },
+	        _react2.default.createElement("image", { x: "0", y: "0", height: height, width: width, xlinkHref: image })
+	      )
+	    ),
+	    _react2.default.createElement(
+	      "g",
+	      { className: "magnet-ports" },
+	      _react2.default.createElement(MagnetPorts, _extends({}, top, { ownerKey: id, position: _consts.POSITION_TOP, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
+	      _react2.default.createElement(MagnetPorts, _extends({}, right, { ownerKey: id, position: _consts.POSITION_RIGHT, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
+	      _react2.default.createElement(MagnetPorts, _extends({}, bottom, { ownerKey: id, position: _consts.POSITION_BOTTOM, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp })),
+	      _react2.default.createElement(MagnetPorts, _extends({}, left, { ownerKey: id, position: _consts.POSITION_LEFT, onPortMouseDown: onPortMouseDown, onPortMouseUp: onPortMouseUp }))
+	    )
+	  );
 	};
 	var Link = function Link(_ref3) {
-			var path = _ref3.path;
-			var id = _ref3.id;
-			var dbClick = _ref3.dbClick;
+	  var path = _ref3.path;
+	  var id = _ref3.id;
+	  var dbClick = _ref3.dbClick;
 
-			return _react2.default.createElement(
-					"g",
-					{ className: "link", "data-key": id, onDoubleClick: dbClick },
-					_react2.default.createElement("path", { id: id, d: path }),
-					_react2.default.createElement("path", { className: "path-hover", d: _Utility.LineHelper.getPathHoverRect(path) })
-			);
+	  return _react2.default.createElement(
+	    "g",
+	    { className: "link", "data-key": id, onDoubleClick: dbClick },
+	    _react2.default.createElement("path", { id: id, d: path }),
+	    _react2.default.createElement("path", { className: "path-hover", d: _Utility.LineHelper.getPathHoverRect(path) })
+	  );
 	};
 	var LineOperator = function LineOperator(_ref4) {
-			var lineId = _ref4.lineId;
-			var onRemoveClick = _ref4.onRemoveClick;
+	  var lineId = _ref4.lineId;
+	  var onRemoveClick = _ref4.onRemoveClick;
 
-			return _react2.default.createElement(
-					"g",
-					{ className: "line-operator" },
-					_react2.default.createElement(
-							"text",
-							null,
-							_react2.default.createElement(
-									"textPath",
-									{ xlinkHref: "#" + lineId, "data-line-key": lineId, onClick: onRemoveClick },
-									"删除"
-							)
-					)
-			);
+	  return _react2.default.createElement(
+	    "g",
+	    { className: "line-operator" },
+	    _react2.default.createElement(
+	      "text",
+	      null,
+	      _react2.default.createElement(
+	        "textPath",
+	        { xlinkHref: "#" + lineId, "data-line-key": lineId, onClick: onRemoveClick },
+	        "删除"
+	      )
+	    )
+	  );
 	};
 	var ElementOperator = function ElementOperator(_ref5) {
-			var id = _ref5.id;
-			var x = _ref5.x;
-			var y = _ref5.y;
-			var width = _ref5.width;
-			var height = _ref5.height;
-			var onRemoveClick = _ref5.onRemoveClick;
+	  var id = _ref5.id;
+	  var x = _ref5.x;
+	  var y = _ref5.y;
+	  var width = _ref5.width;
+	  var height = _ref5.height;
+	  var onRemoveClick = _ref5.onRemoveClick;
 
-			return _react2.default.createElement(
-					"g",
-					{ className: "operator", transform: "translate(" + (x - 3) + "," + (y - 3) + ")" },
-					_react2.default.createElement(
-							"g",
-							{ className: "operator-del" },
-							_react2.default.createElement(
-									"text",
-									{ "data-element-key": id, onClick: onRemoveClick, x: width / 2, y: "-5", textAnchor: "middle" },
-									"删除"
-							)
-					),
-					_react2.default.createElement("rect", { className: "operator-hightlight", width: width + 8, height: height + 8 })
-			);
+	  return _react2.default.createElement(
+	    "g",
+	    { className: "operator", transform: "translate(" + (x - 3) + "," + (y - 3) + ")" },
+	    _react2.default.createElement(
+	      "g",
+	      { className: "operator-del" },
+	      _react2.default.createElement(
+	        "text",
+	        { "data-element-key": id, onClick: onRemoveClick, x: width / 2, y: "-5", textAnchor: "middle" },
+	        "删除"
+	      )
+	    ),
+	    _react2.default.createElement("rect", { className: "operator-hightlight", width: width + 8, height: height + 8 })
+	  );
 	};
 	var Canvas = function Canvas(data) {
-			return _react2.default.createElement(
-					"div",
-					{ className: "canvas" },
-					_react2.default.createElement(
-							"svg",
-							{ width: data.width, height: data.height, onDrop: data.onDrop, onDragOver: data.dragOver, onDragEnd: data.onDragEnd, onDoubleClick: data.dbClickCanvas },
-							_react2.default.createElement(
-									"g",
-									{ transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
-									_react2.default.createElement(
-											"g",
-											{ className: "links" },
-											Object.keys(data.links).map(function (key) {
-													var properties = data.links[key];
-													return _react2.default.createElement(Link, { path: properties.path, key: properties.key, dbClick: data.dbClickLine, id: properties.key });
-											})
-									),
-									_react2.default.createElement(
-											"g",
-											{ className: "elements" },
-											Object.keys(data.elements).map(function (key) {
-													var properties = data.elements[key];
-													var elementType = properties.id;
-													if (_Utility.ElementHelper.isText(elementType)) {
-															return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
-													} else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
-															return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
-													} else if (_Utility.ElementHelper.isGroup(elementType)) {
-															return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
-													} else {
-															return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown }));
-													}
-											})
-									),
-									_react2.default.createElement(ElementOperator, _extends({ key: (0, _Utility.generateUUID)() }, data.operator, { onRemoveClick: data.removeElement })),
-									_react2.default.createElement(LineOperator, { key: (0, _Utility.generateUUID)(), lineId: data.operator.lineId, onRemoveClick: data.removeLine })
-							)
-					)
-			);
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "canvas", diplsy: true },
+	    _react2.default.createElement(
+	      "svg",
+	      { width: data.width, height: data.height, onDrop: data.onDrop, onDragOver: data.dragOver, onDragEnd: data.onDragEnd, onDoubleClick: data.dbClickCanvas },
+	      _react2.default.createElement(
+	        "g",
+	        { transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
+	        _react2.default.createElement(
+	          "g",
+	          { className: "links" },
+	          Object.keys(data.links).map(function (key) {
+	            var properties = data.links[key];
+	            return _react2.default.createElement(Link, { path: properties.path, key: properties.key, dbClick: data.dbClickLine, id: properties.key });
+	          })
+	        ),
+	        _react2.default.createElement(
+	          "g",
+	          { className: "elements" },
+	          Object.keys(data.elements).map(function (key) {
+	            var properties = data.elements[key];
+	            var elementType = properties.id;
+	            if (_Utility.ElementHelper.isText(elementType)) {
+	              return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+	            } else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
+	              return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+	            } else if (_Utility.ElementHelper.isGroup(elementType)) {
+	              return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+	            } else {
+	              return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown, draggable: true }));
+	            }
+	          })
+	        ),
+	        _react2.default.createElement(ElementOperator, _extends({ key: (0, _Utility.generateUUID)() }, data.operator, { onRemoveClick: data.removeElement })),
+	        _react2.default.createElement(LineOperator, { key: (0, _Utility.generateUUID)(), lineId: data.operator.lineId, onRemoveClick: data.removeLine })
+	      )
+	    )
+	  );
 	};
 
 	var StaticCanvas = function StaticCanvas(data) {
-			return _react2.default.createElement(
-					"div",
-					{ className: "canvas" },
-					_react2.default.createElement(
-							"svg",
-							{ width: data.width, height: data.height, onDrop: _Utility.dummyFunction, onDragOver: _Utility.dummyFunction, onDragEnd: _Utility.dummyFunction, onDoubleClick: _Utility.dummyFunction },
-							_react2.default.createElement(
-									"g",
-									{ transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
-									_react2.default.createElement(
-											"g",
-											{ className: "links" },
-											Object.keys(data.links).map(function (key) {
-													var properties = data.links[key];
-													return _react2.default.createElement(Link, { path: properties.path, key: properties.key, dbClick: _Utility.dummyFunction, id: properties.key });
-											})
-									),
-									_react2.default.createElement(
-											"g",
-											{ className: "elements" },
-											Object.keys(data.elements).map(function (key) {
-													var properties = data.elements[key];
-													var elementType = properties.id;
-													if (_Utility.ElementHelper.isText(elementType)) {
-															return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: _Utility.dummyFunction, dragElementStart: _Utility.dummyFunction }));
-													} else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
-															return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: _Utility.dummyFunction, dragElementStart: _Utility.dummyFunction }));
-													} else if (_Utility.ElementHelper.isGroup(elementType)) {
-															return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: _Utility.dummyFunction }));
-													} else {
-															return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: _Utility.dummyFunction, onPortMouseUp: _Utility.dummyFunction, onPortMouseDown: _Utility.dummyFunction }));
-													}
-											})
-									)
-							)
-					)
-			);
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "canvas" },
+	    _react2.default.createElement(
+	      "svg",
+	      { width: data.width, height: data.height, onDrop: _Utility.dummyFunction, onDragOver: _Utility.dummyFunction, onDragEnd: _Utility.dummyFunction, onDoubleClick: _Utility.dummyFunction },
+	      _react2.default.createElement(
+	        "g",
+	        { transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
+	        _react2.default.createElement(
+	          "g",
+	          { className: "links" },
+	          Object.keys(data.links).map(function (key) {
+	            var properties = data.links[key];
+	            return _react2.default.createElement(Link, { path: properties.path, key: properties.key, dbClick: _Utility.dummyFunction, id: properties.key });
+	          })
+	        ),
+	        _react2.default.createElement(
+	          "g",
+	          { className: "elements" },
+	          Object.keys(data.elements).map(function (key) {
+	            var properties = data.elements[key];
+	            var elementType = properties.id;
+	            if (_Utility.ElementHelper.isText(elementType)) {
+	              return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: _Utility.dummyFunction, dragElementStart: _Utility.dummyFunction }));
+	            } else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
+	              return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: _Utility.dummyFunction, dragElementStart: _Utility.dummyFunction }));
+	            } else if (_Utility.ElementHelper.isGroup(elementType)) {
+	              return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.openSubPage, dragElementStart: _Utility.dummyFunction }));
+	            } else {
+	              return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.openSubPage, dragElementStart: _Utility.dummyFunction, onPortMouseUp: _Utility.dummyFunction, onPortMouseDown: _Utility.dummyFunction, draggable: false }));
+	            }
+	          })
+	        )
+	      )
+	    )
+	  );
+	};
+	var StaticCanvasWithClose = exports.StaticCanvasWithClose = function StaticCanvasWithClose(data) {
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "dia-overlay", style: { display: data.hide ? "none" : "block" } },
+	    _react2.default.createElement(
+	      "div",
+	      null,
+	      _react2.default.createElement(
+	        "div",
+	        { onClick: data.closeSubPage },
+	        "X"
+	      )
+	    ),
+	    _react2.default.createElement(StaticCanvas, _extends({ key: (0, _Utility.generateUUID)() }, data))
+	  );
 	};
 
 	exports.Canvas = Canvas;
 	exports.StaticCanvas = StaticCanvas;
+	exports.StaticCanvasWithClose = StaticCanvasWithClose;
 
 /***/ },
 /* 193 */

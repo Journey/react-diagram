@@ -375,6 +375,9 @@ export const StoreHelper = (() => {
     function _getProperties() {
 	return _store.getState().properties;
     }
+  function _getSelectedPageId(){
+    return _store.getState().selectedPaperId;
+  }
     return {
         /**
          * the setting method to store
@@ -489,6 +492,16 @@ export const StoreHelper = (() => {
             });
             return aRefLinks;
         },
+      getSelectedPaperId: () => {
+	return _getSelectedPageId();
+      },
+      hasSubPage:(elementKey) => {
+	var papers = _getPapers();
+	if(papers[elementKey]){
+	  return true;
+	}
+	return false;
+      },
         getUpdatedLinks: (aLinkKeys) => {
             let oLinks = _getLinks();
             var oUpdatedLinks = {};
@@ -515,6 +528,13 @@ export const StoreHelper = (() => {
 	    }
 	    return null;
 	},
+      getPaperIdentifier: (paper,elementKey) => {
+	let property = paper.properties[elementKey];
+	if(property){
+	  return property.deviceInfo && property.deviceInfo.identifier;
+	}
+	return null;
+      },
 	isLastPaper: () => {
 	    var _papers = _getPapers();
 	    if(Object.keys(_papers).length > 1){
@@ -714,6 +734,7 @@ export const ApiSingletone = (()=>{
   var _papers = null;
   var _fRender = null;
   var _fStaticRender = null;
+  var _fUpdateBindingData = null;
    let ret = {
      get palletGroup(){
        return _palletGroupData;
@@ -742,6 +763,12 @@ export const ApiSingletone = (()=>{
      },
      get StaticRender(){
        return _fStaticRender;
+     },
+     set UpdateBindingData(fUpdate){
+       _fUpdateBindingData = fUpdate;
+     },
+     get UpdateBindingData(){
+       return _fUpdateBindingData;
      },
      getDefaultSelectedPaper(){
        var papers = this.papers;
@@ -772,7 +799,8 @@ export const ApiSingletone = (()=>{
      get properties() {
        var paper = this.getDefaultSelectedPaper();
        return paper.properties;
-     }
+     },
+     
    };
   window.REACTDiagramApi = ret;
   return ret;

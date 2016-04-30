@@ -7,7 +7,7 @@ import {
     CANVAS_ELEMENT_DRAG_START
 } from "../consts";
 import groups from "./PalletReducer";
-import {svgProperties,elements,links,operator} from "./CanvasReducer";
+import {svgProperties,elements,links,operator,secondLevelPage} from "./CanvasReducer";
 import properties from "./PropertyReducer";
 import {papers,selectedPaperId} from "./TabsReducer";
 
@@ -55,6 +55,7 @@ const componentReducers = combineReducers({
     properties,
     operator,
     papers,
-    selectedPaperId
+    selectedPaperId,
+    secondLevelPage
 });
 export default componentReducers;

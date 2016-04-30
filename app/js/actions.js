@@ -25,7 +25,10 @@ import {
     DELETE_SUB_PAPGER,
     UPDATE_GEOMETRIC_DATA,
     SWITCH_SUB_PAPER,
-    UPDATE_TEXT_ELEMENT
+    UPDATE_TEXT_ELEMENT,
+    OPEN_SUB_PAGE,
+    CLOSE_SUB_PAGE,
+    UPDATE_ELEMENT_DATAS
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -248,4 +251,24 @@ export const updateTextElement = (elementId,text) => {
 	elementId: elementId,
 	text: text
     };  
+};
+
+export const openSubPage = (paper) => {
+    return {
+	type: OPEN_SUB_PAGE,
+	paper: paper
+    };
+};
+
+export const closeSubPage = () => {
+    return {
+	type: CLOSE_SUB_PAGE
+    };  
+};
+
+export const updateElementDatas = (data) => {
+    return {
+	type: UPDATE_ELEMENT_DATAS,
+	data: data
+    };
 };

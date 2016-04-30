@@ -32,6 +32,9 @@ export const UNDO_OPERATION = "undo operation";
 export const CREATE_SUB_PAPGER = "Create Sub page operation";
 export const DELETE_SUB_PAPGER = "Delete Sub page operation";
 export const SWITCH_SUB_PAPER = "Switch sub page operation";
+export const OPEN_SUB_PAGE = "Open Seconde Level Page for Static App";
+export const CLOSE_SUB_PAGE = "Close Seond Level Page for Static App";
+export const UPDATE_ELMENT_DATAS = "Update element image by status and place holder values";
 
 export const SAVE_SVG_PROPERTIES = "Save SVG Properties";
 export const SAVE_ELEMENT_PROPERTIES = "Save Element Properties";

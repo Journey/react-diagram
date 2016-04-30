@@ -1,6 +1,6 @@
 import React from 'react';
 import Pallet from "../containers/Pallet";
-import {Canvas,StaticCanvas} from "../containers/Canvas";
+import {Canvas,StaticCanvas,StaticSecondLevelCanvas} from "../containers/Canvas";
 import Property from "../containers/Property";
 import Toolbar from "../containers/Toolbar";
 import {Tabs,StaticTabs} from "../containers/Tabs";
@@ -26,10 +26,13 @@ const App = () => (
 );
 
 const StaticApp = () => (
-  <div className="diagram">
+  <div className="diagram dia-static">
     <div className="diagram-component">
 	<StaticTabs />
 	<StaticCanvas />
+    </div>
+    <div className ="dia-sub-page-popup">
+      <StaticSecondLevelCanvas />
     </div>
   </div>
 );

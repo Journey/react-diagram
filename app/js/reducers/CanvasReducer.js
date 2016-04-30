@@ -20,6 +20,8 @@ import {
     DELETE_SUB_PAPGER,
     UPDATE_GEOMETRIC_DATA,
     SWITCH_SUB_PAPER,
+    OPEN_SUB_PAGE,
+    CLOSE_SUB_PAGE,
     SAVE_ELEMENT_PROPERTIES,
     UPDATE_TEXT_ELEMENT
 } from "../consts";
@@ -211,4 +213,14 @@ const operator = (state=DefaultValues.getOperator(),action) => {
 	return state;
     }
 };
-export {svgProperties, elements, links, operator};
+const secondLevelPage = (state={hide:true,svgProperties:DefaultValues.getSvgProperties(),elements:{},links:{},properties:{}},action) => {
+    switch(action.type){
+    case OPEN_SUB_PAGE:
+	return Object.assign({},action.paper,{hide: false});
+	break;
+    case CLOSE_SUB_PAGE:
+	return Object.assign({},state,{hide: true});
+    }
+    return state;
+};
+export {svgProperties, elements, links, operator,secondLevelPage};

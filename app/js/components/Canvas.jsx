@@ -11,7 +11,7 @@ const MagnetPorts = ({x,y,ownerKey,position,onPortMouseDown,onPortMouseUp}) => {
     </g>
   );
 };
-const Element = ({id,typeId,image,x,y,width,height,dbclick,dragElementStart,onPortMouseUp,onPortMouseDown,dbClick}) => {
+const Element = ({id,typeId,image,x,y,width,height,dbclick,dragElementStart,onPortMouseUp,onPortMouseDown,dbClick,draggable}) => {
   let [midHorizontal, midVertical] = [width/2, height/2];
   let [top,right,bottom,left] = [
     {x: midHorizontal,y:0},
@@ -21,7 +21,7 @@ const Element = ({id,typeId,image,x,y,width,height,dbclick,dragElementStart,onPo
   ];
   return (
     <g className="ca-element" transform={`translate(${x},${y})`} >
-      <g draggable="true" onDoubleClick={dbClick} onDragStart={dragElementStart} data-key={id}>
+      <g draggable={draggable} onDoubleClick={dbClick} onDragStart={dragElementStart} data-key={id}>
 	<g className="ca-border">
 	  <rect width={width+2} height={height+2}></rect>
 	</g>
@@ -66,7 +66,7 @@ const ElementOperator = ({id,x,y,width,height,onRemoveClick}) => {
   )
 }
 const Canvas = (data) =>(
-  <div className="canvas">
+  <div className="canvas" diplsy>
     <svg width={data.width} height={data.height} onDrop={data.onDrop} onDragOver={data.dragOver} onDragEnd={data.onDragEnd} onDoubleClick={data.dbClickCanvas}>
     <g transform={`scale(${data.scaleX},${data.scaleY})`}>
       <g className="links">
@@ -89,7 +89,7 @@ const Canvas = (data) =>(
 	    } else if(ElementHelper.isGroup(elementType)){
 	      return <GroupElement {...properties}  id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
 	    } else {
-	      return <Element {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} onPortMouseUp={data.onPortMouseUp} onPortMouseDown={data.onPortMouseDown}/>
+	      return <Element {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} onPortMouseUp={data.onPortMouseUp} onPortMouseDown={data.onPortMouseDown} draggable={true}/>
 	    }
 	    
 	  })
@@ -124,9 +124,9 @@ const StaticCanvas = (data) => (
 	      } else if(ElementHelper.isPlaceHolder(elementType)){
 		return <PlaceholderElement  {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction}/>
 	      } else if(ElementHelper.isGroup(elementType)){
-		return <GroupElement {...properties}  id={properties.key} dbClick={data.dbClickElement} dragElementStart={dummyFunction}/>
+		return <GroupElement {...properties}  id={properties.key} dbClick={data.openSubPage} dragElementStart={dummyFunction}/>
 	      } else {
-		return <Element {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={dummyFunction} onPortMouseUp={dummyFunction} onPortMouseDown={dummyFunction}/>
+		return <Element {...properties} id={properties.key} dbClick={data.openSubPage} dragElementStart={dummyFunction} onPortMouseUp={dummyFunction} onPortMouseDown={dummyFunction} draggable={false}/>
 	      }
 	      
 	    })
@@ -136,5 +136,13 @@ const StaticCanvas = (data) => (
     </svg>
   </div>
 );
+export const StaticCanvasWithClose = (data) =>(
+  <div className="dia-overlay" style={{display: data.hide? "none":"block"}}>
+    <div>
+      <div onClick={data.closeSubPage}>X</div>
+    </div>
+    <StaticCanvas key={generateUUID()} {...data} />
+  </div>
+);
 
-export {Canvas,StaticCanvas};
+export {Canvas,StaticCanvas,StaticCanvasWithClose};
