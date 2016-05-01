@@ -101,6 +101,9 @@ g.link path{
     bottom: 0;
     background: #ccc;
     z-index: 999;
+    margin: 12px;
+    border: 5px solid #666;
+    padding: 6px;
 }
 .dia-overlay .dia-sub-create{
     width: 500px;
@@ -126,6 +129,12 @@ g.link path{
     position:absolute;
     right: 0px;
     top: 0px;
+}
+.dia-close{
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    cursor: pointer;
 }
 .group-element rect{
     fill: #fff;

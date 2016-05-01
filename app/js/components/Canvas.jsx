@@ -83,11 +83,11 @@ const Canvas = (data) =>(
 	    let properties= data.elements[key];
 	    let elementType = properties.id;
 	    if(ElementHelper.isText(elementType)){
-	      return <TextElement {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
+	      return <TextElement {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} draggable={true}/>
 	    } else if(ElementHelper.isPlaceHolder(elementType)){
-	      return <PlaceholderElement  {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
+	      return <PlaceholderElement  {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} draggable={true}/>
 	    } else if(ElementHelper.isGroup(elementType)){
-	      return <GroupElement {...properties}  id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart}/>
+	      return <GroupElement {...properties}  id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} draggable={true}/>
 	    } else {
 	      return <Element {...properties} id={properties.key} dbClick={data.dbClickElement} dragElementStart={data.dragElementStart} onPortMouseUp={data.onPortMouseUp} onPortMouseDown={data.onPortMouseDown} draggable={true}/>
 	    }
@@ -120,11 +120,11 @@ const StaticCanvas = (data) => (
 	      let properties= data.elements[key];
 	      let elementType = properties.id;
 	      if(ElementHelper.isText(elementType)){
-		return <TextElement {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction}/>
+		return <TextElement {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction} draggable={false}/>
 	      } else if(ElementHelper.isPlaceHolder(elementType)){
-		return <PlaceholderElement  {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction}/>
+		return <PlaceholderElement  {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction} draggable={false}/>
 	      } else if(ElementHelper.isGroup(elementType)){
-		return <GroupElement {...properties}  id={properties.key} dbClick={data.openSubPage} dragElementStart={dummyFunction}/>
+		return <GroupElement {...properties}  id={properties.key} dbClick={data.openSubPage} dragElementStart={dummyFunction} draggable={false}/>
 	      } else {
 		return <Element {...properties} id={properties.key} dbClick={data.openSubPage} dragElementStart={dummyFunction} onPortMouseUp={dummyFunction} onPortMouseDown={dummyFunction} draggable={false}/>
 	      }
@@ -139,7 +139,7 @@ const StaticCanvas = (data) => (
 export const StaticCanvasWithClose = (data) =>(
   <div className="dia-overlay" style={{display: data.hide? "none":"block"}}>
     <div>
-      <div onClick={data.closeSubPage}>X</div>
+      <div onClick={data.closeSubPage} className="dia-close">X</div>
     </div>
     <StaticCanvas key={generateUUID()} {...data} />
   </div>

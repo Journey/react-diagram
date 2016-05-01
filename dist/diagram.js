@@ -23455,11 +23455,11 @@
 	            var properties = data.elements[key];
 	            var elementType = properties.id;
 	            if (_Utility.ElementHelper.isText(elementType)) {
-	              return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+	              return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, draggable: true }));
 	            } else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
-	              return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+	              return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, draggable: true }));
 	            } else if (_Utility.ElementHelper.isGroup(elementType)) {
-	              return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart }));
+	              return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, draggable: true }));
 	            } else {
 	              return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.dbClickElement, dragElementStart: data.dragElementStart, onPortMouseUp: data.onPortMouseUp, onPortMouseDown: data.onPortMouseDown, draggable: true }));
 	            }
@@ -23497,11 +23497,11 @@
 	            var properties = data.elements[key];
 	            var elementType = properties.id;
 	            if (_Utility.ElementHelper.isText(elementType)) {
-	              return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: _Utility.dummyFunction, dragElementStart: _Utility.dummyFunction }));
+	              return _react2.default.createElement(_TextElement2.default, _extends({}, properties, { id: properties.key, dbClick: _Utility.dummyFunction, dragElementStart: _Utility.dummyFunction, draggable: false }));
 	            } else if (_Utility.ElementHelper.isPlaceHolder(elementType)) {
-	              return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: _Utility.dummyFunction, dragElementStart: _Utility.dummyFunction }));
+	              return _react2.default.createElement(_PlaceHolder2.default, _extends({}, properties, { id: properties.key, dbClick: _Utility.dummyFunction, dragElementStart: _Utility.dummyFunction, draggable: false }));
 	            } else if (_Utility.ElementHelper.isGroup(elementType)) {
-	              return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.openSubPage, dragElementStart: _Utility.dummyFunction }));
+	              return _react2.default.createElement(_GroupElement2.default, _extends({}, properties, { id: properties.key, dbClick: data.openSubPage, dragElementStart: _Utility.dummyFunction, draggable: false }));
 	            } else {
 	              return _react2.default.createElement(Element, _extends({}, properties, { id: properties.key, dbClick: data.openSubPage, dragElementStart: _Utility.dummyFunction, onPortMouseUp: _Utility.dummyFunction, onPortMouseDown: _Utility.dummyFunction, draggable: false }));
 	            }
@@ -23520,7 +23520,7 @@
 	      null,
 	      _react2.default.createElement(
 	        "div",
-	        { onClick: data.closeSubPage },
+	        { onClick: data.closeSubPage, className: "dia-close" },
 	        "X"
 	      )
 	    ),
@@ -23561,13 +23561,14 @@
 	  var height = _ref.height;
 	  var dbClick = _ref.dbClick;
 	  var dragElementStart = _ref.dragElementStart;
+	  var draggable = _ref.draggable;
 
 	  return _react2.default.createElement(
 	    "g",
 	    { className: "ca-element text-element", transform: "translate(" + x + "," + y + ")" },
 	    _react2.default.createElement(
 	      "g",
-	      { draggable: "true", "data-type": typeId, onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
+	      { draggable: draggable, "data-type": typeId, onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
 	      _react2.default.createElement(
 	        "g",
 	        { className: "ca-text" },
@@ -23641,13 +23642,14 @@
 	  var height = _ref.height;
 	  var dbClick = _ref.dbClick;
 	  var dragElementStart = _ref.dragElementStart;
+	  var draggable = _ref.draggable;
 
 	  return _react2.default.createElement(
 	    "g",
 	    { className: "ca-element placeholder-element", transform: "translate(" + x + "," + y + ")" },
 	    _react2.default.createElement(
 	      "g",
-	      { draggable: "true", "data-type": typeId, onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
+	      { draggable: draggable, "data-type": typeId, onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
 	      _react2.default.createElement(
 	        "g",
 	        { className: "ca-text" },
@@ -23720,13 +23722,14 @@
 	  var height = _ref.height;
 	  var dbClick = _ref.dbClick;
 	  var dragElementStart = _ref.dragElementStart;
+	  var draggable = _ref.draggable;
 
 	  return _react2.default.createElement(
 	    "g",
 	    { className: "ca-element group-element", transform: "translate(" + x + "," + y + ")" },
 	    _react2.default.createElement(
 	      "g",
-	      { draggable: "true", "data-type": typeId, onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
+	      { draggable: draggable, "data-type": typeId, onDoubleClick: dbClick, onDragStart: dragElementStart, "data-key": id },
 	      _react2.default.createElement(
 	        "g",
 	        { className: "ca-border" },

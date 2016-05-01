@@ -1,10 +1,10 @@
 import React from 'react';
 import {generateUUID} from "../Utility";
 
-const PlaceholderElement = ({id,typeId,x,y,text,width,height,dbClick,dragElementStart}) => {
+const PlaceholderElement = ({id,typeId,x,y,text,width,height,dbClick,dragElementStart,draggable}) => {
   return (
     <g className="ca-element placeholder-element" transform={`translate(${x},${y})`} >
-      <g draggable="true" data-type={typeId} onDoubleClick={dbClick} onDragStart={dragElementStart} data-key={id}>
+      <g draggable={draggable} data-type={typeId} onDoubleClick={dbClick} onDragStart={dragElementStart} data-key={id}>
 	<g className="ca-text">
 	  <text x="0" y="0">{text}</text>
 	</g>
