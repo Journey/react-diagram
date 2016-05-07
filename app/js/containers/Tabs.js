@@ -1,5 +1,7 @@
 import {connect} from 'react-redux';
-import {generateUUID,StoreHelper} from "../Utility";
+import {generateUUID} from "../Utility";
+import {StoreHelper} from "../Util/StoreHelper";
+import {DataHelper} from "../Util/DataHelper";
 import {Tabs as TabsView,StaticTabs as StaticTabsView} from "../components/Tabs.jsx";
 import {zoomIn,zoomOut,redo,undo,createSubPage,deleteSubPage,switchSubPage,selectCanvas} from "../actions";
 
@@ -17,14 +19,14 @@ const mapDispatchtoProps = (dispatch) => {
 	    }
 	    var paperId = event.target.parentElement.getAttribute("data-paper-id");
 	    dispatch(deleteSubPage(paperId));
-	    var paper = StoreHelper.getSelectedPaper();
+	    var paper = DataHelper.getPaper();  ;
 	    dispatch(switchSubPage(paper));
 	    dispatch(selectCanvas());
 	},
 	clickPaper: (event)=>{
 	    var paperId = event.target.parentElement.getAttribute("data-paper-id");
 	    if(paperId){
-		var paper = StoreHelper.getSelectedPaper(paperId);
+		var paper = DataHelper.getPaper(paperId);
 		StoreHelper.storeData();
 		dispatch(switchSubPage(paper));
 		dispatch(selectCanvas());

@@ -60,22 +60,30 @@
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
-	var _App = __webpack_require__(187);
+	var _App = __webpack_require__(194);
 
-	var _Utility = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(184);
+
+	var _API = __webpack_require__(209);
+
+	var _DataHelper = __webpack_require__(183);
 
 	function _interopRequireDefault(obj) {
 	    return obj && obj.__esModule ? obj : { default: obj };
 	}
 
-	_Utility.ApiSingletone.Render = function (domId) {
+	_API.API.Render = function (aPalletGroup, oPapers, domId) {
+	    _DataHelper.DataHelper.papers = oPapers;
+	    _DataHelper.DataHelper.palletGroup = aPalletGroup;
 	    var store = (0, _redux.createStore)(_reducers2.default);
-	    _Utility.StoreHelper.setStore(store);;
+	    _StoreHelper.StoreHelper.setStore(store);;
 	    (0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.App, null)), document.getElementById(domId));
 	};
-	_Utility.ApiSingletone.StaticRender = function (domId) {
+	_API.API.StaticRender = function (aPalletGroup, oPapers, domId) {
+	    _DataHelper.DataHelper.papers = oPapers;
+	    _DataHelper.DataHelper.palletGroup = aPalletGroup;
 	    var store = (0, _redux.createStore)(_reducers2.default);
-	    _Utility.StoreHelper.setStore(store);;
+	    _StoreHelper.StoreHelper.setStore(store);;
 	    (0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.StaticApp, null)), document.getElementById(domId));
 	};
 
@@ -21151,13 +21159,13 @@
 
 	var _PalletReducer2 = _interopRequireDefault(_PalletReducer);
 
-	var _CanvasReducer = __webpack_require__(184);
+	var _CanvasReducer = __webpack_require__(190);
 
-	var _PropertyReducer = __webpack_require__(185);
+	var _PropertyReducer = __webpack_require__(192);
 
 	var _PropertyReducer2 = _interopRequireDefault(_PropertyReducer);
 
-	var _TabsReducer = __webpack_require__(186);
+	var _TabsReducer = __webpack_require__(193);
 
 	function _interopRequireDefault(obj) {
 	   return obj && obj.__esModule ? obj : { default: obj };
@@ -21202,6 +21210,7 @@
 	};
 
 	var componentReducers = (0, _redux.combineReducers)({
+	   papers: _TabsReducer.papers,
 	   selects: selects,
 	   svgProperties: _CanvasReducer.svgProperties,
 	   groups: _PalletReducer2.default,
@@ -21209,7 +21218,6 @@
 	   links: _CanvasReducer.links,
 	   properties: _PropertyReducer2.default,
 	   operator: _CanvasReducer.operator,
-	   papers: _TabsReducer.papers,
 	   selectedPaperId: _TabsReducer.selectedPaperId,
 	   secondLevelPage: _CanvasReducer.secondLevelPage
 	});
@@ -21273,6 +21281,8 @@
 	var SAVE_CHART = exports.SAVE_CHART = "Save Chart";
 	var UPDATE_TEXT_ELEMENT = exports.UPDATE_TEXT_ELEMENT = "Update text element values from properties";
 
+	var UI_DATA_UPDATE = exports.UI_DATA_UPDATE = "UI element binding data update, includs status image and binding data";
+
 /***/ },
 /* 182 */
 /***/ function(module, exports, __webpack_require__) {
@@ -21283,7 +21293,7 @@
 	  value: true
 	});
 
-	var _Utility = __webpack_require__(183);
+	var _DataHelper = __webpack_require__(183);
 
 	/**
 	 * the data of the pallet component
@@ -21292,9 +21302,7 @@
 	 * @returns {Object} the pallet element infomation
 	 */
 	var groups = function groups(state, action) {
-	  //comes from Utilit.ApiSingletone.palletGroup
-	  _Utility.PalletData.set(_Utility.ApiSingletone.palletGroup);
-	  return _Utility.ApiSingletone.palletGroup;
+	  return _DataHelper.DataHelper.palletGroup;
 	};
 	exports.default = groups;
 
@@ -21302,12 +21310,568 @@
 /* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	   value: true
+	});
+	exports.DataHelper = undefined;
+
+	var _StoreHelper = __webpack_require__(184);
+
+	var _DefaultValues = __webpack_require__(185);
+
+	var _PalletDataHelper = __webpack_require__(189);
+
+	var _papers = void 0; /**
+	                       * @fileOverview Helper method to get the value of the diagram
+	                       * @name DataHelper.js<Util>
+	                       * @author your name <journey@gmail.com>
+	                       * @license TBD
+	                       */
+
+	var _palletGroup;
+	var DataHelper = exports.DataHelper = {
+	   get papers() {
+	      if (_StoreHelper.StoreHelper.hasStore()) {
+	         return _StoreHelper.StoreHelper.getPapers();
+	      } else if (_papers) {
+	         return _papers;
+	      } else {
+	         return _DefaultValues.DefaultValues.getPapers();
+	      }
+	   },
+	   get palletGroup() {
+	      if (_palletGroup) {
+	         return _palletGroup;
+	      }
+	      return [];
+	   },
+	   set palletGroup(aPalletGroup) {
+	      _PalletDataHelper.PalletDataHelper.data = aPalletGroup;
+	      _palletGroup = aPalletGroup;
+	   },
+	   set papers(oPapers) {
+	      _papers = oPapers;
+	   },
+	   getPaper: function getPaper(paperId) {
+	      if (paperId) {
+	         return this.papers[paperId];
+	      } else {
+	         return this.defaultSelectedPaper;
+	      }
+	   },
+
+	   get elements() {
+	      return this.defaultSelectedPaper.elements;
+	   },
+	   get svgProperties() {
+	      return this.defaultSelectedPaper.svgProperties;
+	   },
+	   get links() {
+	      return this.defaultSelectedPaper.links;
+	   },
+	   get properties() {
+	      return this.defaultSelectedPaper.properties;
+	   },
+	   get selectedPaperId() {
+	      return this.defaultSelectedPaper.uuid;
+	   },
+	   get operator() {
+	      return _DefaultValues.DefaultValues.getOperator();
+	   },
+	   get defaultSelectedPaper() {
+	      var papers = this.papers;
+	      var _paper;
+	      var paperKeys = Object.keys(this.papers);
+	      Object.keys(this.papers).reduce(function (pre, curObj) {
+	         var curPaper = papers[curObj];
+	         if (pre > curPaper.order) {
+	            _paper = curPaper;
+	            return curPaper.order;
+	         }
+	         return pre;
+	      }, 10000000);
+	      return _paper;
+	   }
+	};
+
+/***/ },
+/* 184 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.StoreHelper = undefined;
+
+	var _DefaultValues = __webpack_require__(185);
+
+	var _ElementHelper = __webpack_require__(186);
+
+	var _LineHelper = __webpack_require__(188);
+
+	var _consts = __webpack_require__(181);
+
+	/**
+	 * the store helper used to access some informations in store. contains an referance to the redux golbal store
+	 * infromation
+	 */
+	var StoreHelper = exports.StoreHelper = function () {
+	    var _store = null;
+
+	    function _getElements() {
+	        if (_store) {
+	            return _store.getState().elements;
+	        }
+	    };
+
+	    function _getLinks() {
+	        if (_store) {
+	            return _store.getState().links;
+	        }
+	    };
+
+	    function _getPallets() {
+	        if (_store) {
+	            return _store.getState().groups;
+	        }
+	    };
+
+	    function _getSvgProperties() {
+	        if (_store) {
+	            return _store.getState().svgProperties;
+	        }
+	    };
+
+	    function _getPapers() {
+	        if (_store) {
+	            return _store.getState().papers;
+	        }
+	    };
+
+	    function _getProperties() {
+	        if (_store) {
+	            return _store.getState().properties;
+	        }
+	    };
+
+	    function _getSelectedPageId() {
+	        if (_store) {
+	            return _store.getState().selectedPaperId;
+	        }
+	    };
+	    return {
+	        /**
+	         * the setting method to store
+	         * @param {} oStore
+	         */
+	        setStore: function setStore(oStore) {
+	            window.__store__ = oStore;
+	            _store = oStore;
+	        },
+	        hasStore: function hasStore() {
+	            if (_store) {
+	                return true;
+	            }
+	            return false;
+	        },
+	        getSvgProperties: function getSvgProperties() {
+	            return _getSvgProperties();
+	        },
+	        getDispatch: function getDispatch() {
+	            if (_store) {
+	                return _store.dispatch.bind(_store);
+	            }
+	            return null;
+	        },
+	        /**
+	         * sync paper data from active areas to the papers object
+	         */
+	        storeData: function storeData() {
+	            var _state = _store.getState();
+	            var _selectedPaperId = _state.selectedPaperId;
+	            var paper = _state.papers[_selectedPaperId];
+	            paper.svgProperties = _state.svgProperties;
+	            paper.elements = _state.elements;
+	            paper.links = _state.links;
+	            paper.properties = _state.properties.properties;
+	        },
+	        getElementProperties: function getElementProperties(elementId) {
+	            var properties = _getProperties();
+	            var elements = _getElements();
+	            var element = elements[elementId];
+	            var elementProperty = properties.properties[elementId];
+	            var elementTypeId = element.id;
+	            if (elementProperty) {
+	                //todo::
+	            } else {
+	                    elementProperty = _DefaultValues.DefaultValues.getDefaultProperties(elementTypeId);
+	                }
+	            return elementProperty;
+	        },
+	        getPalletElementInfoById: function getPalletElementInfoById(iPalletelementid) {
+	            var aGroups = _getPallets();
+	            var retElement = null;
+	            for (var groupInx = 0, groupLen = aGroups.length; groupInx < groupLen; groupInx++) {
+	                var group = aGroups[groupInx];
+	                retElement = group.items.find(function (item) {
+	                    if (item.id == iPalletelementid) {
+	                        return true;
+	                    }
+	                    return false;
+	                });
+	                if (retElement) {
+	                    break;
+	                }
+	            }
+	            if (_ElementHelper.ElementHelper.isText(iPalletelementid)) {
+	                retElement.text = "文字元素";
+	                retElement.width = 100;
+	                retElement.height = 20;
+	            } else if (_ElementHelper.ElementHelper.isGroup(iPalletelementid)) {
+	                retElement.bindingId = "";
+	                retElement.width = 150;
+	                retElement.height = 150;
+	            } else if (_ElementHelper.ElementHelper.isPlaceHolder(iPalletelementid)) {
+	                retElement.text = "没有值";
+	                retElement.width = 100;
+	                retElement.height = 20;
+	                retElement.bindingId = "";
+	            }
+	            return Object.assign({}, retElement);
+	        },
+	        getCanvasElmentInfoById: function getCanvasElmentInfoById(sElementId) {
+	            var oElements = _getElements();
+	            return Object.assign({}, oElements[sElementId]);
+	        },
+	        getPortPosition: function getPortPosition(elementKey, position) {
+	            var oElement = StoreHelper.getCanvasElmentInfoById(elementKey);
+	            var startX = oElement.x;
+	            var startY = oElement.y;
+	            var width = oElement.width;
+	            var height = oElement.height;
+
+	            var portPosition = null;
+	            switch (position) {
+	                case _consts.POSITION_TOP:
+	                    portPosition = {
+	                        x: startX + width / 2,
+	                        y: startY
+	                    };
+	                    break;
+	                case _consts.POSITION_RIGHT:
+	                    portPosition = {
+	                        x: startX + width,
+	                        y: startY + height / 2
+	                    };
+	                    break;
+	                case _consts.POSITION_BOTTOM:
+	                    portPosition = {
+	                        x: startX + width / 2,
+	                        y: startY + height
+	                    };
+	                    break;
+	                case _consts.POSITION_LEFT:
+	                    portPosition = {
+	                        x: startX,
+	                        y: startY + height / 2
+	                    };
+	                    break;
+	            }
+	            return portPosition;
+	        },
+	        getRefLinksByElementKey: function getRefLinksByElementKey(elementId) {
+	            var oLinks = _getLinks();
+	            var aRefLinks = Object.keys(oLinks).filter(function (linkKey) {
+	                var link = oLinks[linkKey];
+	                if (link.startPort.elementKey === elementId || link.endPort.elementKey === elementId) {
+	                    return true;
+	                }
+	                return false;
+	            });
+	            return aRefLinks;
+	        },
+	        getSelectedPaperId: function getSelectedPaperId() {
+	            return _getSelectedPageId();
+	        },
+	        hasSubPage: function hasSubPage(elementKey) {
+	            var papers = _getPapers();
+	            if (papers[elementKey]) {
+	                return true;
+	            }
+	            return false;
+	        },
+	        getUpdatedLinks: function getUpdatedLinks(aLinkKeys) {
+	            var oLinks = _getLinks();
+	            var oUpdatedLinks = {};
+	            aLinkKeys.forEach(function (key) {
+	                var oldLink = oLinks[key];
+	                var startPoint = StoreHelper.getPortPosition(oldLink.startPort.elementKey, oldLink.startPort.position);
+	                var endPoint = StoreHelper.getPortPosition(oldLink.endPort.elementKey, oldLink.endPort.position);
+	                var path = _LineHelper.LineHelper.getPath(startPoint, endPoint);
+	                oUpdatedLinks[key] = Object.assign({}, oldLink, {
+	                    path: path
+	                });
+	            });
+	            return oUpdatedLinks;
+	        },
+	        getPaperIdentifier: function getPaperIdentifier(paper, elementKey) {
+	            var property = paper.properties[elementKey];
+	            if (property) {
+	                return property.deviceInfo && property.deviceInfo.identifier;
+	            }
+	            return null;
+	        },
+	        isLastPaper: function isLastPaper() {
+	            var _papers = _getPapers();
+	            if (Object.keys(_papers).length > 1) {
+	                return false;
+	            }
+	            return true;
+	        },
+	        getPapers: function getPapers() {
+	            return _getPapers();
+	        },
+	        getNextPageOrder: function getNextPageOrder() {
+	            var papers = StoreHelper.getPapers();
+	            var largestPageOrder = Object.keys(papers).reduce(function (pre, curKey) {
+	                if (papers[curKey].order > pre) {
+	                    return papers[curKey].order;
+	                } else {
+	                    return pre;
+	                }
+	            }, -1);
+	            return largestPageOrder + 1;
+	        }
+	    };
+	}();
+
+/***/ },
+/* 185 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.DefaultValues = undefined;
+
+	var _ElementHelper = __webpack_require__(186);
+
+	var _StoreHelper = __webpack_require__(184);
+
+	var _UUID = __webpack_require__(187);
+
+	function _defineProperty(obj, key, value) {
+	    if (key in obj) {
+	        Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+	    } else {
+	        obj[key] = value;
+	    }return obj;
+	}
+
+	var DefaultValues = exports.DefaultValues = function () {
+	    var tabIndex = 1;
+	    return {
+	        getPapers: function getPapers() {
+	            var _paper = DefaultValues.getDefaultPaper();
+	            return _defineProperty({}, _paper.key, _paper);
+	        },
+	        getSvgProperties: function getSvgProperties() {
+	            if (_StoreHelper.StoreHelper.hasStore()) {
+	                return _StoreHelper.StoreHelper.getSvgProperties();
+	            }
+	            return {
+	                width: 1000,
+	                height: 1000,
+	                gridSize: 20,
+	                scaleX: 1,
+	                scaleY: 1,
+	                zoomLevel: 1
+
+	            };
+	        },
+	        getOperator: function getOperator() {
+	            return {
+	                id: null, //selected element id
+	                x: 100000,
+	                y: 100000,
+	                width: 10000,
+	                height: 10000,
+	                lineId: null //selected line id
+	            };
+	        },
+	        getDefaultPaper: function () {
+	            var id = (0, _UUID.generateUUID)();
+	            return function () {
+	                return {
+	                    key: id,
+	                    paperName: "默认",
+	                    paperType: 1, // 普通页面
+	                    order: 0,
+	                    svgProperties: DefaultValues.getSvgProperties(),
+	                    elements: {},
+	                    links: {},
+	                    properties: {}
+	                };
+	            };
+	        }(),
+	        generatePaper: function generatePaper(uuid, paperId, paperName, paperType) {
+	            return {
+	                uuid: uuid,
+	                key: paperId,
+	                paperName: paperName,
+	                paperType: paperType,
+	                svgProperties: DefaultValues.getSvgProperties(),
+	                elements: {},
+	                links: {},
+	                properties: {},
+	                operator: DefaultValues.getOperator(),
+	                order: _StoreHelper.StoreHelper.getNextPageOrder()
+	            };
+	        },
+	        getDefaultPapers: function getDefaultPapers() {
+	            var defaultPaper = DefaultValues.getDefaultPaper();
+	            return _defineProperty({}, defaultPaper.key, defaultPaper);
+	        },
+	        getDefaultState: function getDefaultState() {
+	            var defaultPaper = DefaultValues.getDefaultPaper();
+	            var operator = DefaultValues.getOperator();
+	            return {
+	                selectedPaperId: defaultPaper.key,
+	                svgProperties: defaultPaper.svgProperties,
+	                elements: defaultPaper.elements,
+	                properties: defaultPaper.properties,
+	                links: defaultPaper.links,
+	                operator: operator,
+	                papers: _defineProperty({}, defaultPaper.key, defaultPaper)
+	            };
+	        },
+	        getDefaultTextProperties: function getDefaultTextProperties() {
+	            return {
+	                text: "文字元素"
+	            };
+	        },
+	        getDefaultGroupProperties: function getDefaultGroupProperties() {
+	            return {
+	                bindingId: ""
+	            };
+	        },
+	        getDefaultPlaceholderProperties: function getDefaultPlaceholderProperties() {
+	            return {
+	                bindingId: ""
+	            };
+	        },
+	        getDefaultProperties: function getDefaultProperties(elementTypeId) {
+	            var _oProperties = void 0;
+	            if (_ElementHelper.ElementHelper.isText(elementTypeId)) {
+	                _oProperties = DefaultValues.getDefaultTextProperties();
+	            } else if (_ElementHelper.ElementHelper.isGroup(elementTypeId)) {
+	                _oProperties = DefaultValues.getDefaultGroupProperties();
+	            } else if (_ElementHelper.ElementHelper.isPlaceHolder(elementTypeId)) {
+	                _oProperties = DefaultValues.getDefaultPlaceholderProperties();
+	            } else {
+	                _oProperties = {
+	                    deviceInfo: DefaultValues.getDeviceInfo(),
+	                    measurePointInfos: [DefaultValues.getMeasurePointInfo()]
+	                };
+	            }
+	            _oProperties.elementTypeId = elementTypeId;
+	            return _oProperties;
+	        },
+	        getPalletDatas: function getPalletDatas() {
+	            //todo::
+	        },
+	        getDeviceInfo: function getDeviceInfo() {
+	            return {
+	                name: "",
+	                serialNumber: ""
+	            };
+	        },
+	        getMeasurePointInfo: function getMeasurePointInfo() {
+	            return {
+	                name: "",
+	                identifier: "",
+	                type: "1"
+	            };
+	        }
+	    };
+	}();
+
+/***/ },
+/* 186 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	/**
+	 * Element Helper - used to determine the Special Elements. e.g. Text,PlaceHolder,GroupElement
+	 */
+	var ElementHelper = exports.ElementHelper = function () {
+	    //TODO:: REPLACE WITH THE REAL ID
+	    var TEXT_ID = 10;
+	    var PLACE_HOLDER_ID = 11;
+	    var GROUP = 12;
+	    return {
+	        isText: function isText(eleTypeId) {
+	            if (eleTypeId == TEXT_ID) {
+	                return true;
+	            }
+	            return false;
+	        },
+	        isPlaceHolder: function isPlaceHolder(eleTypeId) {
+	            if (eleTypeId == PLACE_HOLDER_ID) {
+	                return true;
+	            }
+	            return false;
+	        },
+	        isGroup: function isGroup(eleTypeId) {
+	            if (eleTypeId == GROUP) {
+	                return true;
+	            }
+	            return false;
+	        }
+	    };
+	}();
+
+/***/ },
+/* 187 */
+/***/ function(module, exports) {
+
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.ApiSingletone = exports.DefaultValues = exports.StoreHelper = exports.ElementHelper = exports.RectHelper = exports.LineHelper = exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.getElementById = exports.dummyFunction = exports.PalletData = exports.getRelativePosition = exports.generateUUID = undefined;
+	var uuidTemplate = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+	/**
+	 * generate uuid
+	 * @returns {string} uuid
+	 */
+	var generateUUID = exports.generateUUID = function generateUUID() {
+	    return uuidTemplate.replace(/[xy]/g, function (c) {
+	        var r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0,
+	            v = c == 'x' ? r : r & 0x3 | 0x8;
+	        return v.toString(16);
+	    });
+	};
+
+/***/ },
+/* 188 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
 
 	var _slicedToArray = function () {
 	    function sliceIterator(arr, i) {
@@ -21333,35 +21897,470 @@
 	            throw new TypeError("Invalid attempt to destructure non-iterable instance");
 	        }
 	    };
-	}(); /**
-	      * @Define Utility
-	      * @name Utility.js
-	      * @author journey
-	      * @license BSD
-	      */
+	}();
+
+	/**
+	 * Line Helper. used to log some temp information for draw lines, and provide some helper operations
+	 * @returns {Object} Line Helper methods
+	 */
+	var LineHelper = exports.LineHelper = function () {
+	    var _startInfo = {
+	        elementKey: null,
+	        position: null
+	    };
+	    return {
+	        /**
+	         * wrap line start/end point info into a certain constructor
+	         * @param {Object} evt the react Event object
+	         * @returns {Object} oContext  contain type/id proerties
+	         */
+
+	        portInfo: function portInfo(elementKey, position) {
+	            return {
+	                elementKey: elementKey, position: position
+	            };
+	        },
+	        logStartInfo: function logStartInfo(key, position) {
+	            _startInfo = this.portInfo(key, position);
+	        },
+	        getStartInfo: function getStartInfo() {
+	            return _startInfo;
+	        },
+	        clearStartInfo: function clearStartInfo() {
+	            _startInfo = this.portInfo(null, null);
+	        },
+	        isSamePort: function isSamePort(startPort, endPort) {
+	            if (startPort.elementKey !== undefined && startPort.elementKey !== endPort.elementKey) {
+	                return false;
+	            };
+	            return true;
+	        },
+	        getPath: function getPath(startPoint, endPoint) {
+	            return "M" + startPoint.x + " " + startPoint.y + " L" + endPoint.x + " " + endPoint.y + " Z";
+	        },
+
+	        /**
+	         * get the hover rect of the path
+	         * @param {string} path only composed by M L Z e.g 'M250 145 L360 145 Z'
+	         */
+	        getPathHoverRect: function getPathHoverRect(sPath) {
+	            var points = sPath.split(/[A-Z]/);
+	            //
+	            points = points.filter(function (value) {
+	                return value !== "";
+	            });
+	            //["22 33 ","33 44"] ->[[22,33],[33,44]]
+	            points = points.map(function (sPoints) {
+	                sPoints = sPoints.trim();
+	                var aPoint = sPoints.split(/\s/);
+	                return [parseInt(aPoint[0]), parseInt(aPoint[1])];
+	            });
+
+	            return RectHelper.getRectPathByPoints(points);
+	        }
+	    };
+	}();
+
+	//todo
+	var RectHelper = exports.RectHelper = function () {
+	    var VERTICAL_TYPE = "Verticle Type";
+	    var HORIZONTAL_TYPE = "Horizontal Type";
+	    var UP_LINE = "Up Line";
+	    var DOWN_LINE = "Down Line";
+
+	    return {
+	        /**
+	         * get the rect area 
+	         * @param {} aPoints
+	         */
+	        getRectPathByPoints: function getRectPathByPoints(aPoints) {
+	            var aUpArea = [],
+	                aDownArea = [];
+	            var sPath = "M",
+	                temp = void 0;
+	            for (var index = 0, length = aPoints.length; index < length - 1; index++) {
+	                temp = RectHelper.getRectPoints(aPoints[index], aPoints[index + 1]);
+	                aUpArea = aUpArea.concat(temp.up);
+	                aDownArea = aDownArea.concat(temp.down);
+	            }
+	            aUpArea.forEach(function (aPoint) {
+	                sPath = sPath + aPoint[0] + " " + aPoint[1] + "L";
+	            });
+	            for (var len = aDownArea.length, inx = len; inx > 0; inx--) {
+	                temp = aDownArea[inx - 1];
+	                sPath = sPath + temp[0] + " " + temp[1] + "L";
+	            }
+	            sPath = sPath + aUpArea[0][0] + " " + aUpArea[0][1] + "Z";
+	            return sPath;
+	        },
+	        getLineType: function getLineType(aStartPoint, aEndPoint) {
+	            var deltaX = aEndPoint[0] - aStartPoint[0];
+	            var deltaY = aEndPoint[1] - aStartPoint[1];
+	            if (deltaX == 0) {
+	                return VERTICAL_TYPE;
+	            }
+	            if (deltaY == 0) {
+	                return HORIZONTAL_TYPE;
+	            }
+	            if (deltaY / deltaX > 0) {
+	                return UP_LINE;
+	            }
+	            return DOWN_LINE;
+	        },
+	        getRectPoints: function getRectPoints(aStartPoint, aEndPoint) {
+	            var lineDirction = RectHelper.getLineType(aStartPoint, aEndPoint);
+
+	            var _aStartPoint = _slicedToArray(aStartPoint, 2);
+
+	            var startX = _aStartPoint[0];
+	            var startY = _aStartPoint[1];
+
+	            var _aEndPoint = _slicedToArray(aEndPoint, 2);
+
+	            var endX = _aEndPoint[0];
+	            var endY = _aEndPoint[1];
+
+	            var aUpArea = [];
+	            var aDownArea = [];
+	            var dimension = 6;
+	            switch (lineDirction) {
+	                case UP_LINE:
+	                    aUpArea.push([startX - dimension, startY + dimension]);
+	                    aUpArea.push([endX - dimension, endY + dimension]);
+	                    aDownArea.push([startX + dimension, startY - dimension]);
+	                    aDownArea.push([endX + dimension, endY - dimension]);
+	                    break;
+	                case DOWN_LINE:
+	                    aUpArea.push([startX + dimension, startY + dimension]);
+	                    aUpArea.push([endX + dimension, endY + dimension]);
+	                    aDownArea.push([startX - dimension, startY - dimension]);
+	                    aDownArea.push([endX - dimension, endY - dimension]);
+	                    break;
+	                case HORIZONTAL_TYPE:
+	                    aUpArea.push([startX, startY + dimension]);
+	                    aUpArea.push([endX, endY + dimension]);
+	                    aDownArea.push([startX, startY - dimension]);
+	                    aDownArea.push([endX, endY - dimension]);
+	                    break;
+	                case VERTICAL_TYPE:
+	                    aUpArea.push([startX + dimension, startY]);
+	                    aUpArea.push([endX + dimension, endY]);
+	                    aDownArea.push([startX - dimension, startY]);
+	                    aDownArea.push([endX - dimension, endY]);
+	                    break;
+	            }
+	            return {
+	                up: aUpArea,
+	                down: aDownArea
+	            };
+	        }
+	    };
+	}();
+
+/***/ },
+/* 189 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	/**
+	 * store the pallet data, is an array [group1, group2].
+	 * @returns {object} the getter/setter of the pallet data
+	 */
+	var PalletDataHelper = exports.PalletDataHelper = function () {
+	    var _palletData = null;
+	    return {
+	        get data() {
+	            return _palletData;
+	        },
+	        set data(aData) {
+	            _palletData = aData;
+	        }
+	    };
+	}();
+
+/***/ },
+/* 190 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+				value: true
+	});
+	exports.secondLevelPage = exports.operator = exports.links = exports.elements = exports.svgProperties = undefined;
+
+	var _redux = __webpack_require__(165);
 
 	var _consts = __webpack_require__(181);
 
+	var _Utility = __webpack_require__(191);
+
+	var _DataHelper = __webpack_require__(183);
+
+	var _DefaultValues = __webpack_require__(185);
+
+	var _StoreHelper = __webpack_require__(184);
+
 	function _defineProperty(obj, key, value) {
-	    if (key in obj) {
-	        Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
-	    } else {
-	        obj[key] = value;
-	    }return obj;
+				if (key in obj) {
+							Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+				} else {
+							obj[key] = value;
+				}return obj;
 	}
 
-	var uuidTemplate = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
 	/**
-	 * generate uuid
-	 * @returns {string} uuid
+	 * The States for the whole canvas
+	 * @param {} _defaultProperties
+	 * @param {} action
+	 * @returns {} 
 	 */
-	var generateUUID = exports.generateUUID = function generateUUID() {
-	    return uuidTemplate.replace(/[xy]/g, function (c) {
-	        var r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0,
-	            v = c == 'x' ? r : r & 0x3 | 0x8;
-	        return v.toString(16);
-	    });
+	var svgProperties = function svgProperties() {
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.svgProperties : arguments[0];
+				var action = arguments[1];
+
+				var newState;
+				var _origZoomLevel = state.zoomLevel;
+				var _newZoomLevel = void 0;
+				switch (action.type) {
+							case _consts.ZOOM_IN:
+										_newZoomLevel = _origZoomLevel + 0.2;
+										newState = Object.assign({}, state, {
+													width: state.width / _origZoomLevel * _newZoomLevel,
+													height: state.height / _origZoomLevel * _newZoomLevel,
+													scaleX: _newZoomLevel,
+													scaleY: _newZoomLevel,
+													zoomLevel: _newZoomLevel
+										});
+										break;
+							case _consts.ZOOM_OUT:
+										_newZoomLevel = _origZoomLevel - 0.2;
+										if (_newZoomLevel <= 0) {
+													_newZoomLevel = 0.2;
+										}
+										newState = Object.assign({}, state, {
+													width: state.width / _origZoomLevel * _newZoomLevel,
+													height: state.height / _origZoomLevel * _newZoomLevel,
+													scaleX: _newZoomLevel,
+													scaleY: _newZoomLevel,
+													zoomLevel: _newZoomLevel
+										});
+										break;
+							case _consts.SAVE_SVG_PROPERTIES:
+										newState = Object.assign({}, state, {
+													width: action.width,
+													height: action.height,
+													gridSize: action.gridSize
+										});
+										break;
+							case _consts.SWITCH_SUB_PAPER:
+										newState = Object.assign({}, action.paper.svgProperties);
+										break;
+							default:
+										newState = state;
+				}
+				return newState;
 	};
+	/**
+	 * the elements of the canvas
+	 * @param {} state
+	 * @param {} action
+	 * @returns {} 
+	 */
+	var elements = function elements() {
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.elements : arguments[0];
+				var action = arguments[1];
+
+				var newState = void 0,
+				    newElement = void 0;
+				switch (action.type) {
+							case _consts.UPDATE_GEOMETRIC_DATA:
+										//save geometric data to elements
+										var key = action.id;
+										newElement = Object.assign({}, state[key], {
+													width: action.width,
+													height: action.height,
+													x: action.x,
+													y: action.y
+										});
+										newState = Object.assign({}, state, _defineProperty({}, key, newElement));
+										break;
+							case _consts.ADD_ELEMENT:
+										key = (0, _Utility.generateUUID)();
+										var element = _StoreHelper.StoreHelper.getPalletElementInfoById(action.id);
+										newElement = Object.assign({}, element, { key: key, x: action.x, y: action.y });
+										newState = Object.assign({}, state);
+										newState[key] = newElement;
+										break;
+							case _consts.MOVE_ELEMENT:
+										var currentElement = state[action.id];
+										var updatedElement = Object.assign({}, currentElement, {
+													x: action.x,
+													y: action.y
+										});
+										var wrapElement = _defineProperty({}, action.id, updatedElement);
+										newState = Object.assign({}, state, wrapElement);
+										break;
+							case _consts.REMOVE_ELEMENT:
+										newState = Object.assign({}, state);
+										delete newState[action.id];
+										break;
+							case _consts.SWITCH_SUB_PAPER:
+										newState = Object.assign({}, action.paper.elements);
+										break;
+							case _consts.UPDATE_TEXT_ELEMENT:
+										var textElement = Object.assign({}, state[action.elementId], { text: action.text });
+										newState = Object.assign({}, state, _defineProperty({}, textElement.key, textElement));
+										break;
+							default:
+										newState = state;
+				}
+				return newState;
+	};
+	/**
+	 * the links which connected the elements
+	 * @param {} state
+	 * @param {} action
+	 * @returns {} 
+	 */
+	var links = function links() {
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.links : arguments[0];
+				var action = arguments[1];
+
+				switch (action.type) {
+							case _consts.UPDATE_LINES:
+										//todo update lines which related to the element
+										var aRefLinks = _StoreHelper.StoreHelper.getRefLinksByElementKey(action.id);
+										var oUpdatedLinks = _StoreHelper.StoreHelper.getUpdatedLinks(aRefLinks);
+										return Object.assign({}, state, oUpdatedLinks);
+										break;
+							case _consts.REMOVE_LINES:
+										aRefLinks = _StoreHelper.StoreHelper.getRefLinksByElementKey(action.id);
+										var newLinks = Object.assign({}, state);
+										aRefLinks.forEach(function (key) {
+													delete newLinks[key];
+										});
+										return newLinks;
+										break;
+							case _consts.REMOVE_LINE:
+										newLinks = Object.assign({}, state);
+										delete newLinks[action.id];
+										return newLinks;
+										break;
+							case _consts.ADD_LINE:
+										var key = (0, _Utility.generateUUID)();
+										var startPoint = _StoreHelper.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
+										var endPoint = _StoreHelper.StoreHelper.getPortPosition(action.endPort.elementKey, action.endPort.position);
+										var path = _Utility.LineHelper.getPath(startPoint, endPoint);
+										return Object.assign({}, state, _defineProperty({}, key, {
+													key: key,
+													startPort: action.startPort,
+													endPort: action.endPort,
+													path: path
+										}));
+										break;
+							case _consts.SWITCH_SUB_PAPER:
+										return Object.assign({}, action.paper.links);
+										break;
+				}
+				return state;
+	};
+	var operator = function operator() {
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.operator : arguments[0];
+				var action = arguments[1];
+
+				switch (action.type) {
+							case _consts.MOVE_ELEMENT:
+										if (state.id === action.id) {
+													return Object.assign({}, state, {
+																x: action.x,
+																y: action.y
+													});
+										}
+										return state;
+										break;
+							case _consts.REMOVE_ELEMENT:
+							case _consts.SELECT_CANVAS:
+										return _DefaultValues.DefaultValues.getOperator();
+										break;
+							case _consts.SELECT_ELEMENT:
+							case _consts.UPDATE_GEOMETRIC_DATA:
+										return {
+													id: action.id,
+													x: action.x,
+													y: action.y,
+													width: action.width,
+													height: action.height
+										};
+										break;
+							case _consts.SELECT_LINE:
+										return Object.assign({}, state, { lineId: action.id });
+										break;
+							case _consts.SWITCH_SUB_PAPER:
+										return Object.assign({}, action.paper.operator);
+										break;
+							default:
+										return state;
+				}
+	};
+	var secondLevelPage = function secondLevelPage() {
+				var state = arguments.length <= 0 || arguments[0] === undefined ? { hide: true, svgProperties: _DefaultValues.DefaultValues.getSvgProperties(), elements: {}, links: {}, properties: {} } : arguments[0];
+				var action = arguments[1];
+
+				switch (action.type) {
+							case _consts.OPEN_SUB_PAGE:
+										return Object.assign({}, action.paper, { hide: false });
+										break;
+							case _consts.CLOSE_SUB_PAGE:
+										return Object.assign({}, state, { hide: true });
+				}
+				return state;
+	};
+	exports.svgProperties = svgProperties;
+	exports.elements = elements;
+	exports.links = links;
+	exports.operator = operator;
+	exports.secondLevelPage = secondLevelPage;
+
+/***/ },
+/* 191 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.dummyFunction = exports.getRelativePosition = exports.generateUUID = exports.LineHelper = exports.ElementHelper = exports.DefaultValues = exports.StoreHelper = undefined;
+
+	var _consts = __webpack_require__(181);
+
+	var _StoreHelper = __webpack_require__(184);
+
+	var _DefaultValues = __webpack_require__(185);
+
+	var _ElementHelper = __webpack_require__(186);
+
+	var _LineHelper = __webpack_require__(188);
+
+	var _UUID = __webpack_require__(187);
+
+	var _DataHelper = __webpack_require__(183);
+
+	exports.StoreHelper = _StoreHelper.StoreHelper;
+	exports.DefaultValues = _DefaultValues.DefaultValues;
+	exports.ElementHelper = _ElementHelper.ElementHelper;
+	exports.LineHelper = _LineHelper.LineHelper;
+	exports.generateUUID = _UUID.generateUUID; /**
+	                                            * @Define Utility
+	                                            * @name Utility.js
+	                                            * @author journey
+	                                            * @license BSD
+	                                            */
 
 	var getRelativePosition = exports.getRelativePosition = function getRelativePosition(evt) {
 	    return {
@@ -21369,39 +22368,9 @@
 	        y: 200
 	    };
 	};
-	/**
-	 * store the pallet data, is an array [group1, group2].
-	 * @returns {object} the getter/setter of the pallet data
-	 */
-	var PalletData = exports.PalletData = function () {
-	    var _palletData = null;
-	    return {
-	        get: function get() {
-	            return _palletData;
-	        },
-	        set: function set(data) {
-	            _palletData = data;
-	        }
-	    };
-	}();
 
 	var dummyFunction = exports.dummyFunction = function dummyFunction() {
 	    return false;
-	};
-
-	/**
-	 * todo::get the pallet element via the element  type id
-	 * @param {int} id the pallet element type id
-	 * @returns {object} the properties of the element  
-	 */
-	var getElementById = exports.getElementById = function getElementById(id) {
-	    return {
-	        id: 1,
-	        name: "element one",
-	        image: "css/1.jpg",
-	        width: 50,
-	        height: 50
-	    };
 	};
 
 	/**
@@ -21508,884 +22477,8 @@
 	    };
 	}();
 
-	/**
-	 * Line Helper. used to log some temp information for draw lines, and provide some helper operations
-	 * @returns {Object} Line Helper methods
-	 */
-	var LineHelper = exports.LineHelper = function () {
-	    var _startInfo = {
-	        elementKey: null,
-	        position: null
-	    };
-	    return {
-	        /**
-	         * wrap line start/end point info into a certain constructor
-	         * @param {Object} evt the react Event object
-	         * @returns {Object} oContext  contain type/id proerties
-	         */
-
-	        portInfo: function portInfo(elementKey, position) {
-	            return {
-	                elementKey: elementKey, position: position
-	            };
-	        },
-	        logStartInfo: function logStartInfo(key, position) {
-	            _startInfo = this.portInfo(key, position);
-	        },
-	        getStartInfo: function getStartInfo() {
-	            return _startInfo;
-	        },
-	        clearStartInfo: function clearStartInfo() {
-	            _startInfo = this.portInfo(null, null);
-	        },
-	        isSamePort: function isSamePort(startPort, endPort) {
-	            if (startPort.elementKey !== undefined && startPort.elementKey !== endPort.elementKey) {
-	                return false;
-	            };
-	            return true;
-	        },
-	        getPath: function getPath(startPoint, endPoint) {
-	            return 'M' + startPoint.x + ' ' + startPoint.y + ' L' + endPoint.x + ' ' + endPoint.y + ' Z';
-	        },
-
-	        /**
-	         * get the hover rect of the path
-	         * @param {string} path only composed by M L Z e.g 'M250 145 L360 145 Z'
-	         */
-	        getPathHoverRect: function getPathHoverRect(sPath) {
-	            var points = sPath.split(/[A-Z]/);
-	            //
-	            points = points.filter(function (value) {
-	                return value !== "";
-	            });
-	            //["22 33 ","33 44"] ->[[22,33],[33,44]]
-	            points = points.map(function (sPoints) {
-	                sPoints = sPoints.trim();
-	                var aPoint = sPoints.split(/\s/);
-	                return [parseInt(aPoint[0]), parseInt(aPoint[1])];
-	            });
-
-	            return RectHelper.getRectPathByPoints(points);
-	        }
-	    };
-	}();
-	//todo
-	var RectHelper = exports.RectHelper = function () {
-	    var VERTICAL_TYPE = "Verticle Type";
-	    var HORIZONTAL_TYPE = "Horizontal Type";
-	    var UP_LINE = "Up Line";
-	    var DOWN_LINE = "Down Line";
-
-	    return {
-	        /**
-	         * get the rect area 
-	         * @param {} aPoints
-	         */
-	        getRectPathByPoints: function getRectPathByPoints(aPoints) {
-	            var aUpArea = [],
-	                aDownArea = [];
-	            var sPath = "M",
-	                temp = void 0;
-	            for (var index = 0, length = aPoints.length; index < length - 1; index++) {
-	                temp = RectHelper.getRectPoints(aPoints[index], aPoints[index + 1]);
-	                aUpArea = aUpArea.concat(temp.up);
-	                aDownArea = aDownArea.concat(temp.down);
-	            }
-	            aUpArea.forEach(function (aPoint) {
-	                sPath = sPath + aPoint[0] + " " + aPoint[1] + "L";
-	            });
-	            for (var len = aDownArea.length, inx = len; inx > 0; inx--) {
-	                temp = aDownArea[inx - 1];
-	                sPath = sPath + temp[0] + " " + temp[1] + "L";
-	            }
-	            sPath = sPath + aUpArea[0][0] + " " + aUpArea[0][1] + "Z";
-	            return sPath;
-	        },
-	        getLineType: function getLineType(aStartPoint, aEndPoint) {
-	            var deltaX = aEndPoint[0] - aStartPoint[0];
-	            var deltaY = aEndPoint[1] - aStartPoint[1];
-	            if (deltaX == 0) {
-	                return VERTICAL_TYPE;
-	            }
-	            if (deltaY == 0) {
-	                return HORIZONTAL_TYPE;
-	            }
-	            if (deltaY / deltaX > 0) {
-	                return UP_LINE;
-	            }
-	            return DOWN_LINE;
-	        },
-	        getRectPoints: function getRectPoints(aStartPoint, aEndPoint) {
-	            var lineDirction = RectHelper.getLineType(aStartPoint, aEndPoint);
-
-	            var _aStartPoint = _slicedToArray(aStartPoint, 2);
-
-	            var startX = _aStartPoint[0];
-	            var startY = _aStartPoint[1];
-
-	            var _aEndPoint = _slicedToArray(aEndPoint, 2);
-
-	            var endX = _aEndPoint[0];
-	            var endY = _aEndPoint[1];
-
-	            var aUpArea = [];
-	            var aDownArea = [];
-	            var dimension = 6;
-	            switch (lineDirction) {
-	                case UP_LINE:
-	                    aUpArea.push([startX - dimension, startY + dimension]);
-	                    aUpArea.push([endX - dimension, endY + dimension]);
-	                    aDownArea.push([startX + dimension, startY - dimension]);
-	                    aDownArea.push([endX + dimension, endY - dimension]);
-	                    break;
-	                case DOWN_LINE:
-	                    aUpArea.push([startX + dimension, startY + dimension]);
-	                    aUpArea.push([endX + dimension, endY + dimension]);
-	                    aDownArea.push([startX - dimension, startY - dimension]);
-	                    aDownArea.push([endX - dimension, endY - dimension]);
-	                    break;
-	                case HORIZONTAL_TYPE:
-	                    aUpArea.push([startX, startY + dimension]);
-	                    aUpArea.push([endX, endY + dimension]);
-	                    aDownArea.push([startX, startY - dimension]);
-	                    aDownArea.push([endX, endY - dimension]);
-	                    break;
-	                case VERTICAL_TYPE:
-	                    aUpArea.push([startX + dimension, startY]);
-	                    aUpArea.push([endX + dimension, endY]);
-	                    aDownArea.push([startX - dimension, startY]);
-	                    aDownArea.push([endX - dimension, endY]);
-	                    break;
-	            }
-	            return {
-	                up: aUpArea,
-	                down: aDownArea
-	            };
-	        }
-	    };
-	}();
-
-	/**
-	 * Element Helper - used to determine the Special Elements. e.g. Text,PlaceHolder,GroupElement
-	 */
-	var ElementHelper = exports.ElementHelper = function () {
-	    var TEXT_ID = 10;
-	    var PLACE_HOLDER_ID = 11;
-	    var GROUP = 12;
-	    return {
-	        isText: function isText(eleTypeId) {
-	            if (eleTypeId == TEXT_ID) {
-	                return true;
-	            }
-	            return false;
-	        },
-	        isPlaceHolder: function isPlaceHolder(eleTypeId) {
-	            if (eleTypeId == PLACE_HOLDER_ID) {
-	                return true;
-	            }
-	            return false;
-	        },
-	        isGroup: function isGroup(eleTypeId) {
-	            if (eleTypeId == GROUP) {
-	                return true;
-	            }
-	            return false;
-	        }
-	    };
-	}();
-
-	/**
-	 * the store helper used to access some informations in store. contains an referance to the redux golbal store
-	 * infromation
-	 */
-	var StoreHelper = exports.StoreHelper = function () {
-	    var _store = null;
-
-	    function _getElements() {
-	        return _store.getState().elements;
-	    }
-
-	    function _getLinks() {
-	        return _store.getState().links;
-	    }
-
-	    function _getPallets() {
-	        return _store.getState().groups;
-	    }
-
-	    function _getSvgProperties() {
-	        return _store.getState().svgProperties;
-	    }
-	    function _getPapers() {
-	        return _store.getState().papers;
-	    }
-	    function _getProperties() {
-	        return _store.getState().properties;
-	    }
-	    function _getSelectedPageId() {
-	        return _store.getState().selectedPaperId;
-	    }
-	    return {
-	        /**
-	         * the setting method to store
-	         * @param {} oStore
-	         */
-	        setStore: function setStore(oStore) {
-	            _store = oStore;
-	        },
-	        getSvgProperties: function getSvgProperties() {
-	            return _getSvgProperties();
-	        },
-	        /**
-	         * sync paper data from active areas to the papers object
-	         */
-	        storeData: function storeData() {
-	            var _state = _store.getState();
-	            var _selectedPaperId = _state.selectedPaperId;
-	            var paper = _state.papers[_selectedPaperId];
-	            paper.svgProperties = _state.svgProperties;
-	            paper.elements = _state.elements;
-	            paper.links = _state.links;
-	            paper.properties = _state.properties.properties;
-	        },
-	        getElementProperties: function getElementProperties(elementId) {
-	            var properties = _getProperties();
-	            var elements = _getElements();
-	            var element = elements[elementId];
-	            var elementProperty = properties.properties[elementId];
-	            var elementTypeId = element.id;
-	            if (elementProperty) {
-	                //todo::
-	            } else {
-	                    elementProperty = DefaultValues.getDefaultProperties(elementTypeId);
-	                }
-	            return elementProperty;
-	        },
-	        getPalletElementInfoById: function getPalletElementInfoById(iPalletelementid) {
-	            var aGroups = _getPallets();
-	            var retElement = null;
-	            for (var groupInx = 0, groupLen = aGroups.length; groupInx < groupLen; groupInx++) {
-	                var group = aGroups[groupInx];
-	                retElement = group.items.find(function (item) {
-	                    if (item.id == iPalletelementid) {
-	                        return true;
-	                    }
-	                    return false;
-	                });
-	                if (retElement) {
-	                    break;
-	                }
-	            }
-	            if (ElementHelper.isText(iPalletelementid)) {
-	                retElement.text = "文字元素";
-	                retElement.width = 100;
-	                retElement.height = 20;
-	            } else if (ElementHelper.isGroup(iPalletelementid)) {
-	                retElement.bindingId = "";
-	                retElement.width = 150;
-	                retElement.height = 150;
-	            } else if (ElementHelper.isPlaceHolder(iPalletelementid)) {
-	                retElement.text = "没有值";
-	                retElement.width = 100;
-	                retElement.height = 20;
-	                retElement.bindingId = "";
-	            }
-	            return Object.assign({}, retElement);
-	        },
-	        getCanvasElmentInfoById: function getCanvasElmentInfoById(sElementId) {
-	            var oElements = _getElements();
-	            return Object.assign({}, oElements[sElementId]);
-	        },
-	        getPortPosition: function getPortPosition(elementKey, position) {
-	            var oElement = StoreHelper.getCanvasElmentInfoById(elementKey);
-	            var startX = oElement.x;
-	            var startY = oElement.y;
-	            var width = oElement.width;
-	            var height = oElement.height;
-
-	            var portPosition = null;
-	            switch (position) {
-	                case _consts.POSITION_TOP:
-	                    portPosition = {
-	                        x: startX + width / 2,
-	                        y: startY
-	                    };
-	                    break;
-	                case _consts.POSITION_RIGHT:
-	                    portPosition = {
-	                        x: startX + width,
-	                        y: startY + height / 2
-	                    };
-	                    break;
-	                case _consts.POSITION_BOTTOM:
-	                    portPosition = {
-	                        x: startX + width / 2,
-	                        y: startY + height
-	                    };
-	                    break;
-	                case _consts.POSITION_LEFT:
-	                    portPosition = {
-	                        x: startX,
-	                        y: startY + height / 2
-	                    };
-	                    break;
-	            }
-	            return portPosition;
-	        },
-	        getRefLinksByElementKey: function getRefLinksByElementKey(elementId) {
-	            var oLinks = _getLinks();
-	            var aRefLinks = Object.keys(oLinks).filter(function (linkKey) {
-	                var link = oLinks[linkKey];
-	                if (link.startPort.elementKey === elementId || link.endPort.elementKey === elementId) {
-	                    return true;
-	                }
-	                return false;
-	            });
-	            return aRefLinks;
-	        },
-	        getSelectedPaperId: function getSelectedPaperId() {
-	            return _getSelectedPageId();
-	        },
-	        hasSubPage: function hasSubPage(elementKey) {
-	            var papers = _getPapers();
-	            if (papers[elementKey]) {
-	                return true;
-	            }
-	            return false;
-	        },
-	        getUpdatedLinks: function getUpdatedLinks(aLinkKeys) {
-	            var oLinks = _getLinks();
-	            var oUpdatedLinks = {};
-	            aLinkKeys.forEach(function (key) {
-	                var oldLink = oLinks[key];
-	                var startPoint = StoreHelper.getPortPosition(oldLink.startPort.elementKey, oldLink.startPort.position);
-	                var endPoint = StoreHelper.getPortPosition(oldLink.endPort.elementKey, oldLink.endPort.position);
-	                var path = LineHelper.getPath(startPoint, endPoint);
-	                oUpdatedLinks[key] = Object.assign({}, oldLink, {
-	                    path: path
-	                });
-	            });
-	            return oUpdatedLinks;
-	        },
-	        getSelectedPaper: function getSelectedPaper(paperId) {
-	            var _papers = _getPapers();
-	            if (paperId) {
-	                return _papers[paperId];
-	            } else {
-	                var keys = Object.keys(_papers);
-	                if (keys) {
-	                    return _papers[keys[0]];
-	                }
-	            }
-	            return null;
-	        },
-	        getPaperIdentifier: function getPaperIdentifier(paper, elementKey) {
-	            var property = paper.properties[elementKey];
-	            if (property) {
-	                return property.deviceInfo && property.deviceInfo.identifier;
-	            }
-	            return null;
-	        },
-	        isLastPaper: function isLastPaper() {
-	            var _papers = _getPapers();
-	            if (Object.keys(_papers).length > 1) {
-	                return false;
-	            }
-	            return true;
-	        },
-	        getPapers: function getPapers() {
-	            return _getPapers();
-	        },
-	        getNextPageOrder: function getNextPageOrder() {
-	            var papers = StoreHelper.getPapers();
-	            var largestPageOrder = Object.keys(papers).reduce(function (pre, curKey) {
-	                if (papers[curKey].order > pre) {
-	                    return papers[curKey].order;
-	                } else {
-	                    return pre;
-	                }
-	            }, -1);
-	            return largestPageOrder + 1;
-	        }
-	    };
-	}();
-
-	var DefaultValues = exports.DefaultValues = function () {
-	    var tabIndex = 1;
-	    return {
-	        getSvgProperties: function getSvgProperties() {
-	            return {
-	                width: 1000,
-	                height: 1000,
-	                gridSize: 20,
-	                scaleX: 1,
-	                scaleY: 1,
-	                zoomLevel: 1
-	            };
-	        },
-	        getOperator: function getOperator() {
-	            return {
-	                id: null, //selected element id
-	                x: 100000,
-	                y: 100000,
-	                width: 10000,
-	                height: 10000,
-	                lineId: null //selected line id
-	            };
-	        },
-	        getDefaultPaper: function () {
-	            var id = generateUUID();
-	            return function () {
-	                return {
-	                    key: id,
-	                    paperName: "默认",
-	                    paperType: 1, // 普通页面
-	                    order: 0,
-	                    svgProperties: DefaultValues.getSvgProperties(),
-	                    elements: {},
-	                    links: {},
-	                    properties: {}
-	                };
-	            };
-	        }(),
-	        generatePaper: function generatePaper(uuid, paperId, paperName, paperType) {
-	            return {
-	                uuid: uuid,
-	                key: paperId,
-	                paperName: paperName,
-	                paperType: paperType,
-	                svgProperties: DefaultValues.getSvgProperties(),
-	                elements: {},
-	                links: {},
-	                properties: {},
-	                operator: DefaultValues.getOperator(),
-	                order: StoreHelper.getNextPageOrder()
-	            };
-	        },
-	        getDefaultPapers: function getDefaultPapers() {
-	            var defaultPaper = DefaultValues.getDefaultPaper();
-	            return _defineProperty({}, defaultPaper.key, defaultPaper);
-	        },
-	        getDefaultState: function getDefaultState() {
-	            var defaultPaper = DefaultValues.getDefaultPaper();
-	            var operator = DefaultValues.getOperator();
-	            return {
-	                selectedPaperId: defaultPaper.key,
-	                svgProperties: defaultPaper.svgProperties,
-	                elements: defaultPaper.elements,
-	                properties: defaultPaper.properties,
-	                links: defaultPaper.links,
-	                operator: operator,
-	                papers: _defineProperty({}, defaultPaper.key, defaultPaper)
-	            };
-	        },
-	        getDefaultTextProperties: function getDefaultTextProperties() {
-	            return { text: "文字元素" };
-	        },
-	        getDefaultGroupProperties: function getDefaultGroupProperties() {
-	            return { bindingId: "" };
-	        },
-	        getDefaultPlaceholderProperties: function getDefaultPlaceholderProperties() {
-	            return { bindingId: "" };
-	        },
-	        getDefaultProperties: function getDefaultProperties(elementTypeId) {
-	            var _oProperties = void 0;
-	            if (ElementHelper.isText(elementTypeId)) {
-	                _oProperties = DefaultValues.getDefaultTextProperties();
-	            } else if (ElementHelper.isGroup(elementTypeId)) {
-	                _oProperties = DefaultValues.getDefaultGroupProperties();
-	            } else if (ElementHelper.isPlaceHolder(elementTypeId)) {
-	                _oProperties = DefaultValues.getDefaultPlaceholderProperties();
-	            } else {
-	                _oProperties = {
-	                    deviceInfo: DefaultValues.getDeviceInfo(),
-	                    measurePointInfos: [DefaultValues.getMeasurePointInfo()]
-	                };
-	            }
-	            _oProperties.elementTypeId = elementTypeId;
-	            return _oProperties;
-	        },
-	        getPalletDatas: function getPalletDatas() {
-	            //todo::
-	        },
-	        getDeviceInfo: function getDeviceInfo() {
-	            return { name: "", serialNumber: "" };
-	        },
-	        getMeasurePointInfo: function getMeasurePointInfo() {
-	            return {
-	                name: "",
-	                identifier: "",
-	                type: "1"
-	            };
-	        }
-	    };
-	}();
-
-	/**
-	 * ApiSingletone: used to store global data of the Component- e.g palletGroup,papers
-	 */
-	var ApiSingletone = exports.ApiSingletone = function () {
-	    var _palletGroupData = [{
-	        id: 1,
-	        groupName: "Group 1",
-	        items: [{
-	            id: 1,
-	            name: "element one",
-	            image: "css/1.jpg",
-	            width: 50,
-	            height: 50
-	        }, {
-	            id: 2,
-	            name: "element two",
-	            image: "css/2.jpg",
-	            width: 50,
-	            height: 50
-	        }]
-	    }, {
-	        id: 2,
-	        groupName: "Group 2",
-	        items: [{
-	            id: 3,
-	            name: "element three",
-	            image: "css/3.jpg",
-	            width: 50,
-	            height: 50
-	        }, {
-	            id: 10,
-	            name: "text",
-	            image: "css/3.jpg",
-	            width: 50,
-	            height: 50
-	        }, {
-	            id: 11,
-	            name: "place holder",
-	            image: "css/3.jpg",
-	            width: 50,
-	            height: 50
-	        }, {
-	            id: 12,
-	            name: "group",
-	            image: "css/3.jpg",
-	            width: 50,
-	            height: 50
-	        }]
-	    }];
-	    var _papers = null;
-	    var _fRender = null;
-	    var _fStaticRender = null;
-	    var _fUpdateBindingData = null;
-	    var ret = {
-	        get palletGroup() {
-	            return _palletGroupData;
-	        },
-	        set palletGroup(data) {
-	            _palletGroupData = data;
-	        },
-	        get papers() {
-	            if (_papers) {
-	                return _papers;
-	            } else {
-	                return DefaultValues.getDefaultPapers();
-	            }
-	        },
-	        set papers(papers) {
-	            _papers = papers;
-	        },
-	        set Render(fRender) {
-	            _fRender = fRender;
-	        },
-	        get Render() {
-	            return _fRender;
-	        },
-	        set StaticRender(fRender) {
-	            _fStaticRender = fRender;
-	        },
-	        get StaticRender() {
-	            return _fStaticRender;
-	        },
-	        set UpdateBindingData(fUpdate) {
-	            _fUpdateBindingData = fUpdate;
-	        },
-	        get UpdateBindingData() {
-	            return _fUpdateBindingData;
-	        },
-	        getDefaultSelectedPaper: function getDefaultSelectedPaper() {
-	            var papers = this.papers;
-	            var _paper;
-	            var paperKeys = Object.keys(papers);
-	            paperKeys.reduce(function (pre, curObj) {
-	                var curPaper = papers[curObj];
-	                if (pre > curPaper.order) {
-	                    _paper = curPaper;
-	                    return curPaper.order;
-	                }
-	                return pre;
-	            }, 10000000);
-	            return _paper;
-	        },
-
-	        get svgProperties() {
-	            var paper = this.getDefaultSelectedPaper();
-	            return paper.svgProperties;
-	        },
-	        get elements() {
-	            var paper = this.getDefaultSelectedPaper();
-	            return paper.elements;
-	        },
-	        get links() {
-	            var paper = this.getDefaultSelectedPaper();
-	            return paper.links;
-	        },
-	        get properties() {
-	            var paper = this.getDefaultSelectedPaper();
-	            return paper.properties;
-	        }
-
-	    };
-	    window.REACTDiagramApi = ret;
-	    return ret;
-	}();
-
 /***/ },
-/* 184 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-				value: true
-	});
-	exports.secondLevelPage = exports.operator = exports.links = exports.elements = exports.svgProperties = undefined;
-
-	var _redux = __webpack_require__(165);
-
-	var _consts = __webpack_require__(181);
-
-	var _Utility = __webpack_require__(183);
-
-	function _defineProperty(obj, key, value) {
-				if (key in obj) {
-							Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
-				} else {
-							obj[key] = value;
-				}return obj;
-	}
-
-	/**
-	 * The States for the whole canvas
-	 * @param {} _defaultProperties
-	 * @param {} action
-	 * @returns {} 
-	 */
-	var svgProperties = function svgProperties() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.ApiSingletone.svgProperties : arguments[0];
-				var action = arguments[1];
-
-				var newState;
-				var _origZoomLevel = state.zoomLevel;
-				var _newZoomLevel = void 0;
-				switch (action.type) {
-							case _consts.ZOOM_IN:
-										_newZoomLevel = _origZoomLevel + 0.2;
-										newState = Object.assign({}, state, {
-													width: state.width / _origZoomLevel * _newZoomLevel,
-													height: state.height / _origZoomLevel * _newZoomLevel,
-													scaleX: _newZoomLevel,
-													scaleY: _newZoomLevel,
-													zoomLevel: _newZoomLevel
-										});
-										break;
-							case _consts.ZOOM_OUT:
-										_newZoomLevel = _origZoomLevel - 0.2;
-										if (_newZoomLevel <= 0) {
-													_newZoomLevel = 0.2;
-										}
-										newState = Object.assign({}, state, {
-													width: state.width / _origZoomLevel * _newZoomLevel,
-													height: state.height / _origZoomLevel * _newZoomLevel,
-													scaleX: _newZoomLevel,
-													scaleY: _newZoomLevel,
-													zoomLevel: _newZoomLevel
-										});
-										break;
-							case _consts.SAVE_SVG_PROPERTIES:
-										newState = Object.assign({}, state, {
-													width: action.width,
-													height: action.height,
-													gridSize: action.gridSize
-										});
-										break;
-							case _consts.SWITCH_SUB_PAPER:
-										newState = Object.assign({}, action.paper.svgProperties);
-										break;
-							default:
-										newState = state;
-				}
-				return newState;
-	};
-	/**
-	 * the elements of the canvas
-	 * @param {} state
-	 * @param {} action
-	 * @returns {} 
-	 */
-	var elements = function elements() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.ApiSingletone.elements : arguments[0];
-				var action = arguments[1];
-
-				var newState = void 0,
-				    newElement = void 0;
-				switch (action.type) {
-							case _consts.UPDATE_GEOMETRIC_DATA:
-										//save geometric data to elements
-										var key = action.id;
-										newElement = Object.assign({}, state[key], {
-													width: action.width,
-													height: action.height,
-													x: action.x,
-													y: action.y
-										});
-										newState = Object.assign({}, state, _defineProperty({}, key, newElement));
-										break;
-							case _consts.ADD_ELEMENT:
-										key = (0, _Utility.generateUUID)();
-										var element = _Utility.StoreHelper.getPalletElementInfoById(action.id);
-										newElement = Object.assign({}, element, { key: key, x: action.x, y: action.y });
-										newState = Object.assign({}, state);
-										newState[key] = newElement;
-										break;
-							case _consts.MOVE_ELEMENT:
-										var currentElement = state[action.id];
-										var updatedElement = Object.assign({}, currentElement, {
-													x: action.x,
-													y: action.y
-										});
-										var wrapElement = _defineProperty({}, action.id, updatedElement);
-										newState = Object.assign({}, state, wrapElement);
-										break;
-							case _consts.REMOVE_ELEMENT:
-										newState = Object.assign({}, state);
-										delete newState[action.id];
-										break;
-							case _consts.SWITCH_SUB_PAPER:
-										newState = Object.assign({}, action.paper.elements);
-										break;
-							case _consts.UPDATE_TEXT_ELEMENT:
-										var textElement = Object.assign({}, state[action.elementId], { text: action.text });
-										newState = Object.assign({}, state, _defineProperty({}, textElement.key, textElement));
-										break;
-							default:
-										newState = state;
-				}
-				return newState;
-	};
-	/**
-	 * the links which connected the elements
-	 * @param {} state
-	 * @param {} action
-	 * @returns {} 
-	 */
-	var links = function links() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.ApiSingletone.links : arguments[0];
-				var action = arguments[1];
-
-				switch (action.type) {
-							case _consts.UPDATE_LINES:
-										//todo update lines which related to the element
-										var aRefLinks = _Utility.StoreHelper.getRefLinksByElementKey(action.id);
-										var oUpdatedLinks = _Utility.StoreHelper.getUpdatedLinks(aRefLinks);
-										return Object.assign({}, state, oUpdatedLinks);
-										break;
-							case _consts.REMOVE_LINES:
-										aRefLinks = _Utility.StoreHelper.getRefLinksByElementKey(action.id);
-										var newLinks = Object.assign({}, state);
-										aRefLinks.forEach(function (key) {
-													delete newLinks[key];
-										});
-										return newLinks;
-										break;
-							case _consts.REMOVE_LINE:
-										newLinks = Object.assign({}, state);
-										delete newLinks[action.id];
-										return newLinks;
-										break;
-							case _consts.ADD_LINE:
-										var key = (0, _Utility.generateUUID)();
-										var startPoint = _Utility.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
-										var endPoint = _Utility.StoreHelper.getPortPosition(action.endPort.elementKey, action.endPort.position);
-										var path = _Utility.LineHelper.getPath(startPoint, endPoint);
-										return Object.assign({}, state, _defineProperty({}, key, {
-													key: key,
-													startPort: action.startPort,
-													endPort: action.endPort,
-													path: path
-										}));
-										break;
-							case _consts.SWITCH_SUB_PAPER:
-										return Object.assign({}, action.paper.links);
-										break;
-				}
-				return state;
-	};
-	var operator = function operator() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.DefaultValues.getOperator() : arguments[0];
-				var action = arguments[1];
-
-				switch (action.type) {
-							case _consts.MOVE_ELEMENT:
-										if (state.id === action.id) {
-													return Object.assign({}, state, {
-																x: action.x,
-																y: action.y
-													});
-										}
-										return state;
-										break;
-							case _consts.REMOVE_ELEMENT:
-							case _consts.SELECT_CANVAS:
-										return _Utility.DefaultValues.getOperator();
-										break;
-							case _consts.SELECT_ELEMENT:
-							case _consts.UPDATE_GEOMETRIC_DATA:
-										return {
-													id: action.id,
-													x: action.x,
-													y: action.y,
-													width: action.width,
-													height: action.height
-										};
-										break;
-							case _consts.SELECT_LINE:
-										return Object.assign({}, state, { lineId: action.id });
-										break;
-							case _consts.SWITCH_SUB_PAPER:
-										return Object.assign({}, action.paper.operator);
-										break;
-							default:
-										return state;
-				}
-	};
-	var secondLevelPage = function secondLevelPage() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? { hide: true, svgProperties: _Utility.DefaultValues.getSvgProperties(), elements: {}, links: {}, properties: {} } : arguments[0];
-				var action = arguments[1];
-
-				switch (action.type) {
-							case _consts.OPEN_SUB_PAGE:
-										return Object.assign({}, action.paper, { hide: false });
-										break;
-							case _consts.CLOSE_SUB_PAGE:
-										return Object.assign({}, state, { hide: true });
-				}
-				return state;
-	};
-	exports.svgProperties = svgProperties;
-	exports.elements = elements;
-	exports.links = links;
-	exports.operator = operator;
-	exports.secondLevelPage = secondLevelPage;
-
-/***/ },
-/* 185 */
+/* 192 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22394,7 +22487,9 @@
 				value: true
 	});
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
+
+	var _DataHelper = __webpack_require__(183);
 
 	var _consts = __webpack_require__(181);
 
@@ -22418,7 +22513,7 @@
 
 	//{selectedProperties:{},properties:{}}
 	var properties = function properties() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? { type: _consts.CANVAS, selectedProperties: _Utility.ApiSingletone.svgProperties, properties: _Utility.ApiSingletone.properties } : arguments[0];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? { type: _consts.CANVAS, selectedProperties: _DataHelper.DataHelper.svgProperties, properties: _DataHelper.DataHelper.properties } : arguments[0];
 				var action = arguments[1];
 
 				var selectedProperties = null;
@@ -22517,7 +22612,7 @@
 	exports.default = properties;
 
 /***/ },
-/* 186 */
+/* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22527,7 +22622,9 @@
 	});
 	exports.selectedPaperId = exports.papers = undefined;
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
+
+	var _DataHelper = __webpack_require__(183);
 
 	var _consts = __webpack_require__(181);
 
@@ -22540,7 +22637,7 @@
 	}
 
 	var papers = function papers() {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.ApiSingletone.papers : arguments[0];
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.papers : arguments[0];
 	    var action = arguments[1];
 
 	    switch (action.type) {
@@ -22556,7 +22653,7 @@
 	};
 
 	var selectedPaperId = function selectedPaperId() {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? _Utility.ApiSingletone.getDefaultSelectedPaper().key : arguments[0];
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.defaultSelectedPaper.key : arguments[0];
 	    var action = arguments[1];
 
 	    switch (action.type) {
@@ -22570,7 +22667,7 @@
 	exports.selectedPaperId = selectedPaperId;
 
 /***/ },
-/* 187 */
+/* 194 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22584,21 +22681,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Pallet = __webpack_require__(188);
+	var _Pallet = __webpack_require__(195);
 
 	var _Pallet2 = _interopRequireDefault(_Pallet);
 
-	var _Canvas = __webpack_require__(191);
+	var _Canvas = __webpack_require__(198);
 
-	var _Property = __webpack_require__(196);
+	var _Property = __webpack_require__(203);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _Toolbar = __webpack_require__(198);
+	var _Toolbar = __webpack_require__(205);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _Tabs = __webpack_require__(200);
+	var _Tabs = __webpack_require__(207);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22656,7 +22753,7 @@
 	exports.StaticApp = StaticApp;
 
 /***/ },
-/* 188 */
+/* 195 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22667,13 +22764,13 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Pallet = __webpack_require__(189);
+	var _Pallet = __webpack_require__(196);
 
 	var _Pallet2 = _interopRequireDefault(_Pallet);
 
-	var _actions = __webpack_require__(190);
+	var _actions = __webpack_require__(197);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
 	var _consts = __webpack_require__(181);
 
@@ -22699,7 +22796,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Pallet2.default);
 
 /***/ },
-/* 189 */
+/* 196 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22801,7 +22898,7 @@
 	exports.default = Pallet;
 
 /***/ },
-/* 190 */
+/* 197 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22809,7 +22906,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.updataBindingData = exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(181);
 
@@ -23061,8 +23158,15 @@
 	    };
 	};
 
+	var updataBindingData = exports.updataBindingData = function updataBindingData(data) {
+	    return {
+	        type: _consts.UI_DATA_UPDATE,
+	        data: data
+	    };
+	};
+
 /***/ },
-/* 191 */
+/* 198 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23074,11 +23178,15 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Canvas = __webpack_require__(192);
+	var _Canvas = __webpack_require__(199);
 
-	var _Utility = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(184);
 
-	var _actions = __webpack_require__(190);
+	var _DataHelper = __webpack_require__(183);
+
+	var _actions = __webpack_require__(197);
+
+	var _Utility = __webpack_require__(191);
 
 	var _consts = __webpack_require__(181);
 
@@ -23137,7 +23245,7 @@
 	            dispatch((0, _actions.removeLines)(key));
 	            dispatch((0, _actions.removeElement)(key));
 
-	            var _StoreHelper$getSvgPr = _Utility.StoreHelper.getSvgProperties();
+	            var _StoreHelper$getSvgPr = _StoreHelper.StoreHelper.getSvgProperties();
 
 	            var width = _StoreHelper$getSvgPr.width;
 	            var height = _StoreHelper$getSvgPr.height;
@@ -23174,7 +23282,7 @@
 	         */
 	        dbClickElement: function dbClickElement(evt) {
 	            var key = evt.currentTarget.getAttribute("data-key");
-	            var elementInfo = _Utility.StoreHelper.getCanvasElmentInfoById(key);
+	            var elementInfo = _StoreHelper.StoreHelper.getCanvasElmentInfoById(key);
 	            var x = elementInfo.x;
 	            var y = elementInfo.y;
 	            var width = elementInfo.width;
@@ -23189,7 +23297,7 @@
 	         * @param {} evt
 	         */
 	        dbClickCanvas: function dbClickCanvas(evt) {
-	            var _StoreHelper$getSvgPr2 = _Utility.StoreHelper.getSvgProperties();
+	            var _StoreHelper$getSvgPr2 = _StoreHelper.StoreHelper.getSvgProperties();
 
 	            var width = _StoreHelper$getSvgPr2.width;
 	            var height = _StoreHelper$getSvgPr2.height;
@@ -23240,10 +23348,10 @@
 	        openSubPage: function openSubPage(event) {
 	            var target = event.currentTarget;
 	            var elementKey = target.getAttribute("data-key");
-	            var paper = _Utility.StoreHelper.getSelectedPaper(_Utility.StoreHelper.getSelectedPaperId());
-	            var identifier = _Utility.StoreHelper.getPaperIdentifier(paper, elementKey);
-	            if (_Utility.StoreHelper.hasSubPage(identifier)) {
-	                dispatch((0, _actions.openSubPage)(_Utility.StoreHelper.getSelectedPaper(identifier)));
+	            var paper = _DataHelper.DataHelper.getPaper(_StoreHelper.StoreHelper.getSelectedPaperId());
+	            var identifier = _StoreHelper.StoreHelper.getPaperIdentifier(paper, elementKey);
+	            if (_StoreHelper.StoreHelper.hasSubPage(identifier)) {
+	                dispatch((0, _actions.openSubPage)(_DataHelper.DataHelper.getPaper(identifier)));
 	            }
 	        },
 	        closeSubPage: function closeSubPage(event) {
@@ -23281,7 +23389,7 @@
 	exports.StaticSecondLevelCanvas = StaticSecondLevelCanvas;
 
 /***/ },
-/* 192 */
+/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23299,17 +23407,17 @@
 
 	var _consts = __webpack_require__(181);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
-	var _TextElement = __webpack_require__(193);
+	var _TextElement = __webpack_require__(200);
 
 	var _TextElement2 = _interopRequireDefault(_TextElement);
 
-	var _PlaceHolder = __webpack_require__(194);
+	var _PlaceHolder = __webpack_require__(201);
 
 	var _PlaceHolder2 = _interopRequireDefault(_PlaceHolder);
 
-	var _GroupElement = __webpack_require__(195);
+	var _GroupElement = __webpack_require__(202);
 
 	var _GroupElement2 = _interopRequireDefault(_GroupElement);
 
@@ -23533,7 +23641,7 @@
 	exports.StaticCanvasWithClose = StaticCanvasWithClose;
 
 /***/ },
-/* 193 */
+/* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23547,7 +23655,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23614,7 +23722,7 @@
 	exports.default = TextElement;
 
 /***/ },
-/* 194 */
+/* 201 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23628,7 +23736,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23695,7 +23803,7 @@
 	exports.default = PlaceholderElement;
 
 /***/ },
-/* 195 */
+/* 202 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23709,7 +23817,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23771,7 +23879,7 @@
 	exports.default = GroupElement;
 
 /***/ },
-/* 196 */
+/* 203 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23782,15 +23890,15 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Property = __webpack_require__(197);
+	var _Property = __webpack_require__(204);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _actions = __webpack_require__(190);
+	var _actions = __webpack_require__(197);
 
 	var _consts = __webpack_require__(181);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
 	function _interopRequireDefault(obj) {
 					return obj && obj.__esModule ? obj : { default: obj };
@@ -23971,7 +24079,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Property2.default);
 
 /***/ },
-/* 197 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23988,13 +24096,13 @@
 
 	var _consts = __webpack_require__(181);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
-	var _TextElement = __webpack_require__(193);
+	var _TextElement = __webpack_require__(200);
 
-	var _PlaceHolder = __webpack_require__(194);
+	var _PlaceHolder = __webpack_require__(201);
 
-	var _GroupElement = __webpack_require__(195);
+	var _GroupElement = __webpack_require__(202);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24307,7 +24415,7 @@
 	exports.default = Property;
 
 /***/ },
-/* 198 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24318,13 +24426,13 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
-	var _Toolbar = __webpack_require__(199);
+	var _Toolbar = __webpack_require__(206);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _actions = __webpack_require__(190);
+	var _actions = __webpack_require__(197);
 
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : { default: obj };
@@ -24398,7 +24506,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Toolbar2.default);
 
 /***/ },
-/* 199 */
+/* 206 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24413,7 +24521,7 @@
 
 	__webpack_require__(181);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24535,7 +24643,7 @@
 	exports.default = Toolbar;
 
 /***/ },
-/* 200 */
+/* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24547,11 +24655,15 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
-	var _Tabs = __webpack_require__(201);
+	var _StoreHelper = __webpack_require__(184);
 
-	var _actions = __webpack_require__(190);
+	var _DataHelper = __webpack_require__(183);
+
+	var _Tabs = __webpack_require__(208);
+
+	var _actions = __webpack_require__(197);
 
 	var mapStateToProps = function mapStateToProps(state) {
 					return {
@@ -24562,20 +24674,20 @@
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
 					return {
 									deletePaper: function deletePaper(event) {
-													if (_Utility.StoreHelper.isLastPaper()) {
+													if (_StoreHelper.StoreHelper.isLastPaper()) {
 																	return;
 													}
 													var paperId = event.target.parentElement.getAttribute("data-paper-id");
 													dispatch((0, _actions.deleteSubPage)(paperId));
-													var paper = _Utility.StoreHelper.getSelectedPaper();
+													var paper = _DataHelper.DataHelper.getPaper();;
 													dispatch((0, _actions.switchSubPage)(paper));
 													dispatch((0, _actions.selectCanvas)());
 									},
 									clickPaper: function clickPaper(event) {
 													var paperId = event.target.parentElement.getAttribute("data-paper-id");
 													if (paperId) {
-																	var paper = _Utility.StoreHelper.getSelectedPaper(paperId);
-																	_Utility.StoreHelper.storeData();
+																	var paper = _DataHelper.DataHelper.getPaper(paperId);
+																	_StoreHelper.StoreHelper.storeData();
 																	dispatch((0, _actions.switchSubPage)(paper));
 																	dispatch((0, _actions.selectCanvas)());
 													}
@@ -24594,7 +24706,7 @@
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 201 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24608,7 +24720,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Utility = __webpack_require__(183);
+	var _Utility = __webpack_require__(191);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24693,6 +24805,55 @@
 
 	exports.Tabs = Tabs;
 	exports.StaticTabs = StaticTabs;
+
+/***/ },
+/* 209 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.API = undefined;
+
+	var _DataHelper = __webpack_require__(183);
+
+	var _StoreHelper = __webpack_require__(184);
+
+	/**
+	 * ApiSingletone: used to store global data of the Component- e.g palletGroup,papers
+	 */
+	var API = exports.API = function () {
+	    var _fRender = null;
+	    var _fStaticRender = null;
+	    var _fUpdateBindingData = null;
+	    var ret = {
+	        set Render(fRender) {
+	            _fRender = fRender;
+	        },
+	        get Render() {
+	            return _fRender;
+	        },
+	        set StaticRender(fRender) {
+	            _fStaticRender = fRender;
+	        },
+	        get StaticRender() {
+	            return _fStaticRender;
+	        },
+	        set UpdateBindingData(fUpdate) {
+	            _fUpdateBindingData = fUpdate;
+	        },
+	        get UpdateBindingData() {
+	            return _fUpdateBindingData;
+	        },
+	        get dispatch() {
+	            return _StoreHelper.StoreHelper.getDispatch();
+	        }
+	    };
+	    window.REACTDiagram = ret;
+	    return ret;
+	}();
 
 /***/ }
 /******/ ]);

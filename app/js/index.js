@@ -4,8 +4,12 @@ import {Provider} from "react-redux";
 import {createStore} from "redux";
 import componentReducers from "./reducers";
 import {App,StaticApp} from "./components/App.jsx";
-import {StoreHelper,ApiSingletone} from "./Utility";
-ApiSingletone.Render = function(domId){
+import {StoreHelper} from "./Util/StoreHelper";
+import {API} from "./API";
+import {DataHelper} from "./Util/DataHelper";
+API.Render = function(aPalletGroup,oPapers,domId){
+    DataHelper.papers = oPapers;
+    DataHelper.palletGroup = aPalletGroup;
     let store = createStore(componentReducers);
     StoreHelper.setStore(store);;
     render(
@@ -15,7 +19,9 @@ ApiSingletone.Render = function(domId){
 	document.getElementById(domId)
     );
 };
-ApiSingletone.StaticRender = function(domId){
+API.StaticRender = function(aPalletGroup,oPapers,domId){
+    DataHelper.papers = oPapers;
+    DataHelper.palletGroup = aPalletGroup;
     let store = createStore(componentReducers);
     StoreHelper.setStore(store);;
     render(

@@ -1,0 +1,92 @@
+/**
+ * @fileOverview Helper method to get the value of the diagram. combine the StoreHelper and DefaultValues
+ * @name DataHelper.js<Util>
+ * @author your name <journey@gmail.com>
+ * @license TBD
+ */
+import {StoreHelper} from "./StoreHelper";
+import {DefaultValues} from "./DefaultValues";
+import {PalletDataHelper} from "./PalletDataHelper";
+let _papers;
+var _palletGroup;
+export const DataHelper = {
+    /**
+     * get diagram papers. if already has store. if hasStore means the diagram have initialized. if not initalized and has _papers,means this is not a new diagram, otherwise this is a new diagram.
+     * @returns {Object} the papers object.
+     */
+    get papers(){
+	if(StoreHelper.hasStore()){
+	    return StoreHelper.getPapers();
+	} else if(_papers){
+	    return _papers;
+	} else {
+	    return DefaultValues.getPapers();
+	}
+    },
+    /**
+     * get the palletGroup data which listed on the left of the canvas
+     * @returns {Array} the pallate group data.
+     */
+    get palletGroup(){
+	if(_palletGroup){
+	    return _palletGroup;
+	}
+	return [];
+    },
+    /**
+     * set palletGroup data. store pallet group data into PalletDataHelper either.
+     * @param {} aPalletGroup
+     */
+    set palletGroup(aPalletGroup){
+	PalletDataHelper.data =aPalletGroup;
+	_palletGroup = aPalletGroup;
+    },
+    set papers(oPapers){
+	_papers = oPapers;
+    },
+    getPaper(paperId){
+	if(paperId){
+	    return this.papers[paperId];
+	} else {
+	    return this.defaultSelectedPaper;
+	}
+    },
+    get elements(){
+	return this.defaultSelectedPaper.elements;
+    },
+    get svgProperties(){
+	return this.defaultSelectedPaper.svgProperties;
+    },
+    get links(){
+	return this.defaultSelectedPaper.links;
+    },
+    get properties(){
+	return this.defaultSelectedPaper.properties;
+    },
+    get selectedPaperId(){
+	return this.defaultSelectedPaper.uuid;
+    },
+    get operator(){
+	return DefaultValues.getOperator();
+    },
+    /**
+     * get the default selected paper. the paper which has the lowest order.
+     * @returns {_Object} _paper the selected paper
+     */
+    get defaultSelectedPaper(){
+	var papers = this.papers;
+	var _paper;
+        var paperKeys = Object.keys(this.papers);
+	Object.keys(this.papers)
+	    .reduce((pre, curObj) => {
+                var curPaper = papers[curObj];
+                if (pre > curPaper.order) {
+                    _paper = curPaper;
+                    return curPaper.order;
+                }
+                return pre;
+            }, 10000000);
+	return _paper;
+    }
+};
+

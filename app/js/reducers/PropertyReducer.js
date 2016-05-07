@@ -1,4 +1,5 @@
-import {generateUUID, StoreHelper, DefaultValues,ApiSingletone} from "../Utility";
+import {generateUUID, StoreHelper, DefaultValues} from "../Utility";
+import {DataHelper} from "../Util/DataHelper";
 import {
     ADD_MEASURE_POINT,
     REMOVE_MEASURE_POINT,
@@ -14,7 +15,7 @@ import {
 } from "../consts";
 
 //{selectedProperties:{},properties:{}}
-const properties = (state={type:CANVAS,selectedProperties:ApiSingletone.svgProperties,properties:ApiSingletone.properties},action) => {
+const properties = (state={type:CANVAS,selectedProperties:DataHelper.svgProperties,properties:DataHelper.properties},action) => {
     let selectedProperties = null;
     let geometricData = {};
     switch(action.type){

@@ -28,7 +28,8 @@ import {
     UPDATE_TEXT_ELEMENT,
     OPEN_SUB_PAGE,
     CLOSE_SUB_PAGE,
-    UPDATE_ELEMENT_DATAS
+    UPDATE_ELEMENT_DATAS,
+    UI_DATA_UPDATE
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -269,6 +270,13 @@ export const closeSubPage = () => {
 export const updateElementDatas = (data) => {
     return {
 	type: UPDATE_ELEMENT_DATAS,
+	data: data
+    };
+};
+
+export const updataBindingData = (data) => {
+    return {
+	type: UI_DATA_UPDATE,
 	data: data
     };
 };

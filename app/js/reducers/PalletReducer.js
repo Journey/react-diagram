@@ -1,4 +1,4 @@
-import {PalletData,ApiSingletone} from "../Utility";
+import {DataHelper} from "../Util/DataHelper";
 /**
  * the data of the pallet component
  * @param {Object} state the data of the pallet element includes group infomation
@@ -6,8 +6,6 @@ import {PalletData,ApiSingletone} from "../Utility";
  * @returns {Object} the pallet element infomation
  */
 const groups = (state,action) => {
-    //comes from Utilit.ApiSingletone.palletGroup
-    PalletData.set(ApiSingletone.palletGroup);
-    return ApiSingletone.palletGroup;
+    return DataHelper.palletGroup;
 };
 export default groups;

@@ -9,7 +9,8 @@ from "../components/Canvas.jsx";
 import {
     StoreHelper
 }
-from "../Utility";
+from "../Util/StoreHelper";
+import {DataHelper} from "../Util/DataHelper";
 import {
     addElement,
     moveElement,
@@ -187,10 +188,10 @@ const mapDispatchtoProps = (dispatch) => {
         openSubPage: (event) => {
             let target = event.currentTarget;
             let elementKey = target.getAttribute("data-key");
-	    let paper = StoreHelper.getSelectedPaper( StoreHelper.getSelectedPaperId() );
+	    let paper = DataHelper.getPaper( StoreHelper.getSelectedPaperId() );
 	    let identifier = StoreHelper.getPaperIdentifier(paper,elementKey);
             if (StoreHelper.hasSubPage(identifier)) {
-                dispatch(openSubPage(StoreHelper.getSelectedPaper(identifier)));
+                dispatch(openSubPage(DataHelper.getPaper(identifier)));
             }
         },
 	closeSubPage:(event) => {

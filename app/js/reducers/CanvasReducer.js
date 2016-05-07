@@ -25,7 +25,10 @@ import {
     SAVE_ELEMENT_PROPERTIES,
     UPDATE_TEXT_ELEMENT
 } from "../consts";
-import {generateUUID, StoreHelper, LineHelper,DefaultValues,ApiSingletone} from "../Utility";
+import {generateUUID, LineHelper} from "../Utility";
+import {DataHelper} from "../Util/DataHelper";
+import {DefaultValues} from "../Util/DefaultValues";
+import {StoreHelper} from "../Util/StoreHelper";
 
 /**
  * The States for the whole canvas
@@ -33,7 +36,7 @@ import {generateUUID, StoreHelper, LineHelper,DefaultValues,ApiSingletone} from 
  * @param {} action
  * @returns {} 
  */
-const svgProperties = (state=ApiSingletone.svgProperties, action) => {
+const svgProperties = (state=DataHelper.svgProperties, action) => {
     var newState;
     let _origZoomLevel = state.zoomLevel;
     let _newZoomLevel;
@@ -82,7 +85,7 @@ const svgProperties = (state=ApiSingletone.svgProperties, action) => {
  * @param {} action
  * @returns {} 
  */
-const elements = (state=ApiSingletone.elements,action) => {
+const elements = (state=DataHelper.elements,action) => {
     let newState,newElement;
     switch(action.type){
     case UPDATE_GEOMETRIC_DATA: //save geometric data to elements
@@ -137,7 +140,7 @@ const elements = (state=ApiSingletone.elements,action) => {
  * @param {} action
  * @returns {} 
  */
-const links = (state=ApiSingletone.links,action) => {
+const links = (state=DataHelper.links,action) => {
     switch(action.type){
     case UPDATE_LINES:
 	//todo update lines which related to the element
@@ -178,7 +181,7 @@ const links = (state=ApiSingletone.links,action) => {
     }
     return state;
 };
-const operator = (state=DefaultValues.getOperator(),action) => {
+const operator = (state=DataHelper.operator,action) => {
     switch(action.type){
     case MOVE_ELEMENT:
 	if(state.id === action.id){

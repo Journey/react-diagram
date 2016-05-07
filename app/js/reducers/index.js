@@ -47,6 +47,7 @@ const selects = (state=_defaultSelectedElement,action) => {
 };
 
 const componentReducers = combineReducers({
+    papers,
     selects,
     svgProperties,
     groups,
@@ -54,7 +55,6 @@ const componentReducers = combineReducers({
     links,
     properties,
     operator,
-    papers,
     selectedPaperId,
     secondLevelPage
 });
