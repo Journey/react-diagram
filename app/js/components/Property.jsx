@@ -43,6 +43,7 @@ const MeasureInfo = ({name,identifier,type,onRemoveMeasurePoint,index,onMeasureP
 	  <select name="type" defaultValue={type} data-index={index} onChange={onMeasurePointValueChange}>
 	    {
 	      DefaultValues.signalTypes.map((oType)=>{
+		return <option key={generateUUID()} value={oType.id}>{oType.name}</option>
 	      })
 	    }
 	  </select>
