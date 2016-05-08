@@ -3,6 +3,7 @@ import {StoreHelper} from "./StoreHelper";
 import {generateUUID} from "./UUID";
 export const DefaultValues = (() => {
     var tabIndex = 1;
+    var _singleTypes = [{id:1,name:"遥测"},{id:2,name:"遥信"},{id:3,name:"遥控"},{id:4,name:"遥调"}];
     return {
 	getPapers: () => {
 	    var _paper = DefaultValues.getDefaultPaper();
@@ -131,6 +132,9 @@ export const DefaultValues = (() => {
                 identifier: "",
                 type: "1"
             };
-        }
+        },
+	get signalTypes(){
+	    return _singleTypes;
+	}
     };
 })();

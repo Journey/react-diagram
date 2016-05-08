@@ -69,6 +69,12 @@ export const StoreHelper = (() => {
         getSvgProperties: () => {
             return _getSvgProperties();
         },
+	getElements: ()=>{
+	    return _getElements();
+	},
+	getProperties: () => {
+	    return _getProperties();  
+	},
         getDispatch: () => {
             if (_store) {
                 return _store.dispatch.bind(_store);

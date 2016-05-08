@@ -7,9 +7,10 @@ import {App,StaticApp} from "./components/App.jsx";
 import {StoreHelper} from "./Util/StoreHelper";
 import {API} from "./API";
 import {DataHelper} from "./Util/DataHelper";
-API.Render = function(aPalletGroup,oPapers,domId){
-    DataHelper.papers = oPapers;
-    DataHelper.palletGroup = aPalletGroup;
+API.Render = function(aPalletGroup,oPapers,aSingleTypes,domId){
+    DataHelper.papers = transformPapers(oPapers);
+    DataHelper.palletGroup = transfromPalletGroupData(aPalletGroup);
+    DataHelper.signalTypes = transformSignalTypes(aSingleTypes);
     let store = createStore(componentReducers);
     StoreHelper.setStore(store);;
     render(
@@ -19,9 +20,10 @@ API.Render = function(aPalletGroup,oPapers,domId){
 	document.getElementById(domId)
     );
 };
-API.StaticRender = function(aPalletGroup,oPapers,domId){
-    DataHelper.papers = oPapers;
-    DataHelper.palletGroup = aPalletGroup;
+API.StaticRender = function(aPalletGroup,oPapers,aSingleTypes,domId){
+    DataHelper.papers = transformPapers(oPapers);
+    DataHelper.palletGroup = transfromPalletGroupData(aPalletGroup);
+    DataHelper.signalTypes = transformSignalTypes(aSingleTypes);
     let store = createStore(componentReducers);
     StoreHelper.setStore(store);;
     render(

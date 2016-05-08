@@ -47,4 +47,5 @@ export const UPDATE_GEOMETRIC_DATA= "Update geometric data from property area";
 export const SAVE_CHART = "Save Chart";
 export const UPDATE_TEXT_ELEMENT = "Update text element values from properties";
 
-export const UI_DATA_UPDATE = "UI element binding data update, includs status image and binding data";
+export const UI_DATA_UPDATE = "UI element binding data update-binding data of the placeholder element";
+export const UI_STATUS_UPDATE="UI element status update- the images of the elements";

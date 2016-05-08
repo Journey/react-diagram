@@ -274,9 +274,15 @@ export const updateElementDatas = (data) => {
     };
 };
 
-export const updataBindingData = (data) => {
+export const updateBindingData = (data) => {
     return {
 	type: UI_DATA_UPDATE,
+	data: data
+    };
+};
+export const updateStatus = (data) => {
+    return {
+	type: UI_STATUS_UPDATE,
 	data: data
     };
 };

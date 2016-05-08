@@ -23,12 +23,15 @@ import {
     OPEN_SUB_PAGE,
     CLOSE_SUB_PAGE,
     SAVE_ELEMENT_PROPERTIES,
-    UPDATE_TEXT_ELEMENT
+    UPDATE_TEXT_ELEMENT,
+    UI_DATA_UPDATE,
+    UI_STATUS_UPDATE
 } from "../consts";
 import {generateUUID, LineHelper} from "../Utility";
 import {DataHelper} from "../Util/DataHelper";
 import {DefaultValues} from "../Util/DefaultValues";
 import {StoreHelper} from "../Util/StoreHelper";
+import {updatePlaceholderValues,updateElementsStatus} from "../Util/PaperHelper";
 
 /**
  * The States for the whole canvas
@@ -128,6 +131,14 @@ const elements = (state=DataHelper.elements,action) => {
 	newState = Object.assign({},state,{
 	    [textElement.key]: textElement
 	});
+	break;
+    case UI_DATA_UPDATE:
+	var oNewPlaceholders = updatePlaceholderValues(action.data);
+	newState = Object.assign({},state,oNewPlaceholders);
+	break;
+    case UI_STATUS_UPDATE:
+	var oNewElements = updateElementsStatus(action.data);
+	newState = Object.assign({},state,oNewElements);
 	break;
     default:
 	newState = state;

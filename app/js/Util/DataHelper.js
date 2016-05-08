@@ -1,5 +1,5 @@
 /**
- * @fileOverview Helper method to get the value of the diagram. combine the StoreHelper and DefaultValues
+ * @fileOverview Helper method to get the value of the diagram. combine the StoreHelper and DefaultValues,which used to get the initialed values for the canvas
  * @name DataHelper.js<Util>
  * @author your name <journey@gmail.com>
  * @license TBD
@@ -9,6 +9,7 @@ import {DefaultValues} from "./DefaultValues";
 import {PalletDataHelper} from "./PalletDataHelper";
 let _papers;
 var _palletGroup;
+var _singleTypes;
 export const DataHelper = {
     /**
      * get diagram papers. if already has store. if hasStore means the diagram have initialized. if not initalized and has _papers,means this is not a new diagram, otherwise this is a new diagram.
@@ -87,6 +88,15 @@ export const DataHelper = {
                 return pre;
             }, 10000000);
 	return _paper;
+    },
+    set signalTypes(aTypes){
+	_singleTypes = aTypes;
+    },
+    get signalTypes(){
+	if(!_singleTypes){
+	    return DefaultValues.signalTypes;
+	}
+	return _singleTypes;
     }
 };
 

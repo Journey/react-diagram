@@ -8,9 +8,6 @@
 * 
 
 # todo
-* pass pallet element
-* pass canvas elements to the canvas
 * static canvas
-  + sync values to placeholders
   + sync image status to element
-  + event handling for subpages
+  + transfrom device property data

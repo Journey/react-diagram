@@ -1,6 +1,7 @@
 import React from 'react';
 import {CANVAS,COMMON_ELEMENT} from "../consts";
 import {generateUUID,ElementHelper} from "../Utility";
+import {DefaultValues} from "../Util/DefaultValues";
 import {TextProperties} from "./TextElement.jsx";
 import {PlaceholderProperties} from "./PlaceHolder.jsx";
 import {GroupProperties} from "./GroupElement.jsx";
@@ -40,10 +41,10 @@ const MeasureInfo = ({name,identifier,type,onRemoveMeasurePoint,index,onMeasureP
 	<div className="pro-row">
 	  <label>类型</label>
 	  <select name="type" defaultValue={type} data-index={index} onChange={onMeasurePointValueChange}>
-	    <option value="1">遥测</option>
-	    <option value="2">遥信</option>
-	    <option value="3">遥控</option>
-	    <option value="4">遥调</option>
+	    {
+	      DefaultValues.signalTypes.map((oType)=>{
+	      })
+	    }
 	  </select>
 	</div>
       </div>

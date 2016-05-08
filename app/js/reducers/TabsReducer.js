@@ -1,7 +1,8 @@
 import {generateUUID, StoreHelper, DefaultValues} from "../Utility";
 import {DataHelper} from "../Util/DataHelper";
+import {papers as papersHelper} from "../Util/PaperHelper";
 import {
-    CREATE_SUB_PAPGER,DELETE_SUB_PAPGER,SWITCH_SUB_PAPER,SAVE_CHART
+    CREATE_SUB_PAPGER,DELETE_SUB_PAPGER,SWITCH_SUB_PAPER,SAVE_CHART,UI_DATA_UPDATE,UI_STATUS_UPDATE
 } from "../consts";
 
 const papers = (state = DataHelper.papers, action) => {
@@ -14,6 +15,12 @@ const papers = (state = DataHelper.papers, action) => {
     case DELETE_SUB_PAPGER:
 	state = Object.assign({},state);
 	delete state[action.paperId];
+	break;
+    case UI_DATA_UPDATE:
+	state = papersHelper.updatePlaceholderValues(action.data);
+	break;
+    case UI_STATUS_UPDATE:
+	state = papersHelper.updateElementsStatus(action.data);
 	break;
     }
     return state;
