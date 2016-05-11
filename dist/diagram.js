@@ -21857,9 +21857,9 @@
 	 */
 	var ElementHelper = exports.ElementHelper = function () {
 	    //TODO:: REPLACE WITH THE REAL ID
-	    var TEXT_ID = 10;
-	    var PLACE_HOLDER_ID = 11;
-	    var GROUP = 12;
+	    var TEXT_ID = 21;
+	    var PLACE_HOLDER_ID = 30;
+	    var GROUP = 20;
 	    return {
 	        isText: function isText(eleTypeId) {
 	            if (eleTypeId == TEXT_ID) {
@@ -23584,7 +23584,7 @@
 	  return _react2.default.createElement(
 	    "g",
 	    { draggable: "false" },
-	    _react2.default.createElement("circle", { r: "6", transform: "translate(" + x + "," + y + ")", "data-owner-key": ownerKey, "data-position": position, onMouseUp: onPortMouseUp, onMouseDown: onPortMouseDown })
+	    _react2.default.createElement("circle", { r: "3", transform: "translate(" + x + "," + y + ")", "data-owner-key": ownerKey, "data-position": position, onMouseUp: onPortMouseUp, onMouseDown: onPortMouseDown })
 	  );
 	};
 	var Element = function Element(_ref2) {
@@ -25023,13 +25023,17 @@
 
 /***/ },
 /* 211 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
+	exports.transformPapers = exports.transfromPalletGroupData = exports.transformSignalTypes = exports.transformElementsStatus = exports.transformBindingData = undefined;
+
+	var _PalletData = __webpack_require__(212);
+
 	/**
 	 * transformBindingData transform binding data from array to Object.
 	 * @param {} aData [{
@@ -25046,22 +25050,22 @@
 	 * @return oBindingData {"deviceno":["3.4w"]}
 	 */
 	var transformBindingData = exports.transformBindingData = function transformBindingData(aData) {
-	    var oBindingData = {};
-	    aData.forEach(function (oData) {
-	        var oDeviceData = void 0;
-	        var deviceno = oData.deviceno;
-	        if (!oBindingData[deviceno]) {
-	            oBindingData[deviceno] = [];
-	        }
-	        oDeviceData = oBindingData[deviceno];
-	        oDeviceData.push(oData.propertyvalue + oData.valueunit);
-	    });
-	    return oBindingData;
+	  var oBindingData = {};
+	  aData.forEach(function (oData) {
+	    var oDeviceData = void 0;
+	    var deviceno = oData.deviceno;
+	    if (!oBindingData[deviceno]) {
+	      oBindingData[deviceno] = [];
+	    }
+	    oDeviceData = oBindingData[deviceno];
+	    oDeviceData.push(oData.propertyvalue + oData.valueunit);
+	  });
+	  return oBindingData;
 	};
 
 	var transformElementsStatus = exports.transformElementsStatus = function transformElementsStatus(aData) {
-	    //todo
-	    console.log("todo");
+	  //todo
+	  console.log("todo");
 	};
 
 	/**
@@ -25070,12 +25074,12 @@
 	 * @returns {} 
 	 */
 	var transformSignalTypes = exports.transformSignalTypes = function transformSignalTypes(aTypes) {
-	    return aTypes.map(function (oType) {
-	        return {
-	            id: oType.id,
-	            name: oType.name
-	        };
-	    });
+	  return aTypes.map(function (oType) {
+	    return {
+	      id: oType.id,
+	      name: oType.name
+	    };
+	  });
 	};
 	/**
 	 * transfrom external pallet group data to diagram needed format
@@ -25083,7 +25087,25 @@
 	 * @returns {} 
 	 */
 	var transfromPalletGroupData = exports.transfromPalletGroupData = function transfromPalletGroupData(aData) {
-	    return aData;
+	  return aData.map(function (oGroup) {
+	    var deviceItems = oGroup.devicetypes;
+	    deviceItems = oGroup.devicetypes.map(function (oDevice) {
+	      var oSize = (0, _PalletData.parseImageSize)(oDevice.size);
+	      return {
+	        id: oDevice.id,
+	        name: oDevice.name,
+	        width: oSize.width,
+	        height: oSize.height,
+	        image: (0, _PalletData.getDefaultStatusImage)(oDevice.statuses), // the default images
+	        statuses: (0, _PalletData.transformStatuses)(oDevice.statuses)
+	      };
+	    });
+	    return {
+	      id: oGroup.id,
+	      groupName: oGroup.name,
+	      items: deviceItems
+	    };
+	  });
 	};
 	/**
 	 * transfrom external papers data  to diagram needed format, currently no implementation needed
@@ -25091,7 +25113,69 @@
 	 * @returns {} 
 	 */
 	var transformPapers = exports.transformPapers = function transformPapers(oPapers) {
-	    return oPapers;
+	  return oPapers;
+	};
+
+/***/ },
+/* 212 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	   value: true
+	});
+	var _oSize = {
+	   "big": {
+	      width: 70,
+	      height: 70
+	   },
+	   "medium": {
+	      width: 30,
+	      height: 30
+	   },
+	   "small": {
+	      width: 20,
+	      height: 20
+	   },
+	   "tiny": {
+	      width: 10,
+	      height: 10
+	   }
+	};
+	function tempUpdateUrl(relativeURL) {
+	   if (relativeURL) {
+	      relativeURL = relativeURL.replace("..", "http://121.40.218.110");
+	   }
+	   return relativeURL;
+	}
+	var parseImageSize = exports.parseImageSize = function parseImageSize(sSize) {
+	   if (_oSize[sSize]) {
+	      return _oSize[sSize];
+	   }
+	   var aSize = sSize.split("*");
+	   return {
+	      width: parseInt(aSize[0]),
+	      height: parseInt(aSize[1])
+	   };
+	};
+
+	var transformStatuses = exports.transformStatuses = function transformStatuses(aStatuses) {
+	   return aStatuses.map(function (oStatus) {
+	      return {
+	         id: oStatus.status.id,
+	         name: oStatus.status.name,
+	         isDefault: oStatus.isdefault,
+	         image: tempUpdateUrl(oStatus.imageurl)
+	      };
+	   });
+	};
+
+	var getDefaultStatusImage = exports.getDefaultStatusImage = function getDefaultStatusImage(aStatuses) {
+	   var oDefault = aStatuses.find(function (oStatus) {
+	      return oStatus.isdefault;
+	   });
+	   return oDefault ? tempUpdateUrl(oDefault.imageurl) : "";
 	};
 
 /***/ }

@@ -7,7 +7,7 @@ import GroupElement from "./GroupElement.jsx";
 const MagnetPorts = ({x,y,ownerKey,position,onPortMouseDown,onPortMouseUp}) => {
   return (
     <g draggable="false">
-      <circle r="6" transform={`translate(${x},${y})`} data-owner-key={ownerKey} data-position={position} onMouseUp={onPortMouseUp} onMouseDown={onPortMouseDown}></circle>
+      <circle r="3" transform={`translate(${x},${y})`} data-owner-key={ownerKey} data-position={position} onMouseUp={onPortMouseUp} onMouseDown={onPortMouseDown}></circle>
     </g>
   );
 };

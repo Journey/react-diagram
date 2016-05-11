@@ -1,3 +1,4 @@
+import {parseImageSize, transformStatuses, getDefaultStatusImage} from "./PalletData";
 /**
  * transformBindingData transform binding data from array to Object.
  * @param {} aData [{
@@ -51,7 +52,25 @@ export const transformSignalTypes = (aTypes) => {
  * @returns {} 
  */
 export const transfromPalletGroupData = (aData)=>{
-    return aData;
+    return aData.map((oGroup)=>{
+	var deviceItems = oGroup.devicetypes;
+	deviceItems = oGroup.devicetypes.map((oDevice)=> {
+	    var oSize = parseImageSize(oDevice.size);
+	    return {
+		id: oDevice.id,
+		name: oDevice.name,
+		width: oSize.width,
+		height: oSize.height,
+		image: getDefaultStatusImage(oDevice.statuses), // the default images
+		statuses: transformStatuses(oDevice.statuses)
+	    };
+	});
+	return {
+	    id: oGroup.id,
+	    groupName: oGroup.name,
+	    items: deviceItems
+	};
+    });
 };
 /**
  * transfrom external papers data  to diagram needed format, currently no implementation needed

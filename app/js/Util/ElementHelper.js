@@ -3,9 +3,9 @@
  */
 export const ElementHelper = (() => {
     //TODO:: REPLACE WITH THE REAL ID
-    const TEXT_ID = 10;
-    const PLACE_HOLDER_ID = 11;
-    const GROUP = 12;
+    const TEXT_ID = 21;
+    const PLACE_HOLDER_ID = 30;
+    const GROUP = 20;
     return {
         isText: (eleTypeId) => {
             if (eleTypeId == TEXT_ID) {
