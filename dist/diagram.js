@@ -24803,12 +24803,12 @@
 	            { className: "dia-center" },
 	            _react2.default.createElement(
 	              "label",
-	              null,
+	              { className: "dia-label" },
 	              "类型"
 	            ),
 	            _react2.default.createElement(
 	              "select",
-	              { name: "page-type" },
+	              { className: "dia-field", name: "page-type" },
 	              _react2.default.createElement(
 	                "option",
 	                { value: "1", defaultVaule: true },
@@ -24826,20 +24826,20 @@
 	            { className: "dia-center" },
 	            _react2.default.createElement(
 	              "label",
-	              null,
+	              { className: "dia-label" },
 	              "名称"
 	            ),
-	            _react2.default.createElement("input", { type: "text", name: "name" })
+	            _react2.default.createElement("input", { className: "dia-field", type: "text", name: "name" })
 	          ),
 	          _react2.default.createElement(
 	            "li",
 	            { className: "dia-center" },
 	            _react2.default.createElement(
 	              "label",
-	              null,
+	              { className: "dia-label" },
 	              "id"
 	            ),
-	            _react2.default.createElement("input", { type: "text", name: "identify" })
+	            _react2.default.createElement("input", { className: "dia-field", type: "text", name: "identify" })
 	          )
 	        ),
 	        _react2.default.createElement(

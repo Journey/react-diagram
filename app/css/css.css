@@ -162,3 +162,13 @@ g.link path{
 .text-element text,.placeholder-element text{
     dominant-baseline: text-before-edge;
 }
+
+.dia-label, .dia-field{
+    display: inline-block;
+}
+.dia-label{
+    width: 60px;
+}
+.dia-field{
+    width: 100px;
+}
