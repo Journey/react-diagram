@@ -92,7 +92,7 @@ export const Position = (() => {
         x: 0,
         y: 0
     };
-    let _gridSize = 20;
+    let _gridSize = 10;
 
     function _alignPostion(iPosition) {
         var iUnit = Math.floor(iPosition / _gridSize);
@@ -129,8 +129,9 @@ export const Position = (() => {
             _mistake.y = mistake.y;
         },
         correctElementPosition: (oPosition) => {
-            var realX = oPosition.x - _mistake.x;
-            var realY = oPosition.y - _mistake.y;
+	    var scale = StoreHelper.getScale();
+            var realX = (oPosition.x - _mistake.x)/scale;
+            var realY = (oPosition.y - _mistake.y)/scale;
             return {
                 x: _alignPostion(realX),
                 y: _alignPostion(realY)

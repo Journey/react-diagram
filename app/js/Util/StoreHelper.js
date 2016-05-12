@@ -69,6 +69,13 @@ export const StoreHelper = (() => {
         getSvgProperties: () => {
             return _getSvgProperties();
         },
+	getScale: () => {
+	    var svgProperties = _getSvgProperties();
+	    if(svgProperties){
+		return svgProperties.scaleX;
+	    }
+	    return 1;
+	},
 	getElements: ()=>{
 	    return _getElements();
 	},

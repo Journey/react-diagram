@@ -18,7 +18,7 @@ export const DefaultValues = (() => {
             return {
                 width: 1000,
                 height: 1000,
-                gridSize: 20,
+                gridSize: 10,
                 scaleX: 1,
                 scaleY: 1,
                 zoomLevel: 1

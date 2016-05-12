@@ -21512,6 +21512,13 @@
 	        getSvgProperties: function getSvgProperties() {
 	            return _getSvgProperties();
 	        },
+	        getScale: function getScale() {
+	            var svgProperties = _getSvgProperties();
+	            if (svgProperties) {
+	                return svgProperties.scaleX;
+	            }
+	            return 1;
+	        },
 	        getElements: function getElements() {
 	            return _getElements();
 	        },
@@ -21726,7 +21733,7 @@
 	            return {
 	                width: 1000,
 	                height: 1000,
-	                gridSize: 20,
+	                gridSize: 10,
 	                scaleX: 1,
 	                scaleY: 1,
 	                zoomLevel: 1
@@ -22481,7 +22488,7 @@
 	        x: 0,
 	        y: 0
 	    };
-	    var _gridSize = 20;
+	    var _gridSize = 10;
 
 	    function _alignPostion(iPosition) {
 	        var iUnit = Math.floor(iPosition / _gridSize);
@@ -22518,8 +22525,9 @@
 	            _mistake.y = mistake.y;
 	        },
 	        correctElementPosition: function correctElementPosition(oPosition) {
-	            var realX = oPosition.x - _mistake.x;
-	            var realY = oPosition.y - _mistake.y;
+	            var scale = _StoreHelper.StoreHelper.getScale();
+	            var realX = (oPosition.x - _mistake.x) / scale;
+	            var realY = (oPosition.y - _mistake.y) / scale;
 	            return {
 	                x: _alignPostion(realX),
 	                y: _alignPostion(realY)
