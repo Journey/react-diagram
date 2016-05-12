@@ -25,7 +25,8 @@ import {
     SAVE_ELEMENT_PROPERTIES,
     UPDATE_TEXT_ELEMENT,
     UI_DATA_UPDATE,
-    UI_STATUS_UPDATE
+    UI_STATUS_UPDATE,
+    RESET_DIAGRAM
 } from "../consts";
 import {generateUUID, LineHelper} from "../Utility";
 import {DataHelper} from "../Util/DataHelper";
@@ -77,8 +78,11 @@ const svgProperties = (state=DataHelper.svgProperties, action) => {
     case SWITCH_SUB_PAPER:
 	newState = Object.assign({},action.paper.svgProperties);
 	break;
+    case RESET_DIAGRAM:
+	newState = DataHelper.svgProperties;
+	break;
     default:
-	newState = state;
+	newState = DataHelper.svgProperties;
     }
     return newState;
 };
@@ -140,6 +144,9 @@ const elements = (state=DataHelper.elements,action) => {
 	var oNewElements = updateElementsStatus(action.data);
 	newState = Object.assign({},state,oNewElements);
 	break;
+    case RESET_DIAGRAM:
+	newState = Object.assign({},DataHelper.elements);
+	break;
     default:
 	newState = state;
     }
@@ -189,6 +196,9 @@ const links = (state=DataHelper.links,action) => {
     case SWITCH_SUB_PAPER:
 	return  Object.assign({},action.paper.links);
 	break;
+    case RESET_DIAGRAM:
+	return Object.assign({},DataHelper.links);
+	break;
     }
     return state;
 };
@@ -223,17 +233,24 @@ const operator = (state=DataHelper.operator,action) => {
     case SWITCH_SUB_PAPER:
 	return Object.assign({},action.paper.operator);
 	break;
+    case RESET_DIAGRAM:
+	return Object.assign({},DataHelper.operator);
+	break;
     default:
 	return state;
     }
 };
-const secondLevelPage = (state={hide:true,svgProperties:DefaultValues.getSvgProperties(),elements:{},links:{},properties:{}},action) => {
+const secondLevelPage = (state=DataHelper.secondLevelPage,action) => {
     switch(action.type){
     case OPEN_SUB_PAGE:
 	return Object.assign({},action.paper,{hide: false});
 	break;
     case CLOSE_SUB_PAGE:
 	return Object.assign({},state,{hide: true});
+	break;
+    case RESET_DIAGRAM:
+	return Object.assign({},DataHelper.secondLevelPage);
+	break;
     }
     return state;
 };

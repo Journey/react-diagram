@@ -1,7 +1,7 @@
 import {DataHelper} from "./Util/DataHelper";
 import {StoreHelper} from "./Util/StoreHelper";
-import {transformBindingData, transformElementsStatus} from "./Adapter/Data";
-import {updateBindingData,updateStatus} from "./actions";
+import {transformBindingData, transformElementsStatus, transformPapers} from "./Adapter/Data";
+import {updateBindingData,updateStatus, resetDiagram} from "./actions";
 /**
  * ApiSingletone: used to store global data of the Component- e.g palletGroup,papers
  */
@@ -51,7 +51,14 @@ export const API = (() => {
 	},
         get dispatch() {
             return StoreHelper.getDispatch();
-        }
+        },
+	reset(oPapers){
+	    oPapers = transformPapers(oPapers);
+	    DataHelper.inResetting = true;
+	    DataHelper.papers = oPapers;
+	    this.dispatch(resetDiagram(oPapers));
+	    DataHelper.inResetting = false;
+	}
     };
     window.REACTDiagram = ret;
     return ret;

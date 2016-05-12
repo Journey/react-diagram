@@ -135,6 +135,15 @@ export const DefaultValues = (() => {
         },
 	get signalTypes(){
 	    return _singleTypes;
+	},
+	get secondLevelPage(){
+	    return {
+		hide:true,
+		svgProperties: this.getSvgProperties(), //todo:: what is the value of this??
+		elements:{},
+		links:{},
+		properties:{}
+	    };
 	}
     };
 })();

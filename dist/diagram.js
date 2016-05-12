@@ -60,15 +60,15 @@
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
-	var _App = __webpack_require__(195);
+	var _App = __webpack_require__(196);
 
-	var _StoreHelper = __webpack_require__(184);
+	var _StoreHelper = __webpack_require__(183);
 
-	var _API = __webpack_require__(210);
+	var _API = __webpack_require__(211);
 
-	var _DataHelper = __webpack_require__(183);
+	var _DataHelper = __webpack_require__(182);
 
-	var _Data = __webpack_require__(211);
+	var _Data = __webpack_require__(212);
 
 	function _interopRequireDefault(obj) {
 	    return obj && obj.__esModule ? obj : { default: obj };
@@ -21152,14 +21152,12 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	   value: true
+	    value: true
 	});
 
 	var _redux = __webpack_require__(165);
 
-	var _consts = __webpack_require__(181);
-
-	var _PalletReducer = __webpack_require__(182);
+	var _PalletReducer = __webpack_require__(181);
 
 	var _PalletReducer2 = _interopRequireDefault(_PalletReducer);
 
@@ -21171,125 +21169,28 @@
 
 	var _TabsReducer = __webpack_require__(194);
 
+	var _SelectsReducer = __webpack_require__(195);
+
 	function _interopRequireDefault(obj) {
-	   return obj && obj.__esModule ? obj : { default: obj };
+	    return obj && obj.__esModule ? obj : { default: obj };
 	}
 
-	var _defaultSelectedElement = {
-	   selectedPalletItem: null,
-	   selectedCanvasItem: null,
-	   selectedLine: null
-	};
-	/**
-	 * reducers for log the selected elements of the component
-	 * @param {Object} state
-	 * @param {Object} action
-	 * @returns {Object} new state
-	 */
-	var selects = function selects() {
-	   var state = arguments.length <= 0 || arguments[0] === undefined ? _defaultSelectedElement : arguments[0];
-	   var action = arguments[1];
-
-	   switch (action.type) {
-	      case _consts.PALLET_ELEMENT_DRAG_START:
-	         return Object.assign({}, state, { selectedPalletItem: action.id });
-	         break;
-	      case _consts.CANVAS_ELEMENT_DRAG_START:
-	         return Object.assign({}, _defaultSelectedElement, {
-	            selectedCanvasItem: action.key
-	         });
-	         break;
-	      case _consts.CANVAS_ELEMENT_SELECT:
-	         return Object.assign({}, state, { selectedCanvasItem: action.id });
-	         break;
-	      case _consts.LINE_ELEMENT_SELECT:
-	         return Object.assign({}, state, { selectedLine: action.id });
-	         break;
-	      case _consts.CLEAR_SELECTION:
-	         return _defaultSelectedElement;
-	         break;
-	      default:
-	         return state;
-	   }
-	};
-
 	var componentReducers = (0, _redux.combineReducers)({
-	   papers: _TabsReducer.papers,
-	   selects: selects,
-	   svgProperties: _CanvasReducer.svgProperties,
-	   groups: _PalletReducer2.default,
-	   elements: _CanvasReducer.elements,
-	   links: _CanvasReducer.links,
-	   properties: _PropertyReducer2.default,
-	   operator: _CanvasReducer.operator,
-	   selectedPaperId: _TabsReducer.selectedPaperId,
-	   secondLevelPage: _CanvasReducer.secondLevelPage
+	    papers: _TabsReducer.papers,
+	    selects: _SelectsReducer.selects,
+	    svgProperties: _CanvasReducer.svgProperties,
+	    groups: _PalletReducer2.default,
+	    elements: _CanvasReducer.elements,
+	    links: _CanvasReducer.links,
+	    properties: _PropertyReducer2.default,
+	    operator: _CanvasReducer.operator,
+	    selectedPaperId: _TabsReducer.selectedPaperId,
+	    secondLevelPage: _CanvasReducer.secondLevelPage
 	});
 	exports.default = componentReducers;
 
 /***/ },
 /* 181 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var POSITION_TOP = exports.POSITION_TOP = "top-magnet port postion relative to ca-element";
-	var POSITION_RIGHT = exports.POSITION_RIGHT = "right-magnet port postion relative to ca-element";
-	var POSITION_BOTTOM = exports.POSITION_BOTTOM = "bottom-magnet port postion relative to ca-element";
-	var POSITION_LEFT = exports.POSITION_LEFT = "left-magnet port postion relative to ca-element";
-
-	var TYPE_PALLETELEMENT = exports.TYPE_PALLETELEMENT = "Pallet Element";
-	var TYPE_CANVASELEMENT = exports.TYPE_CANVASELEMENT = "Canvas Element";
-	var TYPE_CANVASLINE = exports.TYPE_CANVASLINE = "Canvas Line";
-
-	var PALLET_ELEMENT_DRAG_START = exports.PALLET_ELEMENT_DRAG_START = "Pallet element drag start";
-	var CANVAS_ELEMENT_DRAG_START = exports.CANVAS_ELEMENT_DRAG_START = "Canvas element drag start";
-
-	var LINE_ELEMENT_SELECT = exports.LINE_ELEMENT_SELECT = "Select line";
-	var CANVAS_ELEMENT_SELECT = exports.CANVAS_ELEMENT_SELECT = "Canvas Element Select";
-	var CLEAR_SELECTION = exports.CLEAR_SELECTION = "Clear selection";
-
-	var ADD_ELEMENT = exports.ADD_ELEMENT = "Add element";
-	var REMOVE_ELEMENT = exports.REMOVE_ELEMENT = "Remove element";
-	var MOVE_ELEMENT = exports.MOVE_ELEMENT = "Move Element";
-	var SELECT_ELEMENT = exports.SELECT_ELEMENT = "Select Element";
-	var SELECT_LINE = exports.SELECT_LINE = "Select Line";
-	var UPDATE_LINES = exports.UPDATE_LINES = "Update lines";
-	var REMOVE_LINES = exports.REMOVE_LINES = "Remove Lines";
-	var REMOVE_LINE = exports.REMOVE_LINE = "Remove Line";
-	var ADD_LINE = exports.ADD_LINE = "Add Line";
-	var SELECT_CANVAS = exports.SELECT_CANVAS = "Select canva";
-
-	var ZOOM_IN = exports.ZOOM_IN = "Zoom in";
-	var ZOOM_OUT = exports.ZOOM_OUT = "Zoom out";
-	var REDO_OPERATION = exports.REDO_OPERATION = "Re do operation";
-	var UNDO_OPERATION = exports.UNDO_OPERATION = "undo operation";
-	var CREATE_SUB_PAPGER = exports.CREATE_SUB_PAPGER = "Create Sub page operation";
-	var DELETE_SUB_PAPGER = exports.DELETE_SUB_PAPGER = "Delete Sub page operation";
-	var SWITCH_SUB_PAPER = exports.SWITCH_SUB_PAPER = "Switch sub page operation";
-	var OPEN_SUB_PAGE = exports.OPEN_SUB_PAGE = "Open Seconde Level Page for Static App";
-	var CLOSE_SUB_PAGE = exports.CLOSE_SUB_PAGE = "Close Seond Level Page for Static App";
-	var UPDATE_ELMENT_DATAS = exports.UPDATE_ELMENT_DATAS = "Update element image by status and place holder values";
-
-	var SAVE_SVG_PROPERTIES = exports.SAVE_SVG_PROPERTIES = "Save SVG Properties";
-	var SAVE_ELEMENT_PROPERTIES = exports.SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
-	var ADD_MEASURE_POINT = exports.ADD_MEASURE_POINT = "Add Measure Point Properties";
-	var REMOVE_MEASURE_POINT = exports.REMOVE_MEASURE_POINT = "Remove Measure Point Properties";
-	var SAVE_MEASURE_POINT_VALUE = exports.SAVE_MEASURE_POINT_VALUE = "Save Measure point value when changed";
-	var CANVAS = exports.CANVAS = "Canvas";
-	var COMMON_ELEMENT = exports.COMMON_ELEMENT = "Common element which contains measure point info";
-	var UPDATE_GEOMETRIC_DATA = exports.UPDATE_GEOMETRIC_DATA = "Update geometric data from property area";
-	var SAVE_CHART = exports.SAVE_CHART = "Save Chart";
-	var UPDATE_TEXT_ELEMENT = exports.UPDATE_TEXT_ELEMENT = "Update text element values from properties";
-
-	var UI_DATA_UPDATE = exports.UI_DATA_UPDATE = "UI element binding data update-binding data of the placeholder element";
-	var UI_STATUS_UPDATE = exports.UI_STATUS_UPDATE = "UI element status update- the images of the elements";
-
-/***/ },
-/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -21298,7 +21199,7 @@
 	  value: true
 	});
 
-	var _DataHelper = __webpack_require__(183);
+	var _DataHelper = __webpack_require__(182);
 
 	/**
 	 * the data of the pallet component
@@ -21312,19 +21213,19 @@
 	exports.default = groups;
 
 /***/ },
-/* 183 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	   value: true
+	    value: true
 	});
 	exports.DataHelper = undefined;
 
-	var _StoreHelper = __webpack_require__(184);
+	var _StoreHelper = __webpack_require__(183);
 
-	var _DefaultValues = __webpack_require__(185);
+	var _DefaultValues = __webpack_require__(184);
 
 	var _PalletDataHelper = __webpack_require__(189);
 
@@ -21337,98 +21238,113 @@
 
 	var _palletGroup;
 	var _singleTypes;
+	var _reset_in_progress = false;
 	var DataHelper = exports.DataHelper = {
-	   /**
-	    * get diagram papers. if already has store. if hasStore means the diagram have initialized. if not initalized and has _papers,means this is not a new diagram, otherwise this is a new diagram.
-	    * @returns {Object} the papers object.
-	    */
-	   get papers() {
-	      if (_StoreHelper.StoreHelper.hasStore()) {
-	         return _StoreHelper.StoreHelper.getPapers();
-	      } else if (_papers) {
-	         return _papers;
-	      } else {
-	         return _DefaultValues.DefaultValues.getPapers();
-	      }
-	   },
-	   /**
-	    * get the palletGroup data which listed on the left of the canvas
-	    * @returns {Array} the pallate group data.
-	    */
-	   get palletGroup() {
-	      if (_palletGroup) {
-	         return _palletGroup;
-	      }
-	      return [];
-	   },
-	   /**
-	    * set palletGroup data. store pallet group data into PalletDataHelper either.
-	    * @param {} aPalletGroup
-	    */
-	   set palletGroup(aPalletGroup) {
-	      _PalletDataHelper.PalletDataHelper.data = aPalletGroup;
-	      _palletGroup = aPalletGroup;
-	   },
-	   set papers(oPapers) {
-	      _papers = oPapers;
-	   },
-	   getPaper: function getPaper(paperId) {
-	      if (paperId) {
-	         return this.papers[paperId];
-	      } else {
-	         return this.defaultSelectedPaper;
-	      }
-	   },
+	    get inResetting() {
+	        return _reset_in_progress;
+	    },
+	    set inResetting(bReset) {
+	        _reset_in_progress = bReset;
+	    },
+	    /**
+	     * get diagram papers. if already has store. if hasStore means the diagram have initialized. if not initalized and has _papers,means this is not a new diagram, otherwise this is a new diagram.
+	     * @returns {Object} the papers object.
+	     */
+	    get papers() {
+	        var oRet;
+	        if (_papers) {
+	            oRet = _papers;
+	        } else {
+	            oRet = _DefaultValues.DefaultValues.getPapers();
+	        }
+	        if (!this.inResetting && _StoreHelper.StoreHelper.hasStore()) {
+	            oRet = _StoreHelper.StoreHelper.getPapers();
+	        }
+	        return oRet;
+	    },
 
-	   get elements() {
-	      return this.defaultSelectedPaper.elements;
-	   },
-	   get svgProperties() {
-	      return this.defaultSelectedPaper.svgProperties;
-	   },
-	   get links() {
-	      return this.defaultSelectedPaper.links;
-	   },
-	   get properties() {
-	      return this.defaultSelectedPaper.properties;
-	   },
-	   get selectedPaperId() {
-	      return this.defaultSelectedPaper.uuid;
-	   },
-	   get operator() {
-	      return _DefaultValues.DefaultValues.getOperator();
-	   },
-	   /**
-	    * get the default selected paper. the paper which has the lowest order.
-	    * @returns {_Object} _paper the selected paper
-	    */
-	   get defaultSelectedPaper() {
-	      var papers = this.papers;
-	      var _paper;
-	      var paperKeys = Object.keys(this.papers);
-	      Object.keys(this.papers).reduce(function (pre, curObj) {
-	         var curPaper = papers[curObj];
-	         if (pre > curPaper.order) {
-	            _paper = curPaper;
-	            return curPaper.order;
-	         }
-	         return pre;
-	      }, 10000000);
-	      return _paper;
-	   },
-	   set signalTypes(aTypes) {
-	      _singleTypes = aTypes;
-	   },
-	   get signalTypes() {
-	      if (!_singleTypes) {
-	         return _DefaultValues.DefaultValues.signalTypes;
-	      }
-	      return _singleTypes;
-	   }
+	    /**
+	     * get the palletGroup data which listed on the left of the canvas
+	     * @returns {Array} the pallate group data.
+	     */
+	    get palletGroup() {
+	        if (_palletGroup) {
+	            return _palletGroup;
+	        }
+	        return [];
+	    },
+	    /**
+	     * set palletGroup data. store pallet group data into PalletDataHelper either.
+	     * @param {} aPalletGroup
+	     */
+	    set palletGroup(aPalletGroup) {
+	        _PalletDataHelper.PalletDataHelper.data = aPalletGroup;
+	        _palletGroup = aPalletGroup;
+	    },
+	    set papers(oPapers) {
+	        _papers = oPapers;
+	    },
+	    getPaper: function getPaper(paperId) {
+	        if (paperId) {
+	            return this.papers[paperId];
+	        } else {
+	            return this.defaultSelectedPaper;
+	        }
+	    },
+
+	    get elements() {
+	        return this.defaultSelectedPaper.elements;
+	    },
+	    get svgProperties() {
+	        return this.defaultSelectedPaper.svgProperties;
+	    },
+	    get links() {
+	        return this.defaultSelectedPaper.links;
+	    },
+	    get properties() {
+	        return this.defaultSelectedPaper.properties;
+	    },
+	    get selectedPaperId() {
+	        return this.defaultSelectedPaper.uuid;
+	    },
+	    get operator() {
+	        return _DefaultValues.DefaultValues.getOperator();
+	    },
+	    /**
+	     * get the default selected paper. the paper which has the lowest order.
+	     * @returns {_Object} _paper the selected paper
+	     */
+	    get defaultSelectedPaper() {
+	        var papers = this.papers;
+	        var _paper;
+	        var paperKeys = Object.keys(this.papers);
+	        Object.keys(this.papers).reduce(function (pre, curObj) {
+	            var curPaper = papers[curObj];
+	            if (pre > curPaper.order) {
+	                _paper = curPaper;
+	                return curPaper.order;
+	            }
+	            return pre;
+	        }, 10000000);
+	        return _paper;
+	    },
+	    set signalTypes(aTypes) {
+	        _singleTypes = aTypes;
+	    },
+	    get signalTypes() {
+	        if (!_singleTypes) {
+	            return _DefaultValues.DefaultValues.signalTypes;
+	        }
+	        return _singleTypes;
+	    },
+	    get secondLevelPage() {
+	        //todo:: get value from storehlper first
+	        return _DefaultValues.DefaultValues.secondLevelPage;
+	    }
 	};
 
 /***/ },
-/* 184 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -21438,13 +21354,13 @@
 	});
 	exports.StoreHelper = undefined;
 
-	var _DefaultValues = __webpack_require__(185);
+	var _DefaultValues = __webpack_require__(184);
 
-	var _ElementHelper = __webpack_require__(186);
+	var _ElementHelper = __webpack_require__(185);
 
-	var _LineHelper = __webpack_require__(188);
+	var _LineHelper = __webpack_require__(187);
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
 	/**
 	 * the store helper used to access some informations in store. contains an referance to the redux golbal store
@@ -21502,6 +21418,9 @@
 	        setStore: function setStore(oStore) {
 	            window.__store__ = oStore;
 	            _store = oStore;
+	        },
+	        getStore: function getStore() {
+	            return _store;
 	        },
 	        hasStore: function hasStore() {
 	            if (_store) {
@@ -21694,7 +21613,7 @@
 	}();
 
 /***/ },
-/* 185 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -21704,11 +21623,11 @@
 	});
 	exports.DefaultValues = undefined;
 
-	var _ElementHelper = __webpack_require__(186);
+	var _ElementHelper = __webpack_require__(185);
 
-	var _StoreHelper = __webpack_require__(184);
+	var _StoreHelper = __webpack_require__(183);
 
-	var _UUID = __webpack_require__(187);
+	var _UUID = __webpack_require__(186);
 
 	function _defineProperty(obj, key, value) {
 	    if (key in obj) {
@@ -21846,12 +21765,21 @@
 	        },
 	        get signalTypes() {
 	            return _singleTypes;
+	        },
+	        get secondLevelPage() {
+	            return {
+	                hide: true,
+	                svgProperties: this.getSvgProperties(), //todo:: what is the value of this??
+	                elements: {},
+	                links: {},
+	                properties: {}
+	            };
 	        }
 	    };
 	}();
 
 /***/ },
-/* 186 */
+/* 185 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -21890,7 +21818,7 @@
 	}();
 
 /***/ },
-/* 187 */
+/* 186 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21912,7 +21840,7 @@
 	};
 
 /***/ },
-/* 188 */
+/* 187 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -22106,6 +22034,68 @@
 	}();
 
 /***/ },
+/* 188 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var POSITION_TOP = exports.POSITION_TOP = "top-magnet port postion relative to ca-element";
+	var POSITION_RIGHT = exports.POSITION_RIGHT = "right-magnet port postion relative to ca-element";
+	var POSITION_BOTTOM = exports.POSITION_BOTTOM = "bottom-magnet port postion relative to ca-element";
+	var POSITION_LEFT = exports.POSITION_LEFT = "left-magnet port postion relative to ca-element";
+
+	var TYPE_PALLETELEMENT = exports.TYPE_PALLETELEMENT = "Pallet Element";
+	var TYPE_CANVASELEMENT = exports.TYPE_CANVASELEMENT = "Canvas Element";
+	var TYPE_CANVASLINE = exports.TYPE_CANVASLINE = "Canvas Line";
+
+	var PALLET_ELEMENT_DRAG_START = exports.PALLET_ELEMENT_DRAG_START = "Pallet element drag start";
+	var CANVAS_ELEMENT_DRAG_START = exports.CANVAS_ELEMENT_DRAG_START = "Canvas element drag start";
+
+	var LINE_ELEMENT_SELECT = exports.LINE_ELEMENT_SELECT = "Select line";
+	var CANVAS_ELEMENT_SELECT = exports.CANVAS_ELEMENT_SELECT = "Canvas Element Select";
+	var CLEAR_SELECTION = exports.CLEAR_SELECTION = "Clear selection";
+
+	var ADD_ELEMENT = exports.ADD_ELEMENT = "Add element";
+	var REMOVE_ELEMENT = exports.REMOVE_ELEMENT = "Remove element";
+	var MOVE_ELEMENT = exports.MOVE_ELEMENT = "Move Element";
+	var SELECT_ELEMENT = exports.SELECT_ELEMENT = "Select Element";
+	var SELECT_LINE = exports.SELECT_LINE = "Select Line";
+	var UPDATE_LINES = exports.UPDATE_LINES = "Update lines";
+	var REMOVE_LINES = exports.REMOVE_LINES = "Remove Lines";
+	var REMOVE_LINE = exports.REMOVE_LINE = "Remove Line";
+	var ADD_LINE = exports.ADD_LINE = "Add Line";
+	var SELECT_CANVAS = exports.SELECT_CANVAS = "Select canva";
+
+	var ZOOM_IN = exports.ZOOM_IN = "Zoom in";
+	var ZOOM_OUT = exports.ZOOM_OUT = "Zoom out";
+	var REDO_OPERATION = exports.REDO_OPERATION = "Re do operation";
+	var UNDO_OPERATION = exports.UNDO_OPERATION = "undo operation";
+	var CREATE_SUB_PAPGER = exports.CREATE_SUB_PAPGER = "Create Sub page operation";
+	var DELETE_SUB_PAPGER = exports.DELETE_SUB_PAPGER = "Delete Sub page operation";
+	var SWITCH_SUB_PAPER = exports.SWITCH_SUB_PAPER = "Switch sub page operation";
+	var OPEN_SUB_PAGE = exports.OPEN_SUB_PAGE = "Open Seconde Level Page for Static App";
+	var CLOSE_SUB_PAGE = exports.CLOSE_SUB_PAGE = "Close Seond Level Page for Static App";
+	var UPDATE_ELMENT_DATAS = exports.UPDATE_ELMENT_DATAS = "Update element image by status and place holder values";
+
+	var SAVE_SVG_PROPERTIES = exports.SAVE_SVG_PROPERTIES = "Save SVG Properties";
+	var SAVE_ELEMENT_PROPERTIES = exports.SAVE_ELEMENT_PROPERTIES = "Save Element Properties";
+	var ADD_MEASURE_POINT = exports.ADD_MEASURE_POINT = "Add Measure Point Properties";
+	var REMOVE_MEASURE_POINT = exports.REMOVE_MEASURE_POINT = "Remove Measure Point Properties";
+	var SAVE_MEASURE_POINT_VALUE = exports.SAVE_MEASURE_POINT_VALUE = "Save Measure point value when changed";
+	var CANVAS = exports.CANVAS = "Canvas";
+	var COMMON_ELEMENT = exports.COMMON_ELEMENT = "Common element which contains measure point info";
+	var UPDATE_GEOMETRIC_DATA = exports.UPDATE_GEOMETRIC_DATA = "Update geometric data from property area";
+	var SAVE_CHART = exports.SAVE_CHART = "Save Chart";
+	var UPDATE_TEXT_ELEMENT = exports.UPDATE_TEXT_ELEMENT = "Update text element values from properties";
+
+	var UI_DATA_UPDATE = exports.UI_DATA_UPDATE = "UI element binding data update-binding data of the placeholder element";
+	var UI_STATUS_UPDATE = exports.UI_STATUS_UPDATE = "UI element status update- the images of the elements";
+	var RESET_DIAGRAM = exports.RESET_DIAGRAM = "Reset diagram, happens when the switch to an completly new diagram";
+
+/***/ },
 /* 189 */
 /***/ function(module, exports) {
 
@@ -22143,15 +22133,15 @@
 
 	var _redux = __webpack_require__(165);
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
 	var _Utility = __webpack_require__(191);
 
-	var _DataHelper = __webpack_require__(183);
+	var _DataHelper = __webpack_require__(182);
 
-	var _DefaultValues = __webpack_require__(185);
+	var _DefaultValues = __webpack_require__(184);
 
-	var _StoreHelper = __webpack_require__(184);
+	var _StoreHelper = __webpack_require__(183);
 
 	var _PaperHelper = __webpack_require__(192);
 
@@ -22210,8 +22200,11 @@
 							case _consts.SWITCH_SUB_PAPER:
 										newState = Object.assign({}, action.paper.svgProperties);
 										break;
+							case _consts.RESET_DIAGRAM:
+										newState = _DataHelper.DataHelper.svgProperties;
+										break;
 							default:
-										newState = state;
+										newState = _DataHelper.DataHelper.svgProperties;
 				}
 				return newState;
 	};
@@ -22274,6 +22267,9 @@
 										var oNewElements = (0, _PaperHelper.updateElementsStatus)(action.data);
 										newState = Object.assign({}, state, oNewElements);
 										break;
+							case _consts.RESET_DIAGRAM:
+										newState = Object.assign({}, _DataHelper.DataHelper.elements);
+										break;
 							default:
 										newState = state;
 				}
@@ -22324,6 +22320,9 @@
 							case _consts.SWITCH_SUB_PAPER:
 										return Object.assign({}, action.paper.links);
 										break;
+							case _consts.RESET_DIAGRAM:
+										return Object.assign({}, _DataHelper.DataHelper.links);
+										break;
 				}
 				return state;
 	};
@@ -22361,12 +22360,15 @@
 							case _consts.SWITCH_SUB_PAPER:
 										return Object.assign({}, action.paper.operator);
 										break;
+							case _consts.RESET_DIAGRAM:
+										return Object.assign({}, _DataHelper.DataHelper.operator);
+										break;
 							default:
 										return state;
 				}
 	};
 	var secondLevelPage = function secondLevelPage() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? { hide: true, svgProperties: _DefaultValues.DefaultValues.getSvgProperties(), elements: {}, links: {}, properties: {} } : arguments[0];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.secondLevelPage : arguments[0];
 				var action = arguments[1];
 
 				switch (action.type) {
@@ -22375,6 +22377,10 @@
 										break;
 							case _consts.CLOSE_SUB_PAGE:
 										return Object.assign({}, state, { hide: true });
+										break;
+							case _consts.RESET_DIAGRAM:
+										return Object.assign({}, _DataHelper.DataHelper.secondLevelPage);
+										break;
 				}
 				return state;
 	};
@@ -22395,19 +22401,19 @@
 	});
 	exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.dummyFunction = exports.getRelativePosition = exports.generateUUID = exports.LineHelper = exports.ElementHelper = exports.DefaultValues = exports.StoreHelper = undefined;
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
-	var _StoreHelper = __webpack_require__(184);
+	var _StoreHelper = __webpack_require__(183);
 
-	var _DefaultValues = __webpack_require__(185);
+	var _DefaultValues = __webpack_require__(184);
 
-	var _ElementHelper = __webpack_require__(186);
+	var _ElementHelper = __webpack_require__(185);
 
-	var _LineHelper = __webpack_require__(188);
+	var _LineHelper = __webpack_require__(187);
 
-	var _UUID = __webpack_require__(187);
+	var _UUID = __webpack_require__(186);
 
-	var _DataHelper = __webpack_require__(183);
+	var _DataHelper = __webpack_require__(182);
 
 	exports.StoreHelper = _StoreHelper.StoreHelper;
 	exports.DefaultValues = _DefaultValues.DefaultValues;
@@ -22547,9 +22553,9 @@
 	});
 	exports.papers = exports.updateElementsStatus = exports.updatePlaceholderValues = undefined;
 
-	var _StoreHelper = __webpack_require__(184);
+	var _StoreHelper = __webpack_require__(183);
 
-	var _ElementHelper = __webpack_require__(186);
+	var _ElementHelper = __webpack_require__(185);
 
 	/**
 	 * @Define PaperHeler Used to provide some helper method for update the binding data of the paper
@@ -22633,9 +22639,9 @@
 
 	var _Utility = __webpack_require__(191);
 
-	var _DataHelper = __webpack_require__(183);
+	var _DataHelper = __webpack_require__(182);
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
 	function _defineProperty(obj, key, value) {
 				if (key in obj) {
@@ -22748,6 +22754,9 @@
 							case _consts.SWITCH_SUB_PAPER:
 										return Object.assign({}, { type: _consts.CANVAS, selectedProperties: action.paper.svgProperties, properties: action.paper.properties });
 										break;
+							case _consts.RESET_DIAGRAM:
+										return { type: _consts.CANVAS, selectedProperties: _DataHelper.DataHelper.svgProperties, properties: _DataHelper.DataHelper.properties };
+										break;
 							default:
 										return state;
 										break;
@@ -22762,57 +22771,62 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	   value: true
+				value: true
 	});
 	exports.selectedPaperId = exports.papers = undefined;
 
 	var _Utility = __webpack_require__(191);
 
-	var _DataHelper = __webpack_require__(183);
+	var _DataHelper = __webpack_require__(182);
 
 	var _PaperHelper = __webpack_require__(192);
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
 	function _defineProperty(obj, key, value) {
-	   if (key in obj) {
-	      Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
-	   } else {
-	      obj[key] = value;
-	   }return obj;
+				if (key in obj) {
+							Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+				} else {
+							obj[key] = value;
+				}return obj;
 	}
 
 	var papers = function papers() {
-	   var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.papers : arguments[0];
-	   var action = arguments[1];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.papers : arguments[0];
+				var action = arguments[1];
 
-	   switch (action.type) {
-	      case _consts.CREATE_SUB_PAPGER:
-	         state = Object.assign({}, state, _defineProperty({}, action.paperId, _Utility.DefaultValues.generatePaper(action.uuid, action.paperId, action.paperName, action.paperType)));
-	         break;
-	      case _consts.DELETE_SUB_PAPGER:
-	         state = Object.assign({}, state);
-	         delete state[action.paperId];
-	         break;
-	      case _consts.UI_DATA_UPDATE:
-	         state = _PaperHelper.papers.updatePlaceholderValues(action.data);
-	         break;
-	      case _consts.UI_STATUS_UPDATE:
-	         state = _PaperHelper.papers.updateElementsStatus(action.data);
-	         break;
-	   }
-	   return state;
+				switch (action.type) {
+							case _consts.CREATE_SUB_PAPGER:
+										state = Object.assign({}, state, _defineProperty({}, action.paperId, _Utility.DefaultValues.generatePaper(action.uuid, action.paperId, action.paperName, action.paperType)));
+										break;
+							case _consts.DELETE_SUB_PAPGER:
+										state = Object.assign({}, state);
+										delete state[action.paperId];
+										break;
+							case _consts.UI_DATA_UPDATE:
+										state = _PaperHelper.papers.updatePlaceholderValues(action.data);
+										break;
+							case _consts.UI_STATUS_UPDATE:
+										state = _PaperHelper.papers.updateElementsStatus(action.data);
+										break;
+							case _consts.RESET_DIAGRAM:
+										state = Object.assign({}, _DataHelper.DataHelper.papers);
+										break;
+				}
+				return state;
 	};
 
 	var selectedPaperId = function selectedPaperId() {
-	   var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.defaultSelectedPaper.key : arguments[0];
-	   var action = arguments[1];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.defaultSelectedPaper.key : arguments[0];
+				var action = arguments[1];
 
-	   switch (action.type) {
-	      case _consts.SWITCH_SUB_PAPER:
-	         return action.paper.key;
-	   }
-	   return state;
+				switch (action.type) {
+							case _consts.SWITCH_SUB_PAPER:
+										return action.paper.key;
+							case _consts.RESET_DIAGRAM:
+										return _DataHelper.DataHelper.defaultSelectedPaper.key;
+				}
+				return state;
 	};
 
 	exports.papers = papers;
@@ -22820,6 +22834,60 @@
 
 /***/ },
 /* 195 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	   value: true
+	});
+	exports.selects = undefined;
+
+	var _consts = __webpack_require__(188);
+
+	var _defaultSelectedElement = {
+	   selectedPalletItem: null,
+	   selectedCanvasItem: null,
+	   selectedLine: null
+	};
+	/**
+	 * reducers for log the selected elements of the component
+	 * @param {Object} state
+	 * @param {Object} action
+	 * @returns {Object} new state
+	 */
+	var selects = exports.selects = function selects() {
+	   var state = arguments.length <= 0 || arguments[0] === undefined ? _defaultSelectedElement : arguments[0];
+	   var action = arguments[1];
+
+	   switch (action.type) {
+	      case _consts.PALLET_ELEMENT_DRAG_START:
+	         return Object.assign({}, state, { selectedPalletItem: action.id });
+	         break;
+	      case _consts.CANVAS_ELEMENT_DRAG_START:
+	         return Object.assign({}, _defaultSelectedElement, {
+	            selectedCanvasItem: action.key
+	         });
+	         break;
+	      case _consts.CANVAS_ELEMENT_SELECT:
+	         return Object.assign({}, state, { selectedCanvasItem: action.id });
+	         break;
+	      case _consts.LINE_ELEMENT_SELECT:
+	         return Object.assign({}, state, { selectedLine: action.id });
+	         break;
+	      case _consts.CLEAR_SELECTION:
+	         return _defaultSelectedElement;
+	         break;
+	      case _consts.RESET_DIAGRAM:
+	         return _defaultSelectedElement;
+	         break;
+	      default:
+	         return state;
+	   }
+	};
+
+/***/ },
+/* 196 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22833,21 +22901,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Pallet = __webpack_require__(196);
+	var _Pallet = __webpack_require__(197);
 
 	var _Pallet2 = _interopRequireDefault(_Pallet);
 
-	var _Canvas = __webpack_require__(199);
+	var _Canvas = __webpack_require__(200);
 
-	var _Property = __webpack_require__(204);
+	var _Property = __webpack_require__(205);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _Toolbar = __webpack_require__(206);
+	var _Toolbar = __webpack_require__(207);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _Tabs = __webpack_require__(208);
+	var _Tabs = __webpack_require__(209);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22905,7 +22973,7 @@
 	exports.StaticApp = StaticApp;
 
 /***/ },
-/* 196 */
+/* 197 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22916,15 +22984,15 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Pallet = __webpack_require__(197);
+	var _Pallet = __webpack_require__(198);
 
 	var _Pallet2 = _interopRequireDefault(_Pallet);
 
-	var _actions = __webpack_require__(198);
+	var _actions = __webpack_require__(199);
 
 	var _Utility = __webpack_require__(191);
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
 	function _interopRequireDefault(obj) {
 	    return obj && obj.__esModule ? obj : { default: obj };
@@ -22948,7 +23016,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Pallet2.default);
 
 /***/ },
-/* 197 */
+/* 198 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23050,7 +23118,7 @@
 	exports.default = Pallet;
 
 /***/ },
-/* 198 */
+/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23058,9 +23126,9 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.updateStatus = exports.updateBindingData = exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.resetDiagram = exports.updateStatus = exports.updateBindingData = exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
 	var palletElementDragStart = exports.palletElementDragStart = function palletElementDragStart(id) {
 	    return {
@@ -23318,13 +23386,19 @@
 	};
 	var updateStatus = exports.updateStatus = function updateStatus(data) {
 	    return {
-	        type: UI_STATUS_UPDATE,
+	        type: _consts.UI_STATUS_UPDATE,
 	        data: data
+	    };
+	};
+	var resetDiagram = exports.resetDiagram = function resetDiagram(oPapers) {
+	    return {
+	        type: _consts.RESET_DIAGRAM,
+	        data: oPapers
 	    };
 	};
 
 /***/ },
-/* 199 */
+/* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23336,17 +23410,17 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Canvas = __webpack_require__(200);
+	var _Canvas = __webpack_require__(201);
 
-	var _StoreHelper = __webpack_require__(184);
+	var _StoreHelper = __webpack_require__(183);
 
-	var _DataHelper = __webpack_require__(183);
+	var _DataHelper = __webpack_require__(182);
 
-	var _actions = __webpack_require__(198);
+	var _actions = __webpack_require__(199);
 
 	var _Utility = __webpack_require__(191);
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
 	var mapStateToProps = function mapStateToProps(state) {
 	    return {
@@ -23547,7 +23621,7 @@
 	exports.StaticSecondLevelCanvas = StaticSecondLevelCanvas;
 
 /***/ },
-/* 200 */
+/* 201 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23563,19 +23637,19 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
 	var _Utility = __webpack_require__(191);
 
-	var _TextElement = __webpack_require__(201);
+	var _TextElement = __webpack_require__(202);
 
 	var _TextElement2 = _interopRequireDefault(_TextElement);
 
-	var _PlaceHolder = __webpack_require__(202);
+	var _PlaceHolder = __webpack_require__(203);
 
 	var _PlaceHolder2 = _interopRequireDefault(_PlaceHolder);
 
-	var _GroupElement = __webpack_require__(203);
+	var _GroupElement = __webpack_require__(204);
 
 	var _GroupElement2 = _interopRequireDefault(_GroupElement);
 
@@ -23799,7 +23873,7 @@
 	exports.StaticCanvasWithClose = StaticCanvasWithClose;
 
 /***/ },
-/* 201 */
+/* 202 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23880,7 +23954,7 @@
 	exports.default = TextElement;
 
 /***/ },
-/* 202 */
+/* 203 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23961,7 +24035,7 @@
 	exports.default = PlaceholderElement;
 
 /***/ },
-/* 203 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24037,7 +24111,7 @@
 	exports.default = GroupElement;
 
 /***/ },
-/* 204 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24048,13 +24122,13 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Property = __webpack_require__(205);
+	var _Property = __webpack_require__(206);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _actions = __webpack_require__(198);
+	var _actions = __webpack_require__(199);
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
 	var _Utility = __webpack_require__(191);
 
@@ -24237,7 +24311,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Property2.default);
 
 /***/ },
-/* 205 */
+/* 206 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24252,17 +24326,17 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _consts = __webpack_require__(181);
+	var _consts = __webpack_require__(188);
 
 	var _Utility = __webpack_require__(191);
 
-	var _DefaultValues = __webpack_require__(185);
+	var _DefaultValues = __webpack_require__(184);
 
-	var _TextElement = __webpack_require__(201);
+	var _TextElement = __webpack_require__(202);
 
-	var _PlaceHolder = __webpack_require__(202);
+	var _PlaceHolder = __webpack_require__(203);
 
-	var _GroupElement = __webpack_require__(203);
+	var _GroupElement = __webpack_require__(204);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24562,7 +24636,7 @@
 	exports.default = Property;
 
 /***/ },
-/* 206 */
+/* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24575,11 +24649,11 @@
 
 	var _Utility = __webpack_require__(191);
 
-	var _Toolbar = __webpack_require__(207);
+	var _Toolbar = __webpack_require__(208);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _actions = __webpack_require__(198);
+	var _actions = __webpack_require__(199);
 
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : { default: obj };
@@ -24653,7 +24727,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Toolbar2.default);
 
 /***/ },
-/* 207 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24666,7 +24740,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	__webpack_require__(181);
+	__webpack_require__(188);
 
 	var _Utility = __webpack_require__(191);
 
@@ -24790,7 +24864,7 @@
 	exports.default = Toolbar;
 
 /***/ },
-/* 208 */
+/* 209 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24804,13 +24878,13 @@
 
 	var _Utility = __webpack_require__(191);
 
-	var _StoreHelper = __webpack_require__(184);
+	var _StoreHelper = __webpack_require__(183);
 
-	var _DataHelper = __webpack_require__(183);
+	var _DataHelper = __webpack_require__(182);
 
-	var _Tabs = __webpack_require__(209);
+	var _Tabs = __webpack_require__(210);
 
-	var _actions = __webpack_require__(198);
+	var _actions = __webpack_require__(199);
 
 	var mapStateToProps = function mapStateToProps(state) {
 					return {
@@ -24853,7 +24927,7 @@
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 209 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24954,7 +25028,7 @@
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 210 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24964,13 +25038,13 @@
 	});
 	exports.API = undefined;
 
-	var _DataHelper = __webpack_require__(183);
+	var _DataHelper = __webpack_require__(182);
 
-	var _StoreHelper = __webpack_require__(184);
+	var _StoreHelper = __webpack_require__(183);
 
-	var _Data = __webpack_require__(211);
+	var _Data = __webpack_require__(212);
 
-	var _actions = __webpack_require__(198);
+	var _actions = __webpack_require__(199);
 
 	/**
 	 * ApiSingletone: used to store global data of the Component- e.g palletGroup,papers
@@ -25023,6 +25097,13 @@
 
 									get dispatch() {
 													return _StoreHelper.StoreHelper.getDispatch();
+									},
+									reset: function reset(oPapers) {
+													oPapers = (0, _Data.transformPapers)(oPapers);
+													_DataHelper.DataHelper.inResetting = true;
+													_DataHelper.DataHelper.papers = oPapers;
+													this.dispatch((0, _actions.resetDiagram)(oPapers));
+													_DataHelper.DataHelper.inResetting = false;
 									}
 					};
 					window.REACTDiagram = ret;
@@ -25030,7 +25111,7 @@
 	}();
 
 /***/ },
-/* 211 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25040,7 +25121,7 @@
 	});
 	exports.transformPapers = exports.transfromPalletGroupData = exports.transformSignalTypes = exports.transformElementsStatus = exports.transformBindingData = undefined;
 
-	var _PalletData = __webpack_require__(212);
+	var _PalletData = __webpack_require__(213);
 
 	/**
 	 * transformBindingData transform binding data from array to Object.
@@ -25125,7 +25206,7 @@
 	};
 
 /***/ },
-/* 212 */
+/* 213 */
 /***/ function(module, exports) {
 
 	"use strict";

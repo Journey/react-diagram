@@ -60,6 +60,9 @@ export const StoreHelper = (() => {
 	    window.__store__ = oStore;
             _store = oStore;
         },
+	getStore: () => {
+	    return _store;
+	},
 	hasStore: ()=>{
 	    if(_store){
 		return true;

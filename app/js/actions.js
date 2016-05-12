@@ -29,7 +29,9 @@ import {
     OPEN_SUB_PAGE,
     CLOSE_SUB_PAGE,
     UPDATE_ELEMENT_DATAS,
-    UI_DATA_UPDATE
+    UI_DATA_UPDATE,
+    UI_STATUS_UPDATE,
+    RESET_DIAGRAM
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -284,5 +286,11 @@ export const updateStatus = (data) => {
     return {
 	type: UI_STATUS_UPDATE,
 	data: data
+    };
+};
+export const resetDiagram = (oPapers) => {
+    return {
+	type: RESET_DIAGRAM,
+	data: oPapers
     };
 };

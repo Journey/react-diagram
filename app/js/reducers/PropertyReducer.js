@@ -11,7 +11,8 @@ import {
     SAVE_MEASURE_POINT_VALUE,
     UPDATE_GEOMETRIC_DATA,
     MOVE_ELEMENT,
-    SWITCH_SUB_PAPER
+    SWITCH_SUB_PAPER,
+    RESET_DIAGRAM
 } from "../consts";
 
 //{selectedProperties:{},properties:{}}
@@ -103,6 +104,9 @@ const properties = (state={type:CANVAS,selectedProperties:DataHelper.svgProperti
 	break;
     case SWITCH_SUB_PAPER:
 	return Object.assign({},{type:CANVAS,selectedProperties: action.paper.svgProperties,properties: action.paper.properties});
+	break;
+    case RESET_DIAGRAM:
+	return {type:CANVAS,selectedProperties:DataHelper.svgProperties,properties:DataHelper.properties};
 	break;
     default:
 	return state;

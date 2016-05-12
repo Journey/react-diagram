@@ -1,10 +1,10 @@
-import {combineReducers} from "redux";
 import {
     PALLET_ELEMENT_DRAG_START,
     CANVAS_ELEMENT_SELECT,
     LINE_ELEMENT_SELECT,
     CLEAR_SELECTION,
-    CANVAS_ELEMENT_DRAG_START
+    CANVAS_ELEMENT_DRAG_START,
+    RESET_DIAGRAM
 } from "../consts";
 
 let _defaultSelectedElement = {
@@ -18,7 +18,7 @@ let _defaultSelectedElement = {
  * @param {Object} action
  * @returns {Object} new state
  */
-const selects = (state=_defaultSelectedElement,action) => {
+export const selects = (state=_defaultSelectedElement,action) => {
     switch(action.type){
     case PALLET_ELEMENT_DRAG_START:
 	return Object.assign({},state,{selectedPalletItem:action.id});
@@ -37,9 +37,11 @@ const selects = (state=_defaultSelectedElement,action) => {
     case CLEAR_SELECTION:
 	return _defaultSelectedElement;
 	break;
+    case RESET_DIAGRAM:
+	return _defaultSelectedElement;
+	break;
     default:
 	return state;
     }
 };
 
-export default selects;
