@@ -202,6 +202,16 @@ export const StoreHelper = (() => {
             if (papers[elementKey]) {
                 return true;
             }
+	    var subpageUUID = Object.keys(papers)
+		.find((paperUUID)=>{
+		    if(papers[paperUUID].key === elementKey){
+			return true;
+		    }
+		    return false;
+		});
+	    if(subpageUUID){
+		return true;
+	    }
             return false;
         },
         getUpdatedLinks: (aLinkKeys) => {

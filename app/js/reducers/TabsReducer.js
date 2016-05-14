@@ -9,7 +9,7 @@ const papers = (state = DataHelper.papers, action) => {
     switch(action.type){
     case CREATE_SUB_PAPGER:
 	state = Object.assign({},state,{
-	    [action.paperId]: DefaultValues.generatePaper(action.uuid,action.paperId,action.paperName,action.paperType)
+	    [action.uuid]: DefaultValues.generatePaper(action.uuid,action.paperId,action.paperName,action.paperType)
 	});
 	break;
     case DELETE_SUB_PAPGER:
@@ -29,12 +29,12 @@ const papers = (state = DataHelper.papers, action) => {
     return state;
 };
 
-const selectedPaperId = (state= DataHelper.defaultSelectedPaper.key,action) => {
+const selectedPaperId = (state= DataHelper.defaultSelectedPaper.uuid,action) => {
     switch(action.type){
     case SWITCH_SUB_PAPER:
-	return action.paper.key;
+	return action.paper.uuid;
     case RESET_DIAGRAM:
-	return DataHelper.defaultSelectedPaper.key;
+	return DataHelper.defaultSelectedPaper.uuid;
     }
     return state;
 };

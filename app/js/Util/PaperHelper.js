@@ -71,3 +71,11 @@ export const papers = {
     }
 };
 
+export const paper = {
+    isSubPage(iPaperTypeId){
+	if(iPaperTypeId === 2){
+	    return true;
+	}
+	return false;
+    }  
+};

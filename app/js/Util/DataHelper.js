@@ -66,11 +66,29 @@ export const DataHelper = {
         _papers = oPapers;
     },
     getPaper(paperId) {
+	var oPapers = this.papers;
+	//if this is the normal page
         if (paperId) {
-            return this.papers[paperId];
-        } else {
-            return this.defaultSelectedPaper;
+            return oPapers[paperId];
         }
+        return this.defaultSelectedPaper;
+    },
+    getSubpaper(paperKey){
+	var oPapers = this.papers;
+	//if this is the normal page
+        if (oPapers[paperKey]) {
+            return oPapers[paperKey];
+        }
+	//check if it is the subpage(via key))
+	var paperUUID = Object.keys(oPapers)
+	    .find((key)=>{
+		return oPapers[key].key === paperKey;
+	    });
+	if(paperUUID){
+	    return oPapers[paperUUID];
+	}
+	console.error(`the sub page ${paperKey} does not exsits!`);
+        return null;
     },
     get elements() {
         return this.defaultSelectedPaper.elements;
@@ -119,7 +137,11 @@ export const DataHelper = {
         return _singleTypes;
     },
     get secondLevelPage() {
-        //todo:: get value from storehlper first
+        //todo:: get value from storehelper first
         return DefaultValues.secondLevelPage;
+    },
+    getPaperProperties() {
+	//todo:: get value from storehelper first
+	return DefaultValues.paperProperties;
     }
 };

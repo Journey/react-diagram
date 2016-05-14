@@ -191,7 +191,7 @@ const mapDispatchtoProps = (dispatch) => {
 	    let paper = DataHelper.getPaper( StoreHelper.getSelectedPaperId() );
 	    let identifier = StoreHelper.getPaperIdentifier(paper,elementKey);
             if (StoreHelper.hasSubPage(identifier)) {
-                dispatch(openSubPage(DataHelper.getPaper(identifier)));
+                dispatch(openSubPage(DataHelper.getSubpaper(identifier)));
             }
         },
 	closeSubPage:(event) => {

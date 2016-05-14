@@ -39,14 +39,15 @@ export const DefaultValues = (() => {
             var id = generateUUID();
             return () => {
                 return {
-                    key: id,
+                    key: id, //the uuid of normal page, the element binding key for the subpage
                     paperName: "默认",
                     paperType: 1, // 普通页面
                     order: 0,
                     svgProperties: DefaultValues.getSvgProperties(),
                     elements: {},
                     links: {},
-                    properties: {}
+                    properties: {},
+		    uuid: id
                 };
             };
         })(),
@@ -143,6 +144,13 @@ export const DefaultValues = (() => {
 		elements:{},
 		links:{},
 		properties:{}
+	    };
+	},
+	get paperProperties() {
+	    return {
+		pageId: "",
+		pageName: "默认",
+		pageTypeId: 1 //is 普通界面
 	    };
 	}
     };
