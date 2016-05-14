@@ -21285,18 +21285,35 @@
 	        _papers = oPapers;
 	    },
 	    getPaper: function getPaper(paperId) {
+	        var oPapers = this.papers;
+	        //if this is the normal page
 	        if (paperId) {
-	            return this.papers[paperId];
-	        } else {
-	            return this.defaultSelectedPaper;
+	            return oPapers[paperId];
 	        }
+	        return this.defaultSelectedPaper;
+	    },
+	    getSubpaper: function getSubpaper(paperKey) {
+	        var oPapers = this.papers;
+	        //if this is the normal page
+	        if (oPapers[paperKey]) {
+	            return oPapers[paperKey];
+	        }
+	        //check if it is the subpage(via key))
+	        var paperUUID = Object.keys(oPapers).find(function (key) {
+	            return oPapers[key].key === paperKey;
+	        });
+	        if (paperUUID) {
+	            return oPapers[paperUUID];
+	        }
+	        console.error("the sub page " + paperKey + " does not exsits!");
+	        return null;
 	    },
 
 	    get elements() {
 	        return this.defaultSelectedPaper.elements;
 	    },
 	    get svgProperties() {
-	        return this.defaultSelectedPaper.svgProperties;
+	        return Object.assign({}, this.defaultSelectedPaper.svgProperties);
 	    },
 	    get links() {
 	        return this.defaultSelectedPaper.links;
@@ -21338,8 +21355,24 @@
 	        return _singleTypes;
 	    },
 	    get secondLevelPage() {
-	        //todo:: get value from storehlper first
+	        //todo:: get value from storehelper first
 	        return _DefaultValues.DefaultValues.secondLevelPage;
+	    },
+	    getPaperProperties: function getPaperProperties() {
+	        //todo:: get value from storehelper first
+	        return _DefaultValues.DefaultValues.paperProperties;
+	    },
+	    getPaperInfo: function getPaperInfo(paperUUID) {
+	        var oPaper = this.getPaper(paperUUID);
+	        if (oPaper) {
+	            return {
+	                paperType: oPaper.paperType,
+	                paperName: oPaper.paperName,
+	                bindingId: oPaper.key
+	            };
+	        }
+	        console.log("DataHelper.getPaperInfo(" + paperUUID + ")) not find");
+	        return null;
 	    }
 	};
 
@@ -21457,7 +21490,7 @@
 	            var _state = _store.getState();
 	            var _selectedPaperId = _state.selectedPaperId;
 	            var paper = _state.papers[_selectedPaperId];
-	            paper.svgProperties = _state.svgProperties;
+	            paper.svgProperties = Object.assign({}, _state.svgProperties);
 	            paper.elements = _state.elements;
 	            paper.links = _state.links;
 	            paper.properties = _state.properties.properties;
@@ -21563,6 +21596,15 @@
 	        hasSubPage: function hasSubPage(elementKey) {
 	            var papers = _getPapers();
 	            if (papers[elementKey]) {
+	                return true;
+	            }
+	            var subpageUUID = Object.keys(papers).find(function (paperUUID) {
+	                if (papers[paperUUID].key === elementKey) {
+	                    return true;
+	                }
+	                return false;
+	            });
+	            if (subpageUUID) {
 	                return true;
 	            }
 	            return false;
@@ -21673,14 +21715,15 @@
 	            var id = (0, _UUID.generateUUID)();
 	            return function () {
 	                return {
-	                    key: id,
+	                    key: id, //the uuid of normal page, the element binding key for the subpage
 	                    paperName: "默认",
 	                    paperType: 1, // 普通页面
 	                    order: 0,
 	                    svgProperties: DefaultValues.getSvgProperties(),
 	                    elements: {},
 	                    links: {},
-	                    properties: {}
+	                    properties: {},
+	                    uuid: id
 	                };
 	            };
 	        }(),
@@ -21773,6 +21816,13 @@
 	                elements: {},
 	                links: {},
 	                properties: {}
+	            };
+	        },
+	        get paperProperties() {
+	            return {
+	                pageId: "",
+	                pageName: "默认",
+	                pageTypeId: 1 //is 普通界面
 	            };
 	        }
 	    };
@@ -22549,9 +22599,9 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+					value: true
 	});
-	exports.papers = exports.updateElementsStatus = exports.updatePlaceholderValues = undefined;
+	exports.paper = exports.papers = exports.updateElementsStatus = exports.updatePlaceholderValues = undefined;
 
 	var _StoreHelper = __webpack_require__(183);
 
@@ -22565,66 +22615,75 @@
 	 */
 
 	function _updatePlaceholdersValues(elements, properties, oValues) {
-		return Object.keys(elements).filter(function (sEleKey) {
-			if (_ElementHelper.ElementHelper.isPlaceHolder(elements[sEleKey].id)) {
-				return true;
-			}
-			return false;
-		}).reduce(function (oPre, sEleKey) {
-			var property = properties[sEleKey];
-			var bindingid = property["bindingId"];
-			if (oValues[bindingid]) {
-				oPre[property.key] = Object.assign({}, elements[sEleKey], { text: oValues[bindingid].join(",") });
-			}
-			return oPre;
-		}, {});
+					return Object.keys(elements).filter(function (sEleKey) {
+									if (_ElementHelper.ElementHelper.isPlaceHolder(elements[sEleKey].id)) {
+													return true;
+									}
+									return false;
+					}).reduce(function (oPre, sEleKey) {
+									var property = properties[sEleKey];
+									var bindingid = property["bindingId"];
+									if (oValues[bindingid]) {
+													oPre[property.key] = Object.assign({}, elements[sEleKey], { text: oValues[bindingid].join(",") });
+									}
+									return oPre;
+					}, {});
 	}
 	function _updateElementsStatus(elements, properties, oValues) {
-		return {};
+					return {};
 	}
 	var updatePlaceholderValues = exports.updatePlaceholderValues = function updatePlaceholderValues(oValues) {
-		var elements = _StoreHelper.StoreHelper.getElements();
-		var properties = _StoreHelper.StoreHelper.getProperties();
-		return _updatePlaceholdersValues(elements, properties.properties, oValues);
+					var elements = _StoreHelper.StoreHelper.getElements();
+					var properties = _StoreHelper.StoreHelper.getProperties();
+					return _updatePlaceholdersValues(elements, properties.properties, oValues);
 	};
 	var updateElementsStatus = exports.updateElementsStatus = function updateElementsStatus(oStatus) {
-		var elements = _StoreHelper.StoreHelper.getElements();
-		var properties = _StoreHelper.StoreHelper.getProperties();
-		return _updateElementsStatus(elements, properties, oStatus);
+					var elements = _StoreHelper.StoreHelper.getElements();
+					var properties = _StoreHelper.StoreHelper.getProperties();
+					return _updateElementsStatus(elements, properties, oStatus);
 	};
 	/**
 	 * helper method for the papers(collection of paper object) object
 	 */
 	var papers = exports.papers = {
-		/**
-	  * update the place holder values of the papers. as the papers is not display directly so update it directly
-	  * @param {} oValues
-	  */
+					/**
+	     * update the place holder values of the papers. as the papers is not display directly so update it directly
+	     * @param {} oValues
+	     */
 
-		updatePlaceholderValues: function updatePlaceholderValues(oValues) {
-			var oPapers = _StoreHelper.StoreHelper.getPapers();
-			Object.keys(oPapers).forEach(function (paperKey) {
-				var paper = oPapers[paperKey];
-				var updatedPlaceholders = _updatePlaceholdersValues(paper.elements, paper.properties, oValues);
-				paper.elements = Object.assign({}, paper.elements, updatedPlaceholders);
-			});
-			return oPapers;
-		},
+					updatePlaceholderValues: function updatePlaceholderValues(oValues) {
+									var oPapers = _StoreHelper.StoreHelper.getPapers();
+									Object.keys(oPapers).forEach(function (paperKey) {
+													var paper = oPapers[paperKey];
+													var updatedPlaceholders = _updatePlaceholdersValues(paper.elements, paper.properties, oValues);
+													paper.elements = Object.assign({}, paper.elements, updatedPlaceholders);
+									});
+									return oPapers;
+					},
 
-		/**
-	  * 
-	  * @param {Object} oValues the values which represent element status
-	  * @returns {Object}  oPapers The papers with new status
-	  */
-		updateElementsStatus: function updateElementsStatus(oValues) {
-			var oPapers = _StoreHelper.StoreHelper.getPapers();
-			Object.keys(oPapers).forEach(function (paperKey) {
-				var paper = oPapers[paperKey];
-				var updatedElements = _updateElementsStatus(paper.elements, paper.properties);
-				papers.elements = Object.assign({}, paper.elements, updatedElements);
-			});
-			return oPapers;
-		}
+					/**
+	     * 
+	     * @param {Object} oValues the values which represent element status
+	     * @returns {Object}  oPapers The papers with new status
+	     */
+					updateElementsStatus: function updateElementsStatus(oValues) {
+									var oPapers = _StoreHelper.StoreHelper.getPapers();
+									Object.keys(oPapers).forEach(function (paperKey) {
+													var paper = oPapers[paperKey];
+													var updatedElements = _updateElementsStatus(paper.elements, paper.properties);
+													papers.elements = Object.assign({}, paper.elements, updatedElements);
+									});
+									return oPapers;
+					}
+	};
+
+	var paper = exports.paper = {
+					isSubPage: function isSubPage(iPaperTypeId) {
+									if (iPaperTypeId === 2) {
+													return true;
+									}
+									return false;
+					}
 	};
 
 /***/ },
@@ -22636,6 +22695,7 @@
 	Object.defineProperty(exports, "__esModule", {
 				value: true
 	});
+	exports.pageInfo = exports.properties = undefined;
 
 	var _Utility = __webpack_require__(191);
 
@@ -22661,8 +22721,7 @@
 				}
 	}
 
-	//{selectedProperties:{},properties:{}}
-	var properties = function properties() {
+	var properties = exports.properties = function properties() {
 				var state = arguments.length <= 0 || arguments[0] === undefined ? { type: _consts.CANVAS, selectedProperties: _DataHelper.DataHelper.svgProperties, properties: _DataHelper.DataHelper.properties } : arguments[0];
 				var action = arguments[1];
 
@@ -22685,9 +22744,9 @@
 										break;
 							case _consts.SELECT_CANVAS:
 										selectedProperties = {
-													width: action.width,
-													height: action.height,
-													gridSize: action.gridSize
+													width: action.data.width,
+													height: action.data.height,
+													gridSize: action.data.gridSize
 										};
 										return Object.assign({}, state, { selectedProperties: selectedProperties, type: _consts.CANVAS });
 										break;
@@ -22762,6 +22821,7 @@
 										break;
 				}
 	};
+	var pageInfo = exports.pageInfo = function pageInfo() {};
 	exports.default = properties;
 
 /***/ },
@@ -22797,7 +22857,7 @@
 
 				switch (action.type) {
 							case _consts.CREATE_SUB_PAPGER:
-										state = Object.assign({}, state, _defineProperty({}, action.paperId, _Utility.DefaultValues.generatePaper(action.uuid, action.paperId, action.paperName, action.paperType)));
+										state = Object.assign({}, state, _defineProperty({}, action.uuid, _Utility.DefaultValues.generatePaper(action.uuid, action.paperId, action.paperName, action.paperType)));
 										break;
 							case _consts.DELETE_SUB_PAPGER:
 										state = Object.assign({}, state);
@@ -22817,14 +22877,14 @@
 	};
 
 	var selectedPaperId = function selectedPaperId() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.defaultSelectedPaper.key : arguments[0];
+				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.defaultSelectedPaper.uuid : arguments[0];
 				var action = arguments[1];
 
 				switch (action.type) {
 							case _consts.SWITCH_SUB_PAPER:
-										return action.paper.key;
+										return action.paper.uuid;
 							case _consts.RESET_DIAGRAM:
-										return _DataHelper.DataHelper.defaultSelectedPaper.key;
+										return _DataHelper.DataHelper.defaultSelectedPaper.uuid;
 				}
 				return state;
 	};
@@ -23243,12 +23303,10 @@
 	    };
 	};
 
-	var selectCanvas = exports.selectCanvas = function selectCanvas(width, height, gridSize) {
+	var selectCanvas = exports.selectCanvas = function selectCanvas(oSvgProperties) {
 	    return {
 	        type: _consts.SELECT_CANVAS,
-	        width: width,
-	        height: height,
-	        gridSize: gridSize
+	        data: oSvgProperties
 	    };
 	};
 
@@ -23583,7 +23641,7 @@
 	            var paper = _DataHelper.DataHelper.getPaper(_StoreHelper.StoreHelper.getSelectedPaperId());
 	            var identifier = _StoreHelper.StoreHelper.getPaperIdentifier(paper, elementKey);
 	            if (_StoreHelper.StoreHelper.hasSubPage(identifier)) {
-	                dispatch((0, _actions.openSubPage)(_DataHelper.DataHelper.getPaper(identifier)));
+	                dispatch((0, _actions.openSubPage)(_DataHelper.DataHelper.getSubpaper(identifier)));
 	            }
 	        },
 	        closeSubPage: function closeSubPage(event) {
@@ -24132,6 +24190,8 @@
 
 	var _Utility = __webpack_require__(191);
 
+	var _DataHelper = __webpack_require__(182);
+
 	function _interopRequireDefault(obj) {
 					return obj && obj.__esModule ? obj : { default: obj };
 	}
@@ -24228,9 +24288,12 @@
 
 	var mapStateToProps = function mapStateToProps(state) {
 					var properties = state.properties;
+					var paperInfo = _DataHelper.DataHelper.getPaperInfo(state.selectedPaperId);
 					if (properties.type === _consts.CANVAS) {
 									return Object.assign({}, state.properties, {
 													selectedProperties: state.svgProperties
+									}, {
+													paperInfo: paperInfo
 									});
 					}
 					return Object.assign({}, state.properties);
@@ -24256,7 +24319,6 @@
 																					break;
 																	case _consts.COMMON_ELEMENT:
 																					//collect element properties
-																					//todo:: if text element, sync text value
 																					var elementType = _getElementType(event);
 																					var geometricData = _getGeometricDataByEvent(event);
 																					var elementProperties;
@@ -24338,10 +24400,19 @@
 
 	var _GroupElement = __webpack_require__(204);
 
+	var _PaperHelper = __webpack_require__(192);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+	/**
+	* 
+	* @param {} width
+	* @param {} height
+	* @param {} gridSize
+	* @returns {} 
+	*/
 	var SVGProperties = function SVGProperties(_ref) {
 	  var width = _ref.width;
 	  var height = _ref.height;
@@ -24382,13 +24453,48 @@
 	    )
 	  );
 	};
-	var MeasureInfo = function MeasureInfo(_ref2) {
-	  var name = _ref2.name;
-	  var identifier = _ref2.identifier;
-	  var type = _ref2.type;
-	  var onRemoveMeasurePoint = _ref2.onRemoveMeasurePoint;
-	  var index = _ref2.index;
-	  var onMeasurePointValueChange = _ref2.onMeasurePointValueChange;
+	//only for 二级界面，更改绑定的信息
+	var PaperProperties = function PaperProperties(_ref2) {
+	  var paperType = _ref2.paperType;
+	  var paperName = _ref2.paperName;
+	  var bindingId = _ref2.bindingId;
+
+	  var paperId = "";
+	  if (_PaperHelper.paper.isSubPage(paperType)) {
+	    paperId = _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "页面ID"
+	      ),
+	      _react2.default.createElement("input", { type: "text", name: "pageId", defaultValue: bindingId })
+	    );
+	  }
+	  return _react2.default.createElement(
+	    "div",
+	    null,
+	    _react2.default.createElement(
+	      "div",
+	      { className: "pro-row" },
+	      _react2.default.createElement(
+	        "label",
+	        null,
+	        "页面名称"
+	      ),
+	      _react2.default.createElement("input", { type: "text", name: "pageName", defaultValue: paperName })
+	    ),
+	    paperId
+	  );
+	};
+	var MeasureInfo = function MeasureInfo(_ref3) {
+	  var name = _ref3.name;
+	  var identifier = _ref3.identifier;
+	  var type = _ref3.type;
+	  var onRemoveMeasurePoint = _ref3.onRemoveMeasurePoint;
+	  var index = _ref3.index;
+	  var onMeasurePointValueChange = _ref3.onMeasurePointValueChange;
 
 	  return _react2.default.createElement(
 	    "div",
@@ -24448,12 +24554,12 @@
 	    )
 	  );
 	};
-	var GeometricDataElement = function GeometricDataElement(_ref3) {
-	  var width = _ref3.width;
-	  var height = _ref3.height;
-	  var x = _ref3.x;
-	  var y = _ref3.y;
-	  var onGeometricDataChange = _ref3.onGeometricDataChange;
+	var GeometricDataElement = function GeometricDataElement(_ref4) {
+	  var width = _ref4.width;
+	  var height = _ref4.height;
+	  var x = _ref4.x;
+	  var y = _ref4.y;
+	  var onGeometricDataChange = _ref4.onGeometricDataChange;
 
 	  return _react2.default.createElement(
 	    "div",
@@ -24505,15 +24611,15 @@
 	    )
 	  );
 	};
-	var CommonElement = function CommonElement(_ref4) {
-	  var geometricData = _ref4.geometricData;
-	  var elementKey = _ref4.elementKey;
-	  var deviceInfo = _ref4.deviceInfo;
-	  var measurePointInfos = _ref4.measurePointInfos;
-	  var onAddMeasurePoint = _ref4.onAddMeasurePoint;
-	  var onRemoveMeasurePoint = _ref4.onRemoveMeasurePoint;
-	  var onMeasurePointValueChange = _ref4.onMeasurePointValueChange;
-	  var onGeometricDataChange = _ref4.onGeometricDataChange;
+	var CommonElement = function CommonElement(_ref5) {
+	  var geometricData = _ref5.geometricData;
+	  var elementKey = _ref5.elementKey;
+	  var deviceInfo = _ref5.deviceInfo;
+	  var measurePointInfos = _ref5.measurePointInfos;
+	  var onAddMeasurePoint = _ref5.onAddMeasurePoint;
+	  var onRemoveMeasurePoint = _ref5.onRemoveMeasurePoint;
+	  var onMeasurePointValueChange = _ref5.onMeasurePointValueChange;
+	  var onGeometricDataChange = _ref5.onGeometricDataChange;
 
 
 	  return _react2.default.createElement(
@@ -24578,7 +24684,12 @@
 	var PropertyFactory = function PropertyFactory(state) {
 	  switch (state.type) {
 	    case _consts.CANVAS:
-	      return _react2.default.createElement(SVGProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties));
+	      return _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(SVGProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties)),
+	        _react2.default.createElement(PaperProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.paperInfo))
+	      );
 	      break;
 	    case _consts.COMMON_ELEMENT:
 	      var elementTypeId = state.selectedProperties.elementTypeId;
@@ -24902,7 +25013,7 @@
 													dispatch((0, _actions.deleteSubPage)(paperId));
 													var paper = _DataHelper.DataHelper.getPaper();;
 													dispatch((0, _actions.switchSubPage)(paper));
-													dispatch((0, _actions.selectCanvas)());
+													dispatch((0, _actions.selectCanvas)(paper.svgProperties));
 									},
 									clickPaper: function clickPaper(event) {
 													var paperId = event.target.parentElement.getAttribute("data-paper-id");
@@ -24910,7 +25021,9 @@
 																	var paper = _DataHelper.DataHelper.getPaper(paperId);
 																	_StoreHelper.StoreHelper.storeData();
 																	dispatch((0, _actions.switchSubPage)(paper));
-																	dispatch((0, _actions.selectCanvas)());
+																	/*
+	                dispatch(selectCanvas(paper.svgProperties));
+	                 */
 													}
 									},
 									onDeleteSubPage: function onDeleteSubPage(event) {

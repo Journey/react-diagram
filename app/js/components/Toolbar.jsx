@@ -17,14 +17,14 @@ const Toolbar = (state) =>(
     <div className="dia-center">创建子图</div>
     <ul>
       <li className="dia-center">
-	<label>类型</label>
-	<select name="page-type">
+	<label className="dia-label">类型</label>
+	<select className="dia-field" name="page-type">
 	  <option value="1" defaultVaule>普通页面</option>
 	  <option value="2">二级页面</option>
 	</select>
       </li>
-      <li className="dia-center"><label>名称</label><input type="text" name="name"/></li>
-      <li className="dia-center"><label>id</label><input type="text" name="identify"/></li>
+      <li className="dia-center"><label className="dia-label">名称</label><input className="dia-field" type="text" name="name"/></li>
+      <li className="dia-center"><label className="dia-label">id</label><input  className="dia-field" type="text" name="identify"/></li>
     </ul>
     <div className="dia-center">
       <button onClick={state.onSaveSubPage}>保存</button>

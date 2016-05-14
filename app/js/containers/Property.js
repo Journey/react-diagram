@@ -3,6 +3,7 @@ import Property from "../components/Property.jsx";
 import {saveSvgProperties, saveElementProperties, addMeasurePoint,removeMeasurePoint,saveMeasurePointValue, updateElementGeometricData,updateLines,updateTextElement} from "../actions";
 import {CANVAS,COMMON_ELEMENT} from "../consts";
 import {ElementHelper} from "../Utility";
+import {DataHelper} from "../Util/DataHelper";
 
 function _getElementType(event){
     return event.target.getAttribute("data-element-type-id");
@@ -93,9 +94,12 @@ function getElementGeometricDataByEvent(event){
 
 const mapStateToProps = (state) => {
     let properties = state.properties;
+    let paperInfo = DataHelper.getPaperInfo(state.selectedPaperId);
     if(properties.type === CANVAS ) {
 	return Object.assign({},state.properties,{
 	    selectedProperties: state.svgProperties
+	},{
+	    paperInfo: paperInfo
 	});
     }
     return Object.assign({},state.properties);
@@ -115,7 +119,6 @@ const mapDispatchtoProps = (dispatch) => {
 		break;
 	    case COMMON_ELEMENT:
 		//collect element properties
-		//todo:: if text element, sync text value
 		var elementType = _getElementType(event);
 		var geometricData = _getGeometricDataByEvent(event);
 		var elementProperties;

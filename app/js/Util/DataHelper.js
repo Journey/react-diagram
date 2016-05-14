@@ -94,7 +94,7 @@ export const DataHelper = {
         return this.defaultSelectedPaper.elements;
     },
     get svgProperties() {
-        return this.defaultSelectedPaper.svgProperties;
+        return Object.assign({},this.defaultSelectedPaper.svgProperties);
     },
     get links() {
         return this.defaultSelectedPaper.links;
@@ -143,5 +143,17 @@ export const DataHelper = {
     getPaperProperties() {
 	//todo:: get value from storehelper first
 	return DefaultValues.paperProperties;
+    },
+    getPaperInfo(paperUUID){
+	var oPaper = this.getPaper(paperUUID);
+	if(oPaper){
+	    return {
+		paperType: oPaper.paperType,
+		paperName: oPaper.paperName,
+		bindingId: oPaper.key
+	    };
+	}
+	console.log(`DataHelper.getPaperInfo(${paperUUID})) not find`);
+	return null;
     }
 };

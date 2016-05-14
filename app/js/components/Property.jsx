@@ -5,6 +5,14 @@ import {DefaultValues} from "../Util/DefaultValues";
 import {TextProperties} from "./TextElement.jsx";
 import {PlaceholderProperties} from "./PlaceHolder.jsx";
 import {GroupProperties} from "./GroupElement.jsx";
+import {paper as PaperHelper} from "../Util/PaperHelper";
+/**
+* 
+* @param {} width
+* @param {} height
+* @param {} gridSize
+* @returns {} 
+*/
 const SVGProperties = ({width,height,gridSize}) =>{
   return (
   <div>
@@ -22,6 +30,27 @@ const SVGProperties = ({width,height,gridSize}) =>{
     </div>
   </div>
     );
+};
+//only for 二级界面，更改绑定的信息
+const PaperProperties = ({paperType,paperName,bindingId}) => {
+  var paperId = "";
+    if(PaperHelper.isSubPage(paperType)){
+      paperId = (
+      <div className="pro-row">
+	<label>页面ID</label>
+	<input type="text" name="pageId" defaultValue={bindingId} />
+      </div>
+    )
+  }
+  return (
+    <div>
+      <div className="pro-row">
+	<label>页面名称</label>
+	<input type="text" name="pageName" defaultValue= {paperName}/>
+      </div>
+     {paperId}
+         </div>
+  );
 };
 const MeasureInfo = ({name,identifier,type,onRemoveMeasurePoint,index,onMeasurePointValueChange}) => {
   return (
@@ -109,7 +138,10 @@ const PropertyFactory = (state) => {
   switch(state.type){
     case CANVAS:
       return (
-	<SVGProperties key={generateUUID()} {...state.selectedProperties}></SVGProperties>
+	<div>
+	  <SVGProperties key={generateUUID()} {...state.selectedProperties}></SVGProperties>
+	  <PaperProperties key={generateUUID()} {...state.paperInfo}></PaperProperties>
+	</div>
       )
       break;
     case COMMON_ELEMENT:

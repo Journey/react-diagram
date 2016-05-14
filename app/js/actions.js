@@ -146,12 +146,10 @@ export const selectLine = (lineId) => {
     };
 };
 
-export const selectCanvas = (width,height,gridSize) => {
+export const selectCanvas = (oSvgProperties) => {
     return {
 	type: SELECT_CANVAS,
-	width: width,
-	height: height,
-	gridSize: gridSize
+	data:oSvgProperties
     };
 };
 

@@ -15,8 +15,7 @@ import {
     RESET_DIAGRAM
 } from "../consts";
 
-//{selectedProperties:{},properties:{}}
-const properties = (state={type:CANVAS,selectedProperties:DataHelper.svgProperties,properties:DataHelper.properties},action) => {
+export const properties = (state={type:CANVAS,selectedProperties:DataHelper.svgProperties,properties:DataHelper.properties},action) => {
     let selectedProperties = null;
     let geometricData = {};
     switch(action.type){
@@ -36,9 +35,9 @@ const properties = (state={type:CANVAS,selectedProperties:DataHelper.svgProperti
 	break;
     case SELECT_CANVAS:
 	selectedProperties = {
-	    width: action.width,
-	    height: action.height,
-	    gridSize: action.gridSize
+	    width: action.data.width,
+	    height: action.data.height,
+	    gridSize: action.data.gridSize
 	};
 	return Object.assign({},state,{selectedProperties,type:CANVAS});
 	break;
@@ -112,5 +111,8 @@ const properties = (state={type:CANVAS,selectedProperties:DataHelper.svgProperti
 	return state;
 	break;
     }
+};
+export const pageInfo = () => {
+    
 };
 export default properties;

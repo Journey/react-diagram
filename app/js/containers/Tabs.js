@@ -21,7 +21,7 @@ const mapDispatchtoProps = (dispatch) => {
 	    dispatch(deleteSubPage(paperId));
 	    var paper = DataHelper.getPaper();  ;
 	    dispatch(switchSubPage(paper));
-	    dispatch(selectCanvas());
+	    dispatch(selectCanvas(paper.svgProperties));
 	},
 	clickPaper: (event)=>{
 	    var paperId = event.target.parentElement.getAttribute("data-paper-id");
@@ -29,7 +29,9 @@ const mapDispatchtoProps = (dispatch) => {
 		var paper = DataHelper.getPaper(paperId);
 		StoreHelper.storeData();
 		dispatch(switchSubPage(paper));
-		dispatch(selectCanvas());
+		/*
+		dispatch(selectCanvas(paper.svgProperties));
+		 */
 	    }
 	},
 	onDeleteSubPage: (event) => {
