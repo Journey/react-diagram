@@ -1,5 +1,7 @@
 import {connect} from 'react-redux';
 import {generateUUID, StoreHelper} from "../Utility";
+import {papers as Papers} from "../Util/PaperHelper";
+import {callbacks} from "../ext/callbacks";
 import Toolbar from "../components/Toolbar.jsx";
 import {zoomIn,zoomOut,redo,undo,createSubPage,deleteSubPage} from "../actions";
 
@@ -60,10 +62,19 @@ const mapDispatchtoProps = (dispatch) => {
 	},
 	onSave: (event) => {
 	    StoreHelper.storeData();
-	    console.log(JSON.stringify(StoreHelper.getPapers(),function(key,value){
-		return value;
-	    }));
-	    console.log(StoreHelper.getPapers());
+	    var oValideResult = Papers.validateData();
+	    if(oValideResult.isValide){
+		console.log(JSON.stringify(StoreHelper.getPapers(),function(key,value){
+		    return value;
+		}));
+		oValideResult.data = StoreHelper.getPapers();
+		console.log(StoreHelper.getPapers());;
+	    } else {
+		console.log("papgers failed validation");
+		console.log(oValideResult);
+	    }
+	    
+	    callbacks.saveDiagram && callbacks.saveDiagram(oValideResult);
 	}
     };
 };

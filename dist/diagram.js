@@ -64,11 +64,11 @@
 
 	var _StoreHelper = __webpack_require__(183);
 
-	var _API = __webpack_require__(211);
+	var _API = __webpack_require__(212);
 
 	var _DataHelper = __webpack_require__(182);
 
-	var _Data = __webpack_require__(212);
+	var _Data = __webpack_require__(213);
 
 	function _interopRequireDefault(obj) {
 	    return obj && obj.__esModule ? obj : { default: obj };
@@ -21322,6 +21322,9 @@
 	        return this.defaultSelectedPaper.properties;
 	    },
 	    get selectedPaperId() {
+	        if (!this.inResetting && _StoreHelper.StoreHelper.hasStore()) {
+	            return _StoreHelper.StoreHelper.getSelectedPaperId();
+	        }
 	        return this.defaultSelectedPaper.uuid;
 	    },
 	    get operator() {
@@ -21863,6 +21866,23 @@
 	                return true;
 	            }
 	            return false;
+	        },
+	        getDeviceNumber: function getDeviceNumber(property) {
+	            if (!property) {
+	                return null;
+	            }
+
+	            var elementTypeId = property.elementTypeId;
+	            if (ElementHelper.isText(elementTypeId) || ElementHelper.isText(elementTypeId)) {
+	                return null;
+	            }
+
+	            if (ElementHelper.isGroup(elementTypeId)) {
+	                return property.bindingId;
+	            }
+
+	            //normal element
+	            return property.deviceInfo && property.deviceInfo.identifier;
 	        }
 	    };
 	}();
@@ -22144,6 +22164,8 @@
 	var UI_DATA_UPDATE = exports.UI_DATA_UPDATE = "UI element binding data update-binding data of the placeholder element";
 	var UI_STATUS_UPDATE = exports.UI_STATUS_UPDATE = "UI element status update- the images of the elements";
 	var RESET_DIAGRAM = exports.RESET_DIAGRAM = "Reset diagram, happens when the switch to an completly new diagram";
+
+	var SAVE_PAGE_INFO = exports.SAVE_PAGE_INFO = "Save Page info - page name,bindningId(only for subPage)";
 
 /***/ },
 /* 189 */
@@ -22599,7 +22621,7 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-					value: true
+		value: true
 	});
 	exports.paper = exports.papers = exports.updateElementsStatus = exports.updatePlaceholderValues = undefined;
 
@@ -22615,75 +22637,134 @@
 	 */
 
 	function _updatePlaceholdersValues(elements, properties, oValues) {
-					return Object.keys(elements).filter(function (sEleKey) {
-									if (_ElementHelper.ElementHelper.isPlaceHolder(elements[sEleKey].id)) {
-													return true;
-									}
-									return false;
-					}).reduce(function (oPre, sEleKey) {
-									var property = properties[sEleKey];
-									var bindingid = property["bindingId"];
-									if (oValues[bindingid]) {
-													oPre[property.key] = Object.assign({}, elements[sEleKey], { text: oValues[bindingid].join(",") });
-									}
-									return oPre;
-					}, {});
+		return Object.keys(elements).filter(function (sEleKey) {
+			if (_ElementHelper.ElementHelper.isPlaceHolder(elements[sEleKey].id)) {
+				return true;
+			}
+			return false;
+		}).reduce(function (oPre, sEleKey) {
+			var property = properties[sEleKey];
+			var bindingid = property["bindingId"];
+			if (oValues[bindingid]) {
+				oPre[property.key] = Object.assign({}, elements[sEleKey], { text: oValues[bindingid].join(",") });
+			}
+			return oPre;
+		}, {});
 	}
 	function _updateElementsStatus(elements, properties, oValues) {
-					return {};
+		return {};
 	}
 	var updatePlaceholderValues = exports.updatePlaceholderValues = function updatePlaceholderValues(oValues) {
-					var elements = _StoreHelper.StoreHelper.getElements();
-					var properties = _StoreHelper.StoreHelper.getProperties();
-					return _updatePlaceholdersValues(elements, properties.properties, oValues);
+		var elements = _StoreHelper.StoreHelper.getElements();
+		var properties = _StoreHelper.StoreHelper.getProperties();
+		return _updatePlaceholdersValues(elements, properties.properties, oValues);
 	};
 	var updateElementsStatus = exports.updateElementsStatus = function updateElementsStatus(oStatus) {
-					var elements = _StoreHelper.StoreHelper.getElements();
-					var properties = _StoreHelper.StoreHelper.getProperties();
-					return _updateElementsStatus(elements, properties, oStatus);
+		var elements = _StoreHelper.StoreHelper.getElements();
+		var properties = _StoreHelper.StoreHelper.getProperties();
+		return _updateElementsStatus(elements, properties, oStatus);
 	};
 	/**
 	 * helper method for the papers(collection of paper object) object
 	 */
 	var papers = exports.papers = {
-					/**
-	     * update the place holder values of the papers. as the papers is not display directly so update it directly
-	     * @param {} oValues
-	     */
+		/**
+	  * update the place holder values of the papers. as the papers is not display directly so update it directly
+	  * @param {} oValues
+	  */
 
-					updatePlaceholderValues: function updatePlaceholderValues(oValues) {
-									var oPapers = _StoreHelper.StoreHelper.getPapers();
-									Object.keys(oPapers).forEach(function (paperKey) {
-													var paper = oPapers[paperKey];
-													var updatedPlaceholders = _updatePlaceholdersValues(paper.elements, paper.properties, oValues);
-													paper.elements = Object.assign({}, paper.elements, updatedPlaceholders);
-									});
-									return oPapers;
-					},
+		updatePlaceholderValues: function updatePlaceholderValues(oValues) {
+			var oPapers = _StoreHelper.StoreHelper.getPapers();
+			Object.keys(oPapers).forEach(function (paperKey) {
+				var paper = oPapers[paperKey];
+				var updatedPlaceholders = _updatePlaceholdersValues(paper.elements, paper.properties, oValues);
+				paper.elements = Object.assign({}, paper.elements, updatedPlaceholders);
+			});
+			return oPapers;
+		},
 
-					/**
-	     * 
-	     * @param {Object} oValues the values which represent element status
-	     * @returns {Object}  oPapers The papers with new status
-	     */
-					updateElementsStatus: function updateElementsStatus(oValues) {
-									var oPapers = _StoreHelper.StoreHelper.getPapers();
-									Object.keys(oPapers).forEach(function (paperKey) {
-													var paper = oPapers[paperKey];
-													var updatedElements = _updateElementsStatus(paper.elements, paper.properties);
-													papers.elements = Object.assign({}, paper.elements, updatedElements);
-									});
-									return oPapers;
+		/**
+	  * 
+	  * @param {Object} oValues the values which represent element status
+	  * @returns {Object}  oPapers The papers with new status
+	  */
+		updateElementsStatus: function updateElementsStatus(oValues) {
+			var oPapers = _StoreHelper.StoreHelper.getPapers();
+			Object.keys(oPapers).forEach(function (paperKey) {
+				var paper = oPapers[paperKey];
+				var updatedElements = _updateElementsStatus(paper.elements, paper.properties);
+				papers.elements = Object.assign({}, paper.elements, updatedElements);
+			});
+			return oPapers;
+		},
+
+		/**
+	  * validate papers. to check whether the subpage binding is correctly set for now. need add more if needed
+	  */
+		validateData: function validateData() {
+			//todo
+			var invalideMessages = [];
+			var oPapers = _StoreHelper.StoreHelper.getPapers();
+			var subPages = Object.keys(oPapers).reduce(function (pre, curPaperKey) {
+				var curPaper = oPapers[curPaperKey];
+				if (paper.isSubPage(curPaper.paperType)) {
+					pre[curPaperKey] = curPaper.key;
+				}
+				return pre;
+			}, {});
+
+			var isValide = !subPages || Object.keys(subPages).every(function (subPaperUUID) {
+				var hasPaper = Object.keys(oPapers).find(function (paperKey) {
+					var curPaper = oPapers[paperKey];
+					if (paper.isSubPage(curPaper)) {
+						return false;
 					}
+					if (paper.hasDeviceNumber(curPaper, subPages[subPaperUUID])) {
+						return true;
+					}
+					return false;
+				});
+				if (hasPaper) {
+					return true;
+				} else {
+					invalideMessages.push("子页面" + oPapers[subPaperUUID].paperName + "绑定id:" + subPages[subPaperUUID] + " 不存在");
+					return false;
+				}
+			});
+			return {
+				isValide: !!isValide,
+				messages: invalideMessages
+			};
+		}
 	};
 
 	var paper = exports.paper = {
-					isSubPage: function isSubPage(iPaperTypeId) {
-									if (iPaperTypeId === 2) {
-													return true;
-									}
-									return false;
-					}
+		isSubPage: function isSubPage(paper) {
+			var iPaperTypeId;
+			if (parseInt(paper)) {
+				//the param is paperId
+				iPaperTypeId = paper;
+			} else {
+				//is paper object
+				iPaperTypeId = paper.paperType;
+			}
+			iPaperTypeId = parseInt(iPaperTypeId);
+			if (iPaperTypeId === 2) {
+				return true;
+			}
+			return false;
+		},
+		hasDeviceNumber: function hasDeviceNumber(paper, deviceNumber) {
+			var properties = paper.properties;
+			return Object.keys(properties).find(function (uuid) {
+				var property = properties[uuid];
+				var curDeviceNumber = _ElementHelper.ElementHelper.getDeviceNumber(property);
+				if (deviceNumber && curDeviceNumber === deviceNumber) {
+					return true;
+				}
+				return false;
+			});
+		}
 	};
 
 /***/ },
@@ -22872,6 +22953,14 @@
 							case _consts.RESET_DIAGRAM:
 										state = Object.assign({}, _DataHelper.DataHelper.papers);
 										break;
+							case _consts.SAVE_PAGE_INFO:
+										var selectedPaper = state[_DataHelper.DataHelper.selectedPaperId];
+										selectedPaper = Object.assign({}, selectedPaper, {
+													paperName: action.data.paperName,
+													key: action.data.bindingId ? action.data.bindingId : selectedPaper.uuid
+										});
+										state = Object.assign({}, state, _defineProperty({}, selectedPaper.uuid, selectedPaper));
+										break;
 				}
 				return state;
 	};
@@ -22975,7 +23064,7 @@
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _Tabs = __webpack_require__(209);
+	var _Tabs = __webpack_require__(210);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23186,7 +23275,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.resetDiagram = exports.updateStatus = exports.updateBindingData = exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.savePageInfo = exports.resetDiagram = exports.updateStatus = exports.updateBindingData = exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(188);
 
@@ -23452,6 +23541,16 @@
 	    return {
 	        type: _consts.RESET_DIAGRAM,
 	        data: oPapers
+	    };
+	};
+
+	var savePageInfo = exports.savePageInfo = function savePageInfo(paperName, bindingId) {
+	    return {
+	        type: _consts.SAVE_PAGE_INFO,
+	        data: {
+	            paperName: paperName,
+	            bindingId: bindingId
+	        }
 	    };
 	};
 
@@ -24210,6 +24309,19 @@
 									gridSize: gridSizeEle.value
 					};
 	}
+	function _getPageInfoByEvent(event) {
+					var containerElement = event.currentTarget.parentElement.parentElement;
+					var pageNameEle = containerElement.querySelector("input[name=pageName]");
+					var pageIdEle = containerElement.querySelector("input[name=pageId]");
+					var bindingId;
+					if (pageIdEle) {
+									bindingId = pageIdEle.value;
+					}
+					return {
+									pageName: pageNameEle.value,
+									bindingId: bindingId
+					};
+	}
 
 	function _getGeometricDataByEvent(event) {
 					var containerElement = event.currentTarget.parentElement.parentElement;
@@ -24315,7 +24427,13 @@
 																					var height = _getSVGPropertiesByEv.height;
 																					var gridSize = _getSVGPropertiesByEv.gridSize;
 
+																					var _getPageInfoByEvent2 = _getPageInfoByEvent(event);
+
+																					var pageName = _getPageInfoByEvent2.pageName;
+																					var bindingId = _getPageInfoByEvent2.bindingId;
+
 																					dispatch((0, _actions.saveSvgProperties)(width, height, gridSize));
+																					dispatch((0, _actions.savePageInfo)(pageName, bindingId));
 																					break;
 																	case _consts.COMMON_ELEMENT:
 																					//collect element properties
@@ -24760,7 +24878,11 @@
 
 	var _Utility = __webpack_require__(191);
 
-	var _Toolbar = __webpack_require__(208);
+	var _PaperHelper = __webpack_require__(192);
+
+	var _callbacks = __webpack_require__(208);
+
+	var _Toolbar = __webpack_require__(209);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
@@ -24827,10 +24949,19 @@
 			},
 			onSave: function onSave(event) {
 				_Utility.StoreHelper.storeData();
-				console.log(JSON.stringify(_Utility.StoreHelper.getPapers(), function (key, value) {
-					return value;
-				}));
-				console.log(_Utility.StoreHelper.getPapers());
+				var oValideResult = _PaperHelper.papers.validateData();
+				if (oValideResult.isValide) {
+					console.log(JSON.stringify(_Utility.StoreHelper.getPapers(), function (key, value) {
+						return value;
+					}));
+					oValideResult.data = _Utility.StoreHelper.getPapers();
+					console.log(_Utility.StoreHelper.getPapers());;
+				} else {
+					console.log("papgers failed validation");
+					console.log(oValideResult);
+				}
+
+				_callbacks.callbacks.saveDiagram && _callbacks.callbacks.saveDiagram(oValideResult);
 			}
 		};
 	};
@@ -24839,6 +24970,29 @@
 
 /***/ },
 /* 208 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	   value: true
+	});
+	//callback function for saveDiagram
+	var _saveDiagram = null;
+	var callbacks = exports.callbacks = {
+	   get saveDiagrams() {
+	      return _saveDiagram;
+	   },
+	   set saveDiagram(fSave) {
+	      _saveDiagram = fSave;
+	   },
+	   clear: function clear() {
+	      _saveDiagram = null;
+	   }
+	};
+
+/***/ },
+/* 209 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24975,7 +25129,7 @@
 	exports.default = Toolbar;
 
 /***/ },
-/* 209 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24993,7 +25147,7 @@
 
 	var _DataHelper = __webpack_require__(182);
 
-	var _Tabs = __webpack_require__(210);
+	var _Tabs = __webpack_require__(211);
 
 	var _actions = __webpack_require__(199);
 
@@ -25040,7 +25194,7 @@
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 210 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25141,7 +25295,7 @@
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 211 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25155,7 +25309,9 @@
 
 	var _StoreHelper = __webpack_require__(183);
 
-	var _Data = __webpack_require__(212);
+	var _callbacks = __webpack_require__(208);
+
+	var _Data = __webpack_require__(213);
 
 	var _actions = __webpack_require__(199);
 
@@ -25211,6 +25367,9 @@
 									get dispatch() {
 													return _StoreHelper.StoreHelper.getDispatch();
 									},
+									registerSaveDiagram: function registerSaveDiagram(fSave) {
+													_callbacks.callbacks.saveDiagram = fSave;
+									},
 									reset: function reset(oPapers) {
 													oPapers = (0, _Data.transformPapers)(oPapers);
 													_DataHelper.DataHelper.inResetting = true;
@@ -25224,7 +25383,7 @@
 	}();
 
 /***/ },
-/* 212 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25234,7 +25393,7 @@
 	});
 	exports.transformPapers = exports.transfromPalletGroupData = exports.transformSignalTypes = exports.transformElementsStatus = exports.transformBindingData = undefined;
 
-	var _PalletData = __webpack_require__(213);
+	var _PalletData = __webpack_require__(214);
 
 	/**
 	 * transformBindingData transform binding data from array to Object.
@@ -25319,7 +25478,7 @@
 	};
 
 /***/ },
-/* 213 */
+/* 214 */
 /***/ function(module, exports) {
 
 	"use strict";

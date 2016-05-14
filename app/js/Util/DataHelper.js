@@ -103,6 +103,9 @@ export const DataHelper = {
         return this.defaultSelectedPaper.properties;
     },
     get selectedPaperId() {
+	if(!this.inResetting && StoreHelper.hasStore()){
+	    return StoreHelper.getSelectedPaperId();
+	}
         return this.defaultSelectedPaper.uuid;
     },
     get operator() {

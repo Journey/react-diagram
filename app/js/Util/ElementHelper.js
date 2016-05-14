@@ -24,6 +24,23 @@ export const ElementHelper = (() => {
                 return true;
             }
             return false;
-        }
+        },
+	getDeviceNumber: (property) => {
+	    if(!property){
+		return null;
+	    }
+	    
+	    var elementTypeId = property.elementTypeId;
+	    if(ElementHelper.isText(elementTypeId) || ElementHelper.isText(elementTypeId)){
+		return null;
+	    }
+	    
+	    if(ElementHelper.isGroup(elementTypeId)){
+		return property.bindingId;
+	    }
+
+	    //normal element
+	    return property.deviceInfo && property.deviceInfo.identifier;
+	}
     };
 })();

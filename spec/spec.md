@@ -10,4 +10,12 @@
 # todo
 * static canvas
   + sync image status to element
-  + transfrom device property data
+
+* sync pageinfo when save canvas properties
+* check data integraty when save the diagram - subpage binding key
+
+
+
+# knowledge
+* reducer - define data structer and response when actions
+* container - wrap reducer data for component

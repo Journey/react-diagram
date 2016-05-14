@@ -1,5 +1,6 @@
 import {DataHelper} from "./Util/DataHelper";
 import {StoreHelper} from "./Util/StoreHelper";
+import {callbacks} from "./ext/callbacks";
 import {transformBindingData, transformElementsStatus, transformPapers} from "./Adapter/Data";
 import {updateBindingData,updateStatus, resetDiagram} from "./actions";
 /**
@@ -52,6 +53,9 @@ export const API = (() => {
         get dispatch() {
             return StoreHelper.getDispatch();
         },
+	registerSaveDiagram(fSave){
+	    callbacks.saveDiagram = fSave;
+	},
 	reset(oPapers){
 	    oPapers = transformPapers(oPapers);
 	    DataHelper.inResetting = true;

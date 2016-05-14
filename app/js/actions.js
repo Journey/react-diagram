@@ -31,7 +31,8 @@ import {
     UPDATE_ELEMENT_DATAS,
     UI_DATA_UPDATE,
     UI_STATUS_UPDATE,
-    RESET_DIAGRAM
+    RESET_DIAGRAM,
+    SAVE_PAGE_INFO
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -291,4 +292,14 @@ export const resetDiagram = (oPapers) => {
 	type: RESET_DIAGRAM,
 	data: oPapers
     };
+};
+
+export const savePageInfo = (paperName,bindingId) => {
+    return {
+	type: SAVE_PAGE_INFO,
+	data: {
+	    paperName: paperName,
+	    bindingId: bindingId
+	}
+    };  
 };

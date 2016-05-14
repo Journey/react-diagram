@@ -68,14 +68,73 @@ export const papers = {
 		papers.elements = Object.assign({},paper.elements,updatedElements);
 	    });
 	return oPapers;
+    },
+    /**
+     * validate papers. to check whether the subpage binding is correctly set for now. need add more if needed
+     */
+    validateData(){
+	//todo
+	var invalideMessages = [];
+	var oPapers = StoreHelper.getPapers();
+	var subPages = Object.keys(oPapers)
+	    .reduce((pre,curPaperKey) => {
+		var curPaper = oPapers[curPaperKey];
+		if(paper.isSubPage(curPaper.paperType)){
+		    pre[curPaperKey] = curPaper.key;
+		}
+		return pre;
+	    },{});
+
+	var isValide = !subPages ||  Object.keys(subPages)
+		.every((subPaperUUID)=>{
+		    var hasPaper = Object.keys(oPapers).find((paperKey)=>{
+			var curPaper = oPapers[paperKey];
+			if(paper.isSubPage(curPaper)){
+			    return false;
+			}
+			if(paper.hasDeviceNumber(curPaper, subPages[subPaperUUID])){
+			    return true;
+			}
+			return false;
+		    });
+		    if(hasPaper){
+			return true;
+		    } else {
+			invalideMessages.push(`子页面${oPapers[subPaperUUID].paperName}绑定id:${subPages[subPaperUUID]} 不存在`);
+			return false;
+		    }
+		});
+	return {
+	    isValide: !!isValide,
+	    messages: invalideMessages
+	};
     }
 };
 
 export const paper = {
-    isSubPage(iPaperTypeId){
+    isSubPage(paper){
+	var iPaperTypeId;
+	if( parseInt(paper)){ //the param is paperId
+	    iPaperTypeId = paper;
+	} else {//is paper object
+	    iPaperTypeId = paper.paperType;
+	}
+	iPaperTypeId = parseInt(iPaperTypeId);
 	if(iPaperTypeId === 2){
 	    return true;
 	}
 	return false;
-    }  
+    },
+    hasDeviceNumber(paper, deviceNumber){
+	var properties = paper.properties;
+	return Object.keys(properties)
+	    .find((uuid)=>{
+		var property = properties[uuid];
+		var curDeviceNumber = ElementHelper.getDeviceNumber(property);
+		if(deviceNumber && curDeviceNumber === deviceNumber){
+		    return true;
+		}
+		return false;
+	    });
+    }
 };

@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import Property from "../components/Property.jsx";
-import {saveSvgProperties, saveElementProperties, addMeasurePoint,removeMeasurePoint,saveMeasurePointValue, updateElementGeometricData,updateLines,updateTextElement} from "../actions";
+import {saveSvgProperties, saveElementProperties, addMeasurePoint,removeMeasurePoint,saveMeasurePointValue, updateElementGeometricData,updateLines,updateTextElement,savePageInfo} from "../actions";
 import {CANVAS,COMMON_ELEMENT} from "../consts";
 import {ElementHelper} from "../Utility";
 import {DataHelper} from "../Util/DataHelper";
@@ -17,6 +17,19 @@ function _getSVGPropertiesByEvent(event){
 	width: widthEle.value,
 	height: heightEle.value,
 	gridSize: gridSizeEle.value
+    };
+}
+function _getPageInfoByEvent(event){
+    var containerElement = event.currentTarget.parentElement.parentElement;
+    var pageNameEle = containerElement.querySelector("input[name=pageName]");
+    var pageIdEle = containerElement.querySelector("input[name=pageId]");
+    var bindingId;
+    if(pageIdEle){
+	bindingId = pageIdEle.value;
+    }
+    return {
+	pageName: pageNameEle.value,
+	bindingId: bindingId
     };
 }
 
@@ -115,7 +128,9 @@ const mapDispatchtoProps = (dispatch) => {
 	    case CANVAS:
 		//collect svg properties
 		var {width,height,gridSize} = _getSVGPropertiesByEvent(event);
+		var {pageName,bindingId} = _getPageInfoByEvent(event);
 		dispatch(saveSvgProperties(width,height,gridSize));
+		dispatch(savePageInfo(pageName,bindingId));
 		break;
 	    case COMMON_ELEMENT:
 		//collect element properties

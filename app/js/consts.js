@@ -50,3 +50,5 @@ export const UPDATE_TEXT_ELEMENT = "Update text element values from properties";
 export const UI_DATA_UPDATE = "UI element binding data update-binding data of the placeholder element";
 export const UI_STATUS_UPDATE="UI element status update- the images of the elements";
 export const RESET_DIAGRAM = "Reset diagram, happens when the switch to an completly new diagram";
+
+export const SAVE_PAGE_INFO = "Save Page info - page name,bindningId(only for subPage)";
