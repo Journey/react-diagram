@@ -1,7 +1,7 @@
 //callback function for saveDiagram
 var _saveDiagram = null;
 export const callbacks = {
-    get saveDiagrams(){
+    get saveDiagram(){
 	return _saveDiagram;
     },
     set saveDiagram(fSave){

@@ -40,7 +40,7 @@ Group.propTypes = {
 
 const Pallet = (data) =>(
   <div className="pallet">
-    <h3>图元列表</h3>
+    <h3 className="dia-header">图元列表</h3>
     <div className="pallet-content">
       {
 	data.groups.map(group =>(

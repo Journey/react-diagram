@@ -53,7 +53,7 @@ export const API = (() => {
         get dispatch() {
             return StoreHelper.getDispatch();
         },
-	registerSaveDiagram(fSave){
+	registeSaveDiagram(fSave){
 	    callbacks.saveDiagram = fSave;
 	},
 	reset(oPapers){

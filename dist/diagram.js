@@ -71,24 +71,25 @@
 	var _Data = __webpack_require__(213);
 
 	function _interopRequireDefault(obj) {
-	    return obj && obj.__esModule ? obj : { default: obj };
+		return obj && obj.__esModule ? obj : { default: obj };
 	}
 
-	_API.API.Render = function (aPalletGroup, oPapers, aSingleTypes, domId) {
-	    _DataHelper.DataHelper.papers = (0, _Data.transformPapers)(oPapers);
-	    _DataHelper.DataHelper.palletGroup = (0, _Data.transfromPalletGroupData)(aPalletGroup);
-	    _DataHelper.DataHelper.signalTypes = (0, _Data.transformSignalTypes)(aSingleTypes);
-	    var store = (0, _redux.createStore)(_reducers2.default);
-	    _StoreHelper.StoreHelper.setStore(store);;
-	    (0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.App, null)), document.getElementById(domId));
-	};
-	_API.API.StaticRender = function (aPalletGroup, oPapers, aSingleTypes, domId) {
-	    _DataHelper.DataHelper.papers = (0, _Data.transformPapers)(oPapers);
-	    _DataHelper.DataHelper.palletGroup = (0, _Data.transfromPalletGroupData)(aPalletGroup);
-	    _DataHelper.DataHelper.signalTypes = (0, _Data.transformSignalTypes)(aSingleTypes);
-	    var store = (0, _redux.createStore)(_reducers2.default);
-	    _StoreHelper.StoreHelper.setStore(store);;
-	    (0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.StaticApp, null)), document.getElementById(domId));
+	_API.API.init = function (aPalletGroup, aSingleTypes, domId) {
+		//DataHelper.papers = transformPapers(oPapers);
+		_DataHelper.DataHelper.palletGroup = (0, _Data.transfromPalletGroupData)(aPalletGroup);
+		_DataHelper.DataHelper.signalTypes = (0, _Data.transformSignalTypes)(aSingleTypes);
+		var store = (0, _redux.createStore)(_reducers2.default);
+		_StoreHelper.StoreHelper.setStore(store);
+		return {
+			dynamic: function dynamic(oPapers) {
+				(0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.App, null)), document.getElementById(domId));
+				_API.API.reset(oPapers);
+			},
+			static: function _static(oPapers) {
+				(0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.StaticApp, null)), document.getElementById(domId));
+				_API.API.reset(oPapers);
+			}
+		};
 	};
 
 /***/ },
@@ -21696,7 +21697,7 @@
 	            }
 	            return {
 	                width: 1000,
-	                height: 1000,
+	                height: 600,
 	                gridSize: 10,
 	                scaleX: 1,
 	                scaleY: 1,
@@ -23239,7 +23240,7 @@
 	    { className: "pallet" },
 	    _react2.default.createElement(
 	      "h3",
-	      null,
+	      { className: "dia-header" },
 	      "图元列表"
 	    ),
 	    _react2.default.createElement(
@@ -24848,7 +24849,15 @@
 	  return _react2.default.createElement(
 	    "div",
 	    { className: "pro-area" },
-	    _react2.default.createElement("div", null),
+	    _react2.default.createElement(
+	      "div",
+	      null,
+	      _react2.default.createElement(
+	        "h3",
+	        { className: "dia-header" },
+	        "属性"
+	      )
+	    ),
 	    _react2.default.createElement(
 	      "div",
 	      null,
@@ -24955,13 +24964,12 @@
 						return value;
 					}));
 					oValideResult.data = _Utility.StoreHelper.getPapers();
-					console.log(_Utility.StoreHelper.getPapers());;
+					console.log(_Utility.StoreHelper.getPapers());
+					_callbacks.callbacks.saveDiagram && _callbacks.callbacks.saveDiagram(oValideResult);
 				} else {
 					console.log("papgers failed validation");
 					console.log(oValideResult);
 				}
-
-				_callbacks.callbacks.saveDiagram && _callbacks.callbacks.saveDiagram(oValideResult);
 			}
 		};
 	};
@@ -24980,7 +24988,7 @@
 	//callback function for saveDiagram
 	var _saveDiagram = null;
 	var callbacks = exports.callbacks = {
-	   get saveDiagrams() {
+	   get saveDiagram() {
 	      return _saveDiagram;
 	   },
 	   set saveDiagram(fSave) {
@@ -25367,7 +25375,7 @@
 									get dispatch() {
 													return _StoreHelper.StoreHelper.getDispatch();
 									},
-									registerSaveDiagram: function registerSaveDiagram(fSave) {
+									registeSaveDiagram: function registeSaveDiagram(fSave) {
 													_callbacks.callbacks.saveDiagram = fSave;
 									},
 									reset: function reset(oPapers) {

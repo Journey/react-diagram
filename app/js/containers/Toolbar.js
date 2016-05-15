@@ -68,13 +68,12 @@ const mapDispatchtoProps = (dispatch) => {
 		    return value;
 		}));
 		oValideResult.data = StoreHelper.getPapers();
-		console.log(StoreHelper.getPapers());;
+		console.log(StoreHelper.getPapers());
+		callbacks.saveDiagram && callbacks.saveDiagram(oValideResult);
 	    } else {
 		console.log("papgers failed validation");
 		console.log(oValideResult);
 	    }
-	    
-	    callbacks.saveDiagram && callbacks.saveDiagram(oValideResult);
 	}
     };
 };

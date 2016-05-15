@@ -178,7 +178,9 @@ const PropertyFactory = (state) => {
 };
 const Property = (state) =>(
   <div className="pro-area">
-    <div></div>
+    <div>
+      <h3 className="dia-header">属性</h3>
+    </div>
     <div>
       {PropertyFactory(state)}
       <div className="align-center">
