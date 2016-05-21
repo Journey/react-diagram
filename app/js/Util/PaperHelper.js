@@ -100,14 +100,52 @@ export const papers = {
 		    if(hasPaper){
 			return true;
 		    } else {
-			invalideMessages.push(`子页面${oPapers[subPaperUUID].paperName}绑定id:${subPages[subPaperUUID]} 不存在`);
+			invalideMessages.push(`子页面${oPapers[subPaperUUID].paperName}绑定设备:${subPages[subPaperUUID]} 不存在`);
 			return false;
 		    }
 		});
+	var duplicateInfo = this.checkDuplicateInfo(oPapers);
+	if(duplicateInfo){
+	    isValide = false;
+	    invalideMessages = invalideMessages.concat(duplicateInfo);
+	}
 	return {
 	    isValide: !!isValide,
 	    messages: invalideMessages
 	};
+    },
+    /**
+     * check if has duplicated infomation: same device numbers
+     * @param {} oPaper
+     * @returns {} 
+     */
+    checkDuplicateInfo(oPapers){
+	var oDeviceNumbers = {};
+	var aErrorMessages = [];
+	Object.keys(oPapers).forEach((sPaperKey)=>{
+	    var oPaper = oPapers[sPaperKey];
+	    var oProperties = oPaper.properties;
+	    Object.keys(oProperties).forEach((key)=>{
+		var property = oProperties[key];
+		var deviceNumber = property && property.deviceInfo && property.deviceInfo.identifier;
+		if(deviceNumber){
+		    if(oDeviceNumbers[deviceNumber]){
+			aErrorMessages.push(`重复的设备编号:${deviceNumber}`);
+		    } else {
+			oDeviceNumbers[deviceNumber] = true;
+		    }
+		}
+
+		var duplicateBindingInfo = paper.checkDuplicateBindingInfo(property);
+		if(duplicateBindingInfo){
+		    aErrorMessages = aErrorMessages.concat(duplicateBindingInfo);
+		}
+	    });
+	});
+	if(aErrorMessages.length > 0){
+	    return aErrorMessages;
+	}
+	return false;
     }
 };
 
@@ -136,5 +174,23 @@ export const paper = {
 		}
 		return false;
 	    });
+    },
+    
+    checkDuplicateBindingInfo(oElementProperty){
+	var oMeasureId = {};
+	var aErrorMessages = [];
+	var aMeasurePointInfos = oElementProperty.measurePointInfos;
+	if(aMeasurePointInfos && aMeasurePointInfos.length > 0){
+	    aMeasurePointInfos.forEach((oInfo) => {
+		if(oInfo.identifier){
+		    if(oMeasureId[oInfo.identifier]){
+			aErrorMessages.push(`有重复的测点${oInfo.identifier}`);
+		    } else {
+			oMeasureId[oInfo.identifier] = true;
+		    }
+		}
+	    }); 
+	}
+	return aErrorMessages.length > 0 ? aErrorMessages : false;
     }
 };

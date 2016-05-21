@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>Hello React!</title>
-      <link href="../app/css/css.css" rel="stylesheet" type="text/css" />
+    <link href="../app/css/css.css" rel="stylesheet" type="text/css" />
+    <link href="../app/css/bootstrap-3.3.6-dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <div id="diagram"></div>
@@ -15,10 +16,10 @@
      var aBindingData = [{"$id":"1","datasource":null,"deviceno":"N5-BC","deviceproperty":"BC","propertyvalue":0.5,"valueunit":"度","occurtime":"2015-07-25T10:52:16","id":null,"name":"BC"},{"$id":"2","datasource":null,"deviceno":"N5-PL","deviceproperty":"PL","propertyvalue":0.0,"valueunit":"瓦","occurtime":"2015-07-25T10:52:16","id":null,"name":"PL"},{"$id":"3","datasource":null,"deviceno":"N5-PS","deviceproperty":"PS","propertyvalue":241.0,"valueunit":"瓦","occurtime":"2015-07-25T10:52:16","id":null,"name":"PS"},{"$id":"4","datasource":null,"deviceno":"N5-PW","deviceproperty":"PW","propertyvalue":1.0,"valueunit":"瓦","occurtime":"2015-07-25T10:52:16","id":null,"name":"PW"}];
      var signalTypes = [{"$id":"1","code":"C","id":1,"name":"遥测"},{"$id":"2","code":"X","id":2,"name":"遥信"},{"$id":"3","code":"K","id":3,"name":"遥控"},{"$id":"4","code":"T","id":4,"name":"遥调"}];
      var dia =  REACTDiagram.init(palletGroup,signalTypes,"diagram");
-    dia.static(oPapers3);
-     setTimeout(function(){
+    dia.dynamic(oPapers3);
+     /*setTimeout(function(){
      dia.dynamic(oPapers2);
-     },5000);
+     },5000);*/
      
      /*setTimeout(function(){
      REACTDiagram.updateBindingData(aBindingData);

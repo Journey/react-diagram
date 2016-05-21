@@ -52,3 +52,4 @@ export const UI_STATUS_UPDATE="UI element status update- the images of the eleme
 export const RESET_DIAGRAM = "Reset diagram, happens when the switch to an completly new diagram";
 
 export const SAVE_PAGE_INFO = "Save Page info - page name,bindningId(only for subPage)";
+export const TOGGLE_EXPAND = "Toggle expand on pallet group";

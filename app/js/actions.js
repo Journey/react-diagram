@@ -32,7 +32,8 @@ import {
     UI_DATA_UPDATE,
     UI_STATUS_UPDATE,
     RESET_DIAGRAM,
-    SAVE_PAGE_INFO
+    SAVE_PAGE_INFO,
+    TOGGLE_EXPAND
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -302,4 +303,11 @@ export const savePageInfo = (paperName,bindingId) => {
 	    bindingId: bindingId
 	}
     };  
+};
+
+export const toggleExpand = (groupId) => {
+    return {
+	type: TOGGLE_EXPAND,
+	data: groupId
+    };
 };

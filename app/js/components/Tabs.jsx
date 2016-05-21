@@ -2,7 +2,8 @@ import React, {PropTypes} from 'react';
 import {generateUUID,dummyFunction} from "../Utility";
 const Tab = ({paperId,paperName,paperType,deletePaper,selectPaper,isSelected}) =>(
   <div className={isSelected?"dia-tab selected" : "dia-tab"} data-paper-id={paperId}>
-	<span onClick={selectPaper}>{paperName}</span><span className="dia-del-tab" onClick={deletePaper}>x</span>
+    <span onClick={selectPaper} className="dia-tab-name">{paperName}</span>
+    <span className="dia-del-tab bootstrap glyphicon glyphicon-remove" onClick={deletePaper}></span>
   </div>
 );
 const StaticTab =  ({paperId,paperName,paperType,selectPaper,isSelected}) =>(

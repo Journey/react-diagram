@@ -16,8 +16,8 @@ export const DefaultValues = (() => {
 		return StoreHelper.getSvgProperties();
 	    }
             return {
-                width: 1000,
-                height: 600,
+                width: 800,
+                height: 800,
                 gridSize: 10,
                 scaleX: 1,
                 scaleY: 1,

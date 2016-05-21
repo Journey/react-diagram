@@ -10,21 +10,35 @@
     text-align: center;
 }
 .dia-flex{
-    display: flex;
-    flex-direction: row;
+    position:relative;
 }
 .diagram-component .canvas{
 }
 .dia-border{
     border: 1px solid #ccc;
+    border-bottom: none;
 }
-.first-col{
+.dia-flex .first-col{
+    position: absolute;
+    left: 0;
     width: 300px;
 }
-.mid-col{
-    flex-grow: 1;
+.dia-flex .mid-col{
+    position: absolute;
+    overflow: auto;
+    left: 300px;
+    right: 300px;
+    min-width: 300px;
 }
-.last-col{
+.dia-flex .canvas{
+    text-align: center;
+}
+.dia-flex svg{
+    display: inline-block;
+}
+.dia-flex .last-col{
+    position: absolute;
+    right: 0;
     width: 300px;
 }
 .pallet{
@@ -43,6 +57,13 @@
 .pallet h4{
     clear: both;
 }
+.pallet-group h4{
+    cursor: pointer;
+}
+.pallet-group li{
+    width: 60px;
+    height: 80px;
+}
 
 .magnet-ports{
     cursor: pointer;
@@ -50,8 +71,6 @@
 .ca-border rect{
     fill: none;
 }
-
-
 /*canvas begin*/
 .ca-grids path{
     stroke: #ccc;
@@ -171,4 +190,22 @@ g.link path{
 }
 .dia-field{
     width: 100px;
+}
+.pro-area label{
+    display: inline-block;
+    width: 90px;
+    text-align: right;
+}
+.pro-area input, .pro-area select{
+    display: inline-block;
+    width: 170px;
+}
+.dia-sub-create label{
+    display: inline-block;
+    width: 100px;
+    text-align: right;
+}
+.dia-sub-create button{
+    display: inline-block;
+    margin: 6px;
 }

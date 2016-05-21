@@ -18,7 +18,7 @@ const App = () => (
 	<Tabs />
 	<Canvas />
       </div>
-      <div className="lat-col dia-border">
+      <div className="last-col dia-border">
 	<Property />
       </div>
     </div>

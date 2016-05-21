@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react';
 const Item = ({onDrag,image,name,id}) =>(
   <li>
     <img src={image} data-id={id} alt={name} title={name} draggable="true" onDragStart={onDrag} />
+    <span>{name}</span>
   </li>
 );
   Item.propTypes = {
@@ -11,10 +12,22 @@ const Item = ({onDrag,image,name,id}) =>(
     image: PropTypes.string.isRequired
   };
 
-const Group = (data)=>(
+const Group = (data)=>{
+  var expandStatus = {'dia-chevron-head':true,'glyphicon':true,'glyphicon-chevron-down':!data.isExpand,'glyphicon-chevron-up':data.isExpand};
+  return (
   <div className="pallet-group">
-    <h4>{data.groupName}</h4>
-    <ul>
+    <h4
+	    data-group-id={data.id}
+	    onClick={data.toggleExpand}>
+      <span className={Object.keys(expandStatus).reduce((acc,key)=>{
+	  if(expandStatus[key]){
+	    return acc + " " + key;
+	  }
+	  return acc;
+	},'')}></span>
+      <span>{data.groupName}</span>
+    </h4>
+    <ul className={data.isExpand? '' : 'hide'}>
       {
 	data.items.map(item =>
 	  <Item key={item.id}
@@ -26,6 +39,7 @@ const Group = (data)=>(
     </ul>
   </div>
 );
+  }
 
 Group.propTypes = {
   id: PropTypes.number.isRequired,
@@ -47,7 +61,8 @@ const Pallet = (data) =>(
 	  <Group
 	  key={group.id}
 	  {...group}
-	  onPalletElementDragStart={data.onPalletElementDragStart}
+		  onPalletElementDragStart={data.onPalletElementDragStart}
+		  toggleExpand={data.toggleExpand}
 	  />
         ))	
       }

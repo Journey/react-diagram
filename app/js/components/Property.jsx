@@ -18,15 +18,15 @@ const SVGProperties = ({width,height,gridSize}) =>{
   <div>
     <div className="pro-row">
       <label>宽度</label>
-      <input type="number" name="width" min="200" defaultValue={width} />
+      <input type="number" name="width" min="300" defaultValue={width} />
     </div>
     <div className="pro-row">
       <label>高度</label>
-      <input type="number" name="height" min="200" defaultValue={height} />
+      <input type="number" name="height" min="300" defaultValue={height} />
     </div>
-    <div className="pro-row">
+    <div className="pro-row hide">
       <label>网格大小</label>
-      <input type="number" name="gridSize" step="5" min="10" max="100" defaultValue={gridSize} />
+      <input type="number" name="gridSize" step="10" min="10" max="30" defaultValue={gridSize} />
     </div>
   </div>
     );
@@ -37,7 +37,7 @@ const PaperProperties = ({paperType,paperName,bindingId}) => {
     if(PaperHelper.isSubPage(paperType)){
       paperId = (
       <div className="pro-row">
-	<label>页面ID</label>
+	<label>关联设备</label>
 	<input type="text" name="pageId" defaultValue={bindingId} />
       </div>
     )

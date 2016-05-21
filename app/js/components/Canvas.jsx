@@ -1,6 +1,7 @@
 import React from 'react';
 import {POSITION_TOP,POSITION_RIGHT,POSITION_BOTTOM,POSITION_LEFT} from "../consts";
 import {LineHelper,generateUUID,ElementHelper,dummyFunction} from "../Utility";
+import {GridHelper} from "../Util/gridHelper";
 import TextElement from "./TextElement.jsx";
 import PlaceholderElement from "./PlaceHolder.jsx";
 import GroupElement from "./GroupElement.jsx";
@@ -66,8 +67,8 @@ const ElementOperator = ({id,x,y,width,height,onRemoveClick}) => {
   )
 }
 const Canvas = (data) =>(
-  <div className="canvas" diplsy>
-    <svg width={data.width} height={data.height} onDrop={data.onDrop} onDragOver={data.dragOver} onDragEnd={data.onDragEnd} onDoubleClick={data.dbClickCanvas}>
+  <div className="canvas">
+    <svg width={data.width} height={data.height} onDrop={data.onDrop} onDragOver={data.dragOver} onDragEnd={data.onDragEnd} onDoubleClick={data.dbClickCanvas} style={{background:'url('+GridHelper.getBase64Image()+")"}}>
     <g transform={`scale(${data.scaleX},${data.scaleY})`}>
       <g className="links">
 	{

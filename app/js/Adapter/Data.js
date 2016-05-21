@@ -68,6 +68,7 @@ export const transfromPalletGroupData = (aData)=>{
 	return {
 	    id: oGroup.id,
 	    groupName: oGroup.name,
+	    isExpand: false,
 	    items: deviceItems
 	};
     });

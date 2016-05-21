@@ -98,7 +98,16 @@ export const StoreHelper = (() => {
             var _state = _store.getState();
             var _selectedPaperId = _state.selectedPaperId;
             var paper = _state.papers[_selectedPaperId];
-            paper.svgProperties = Object.assign({},_state.svgProperties);
+	    var svgProperties = Object.assign({},_state.svgProperties);
+	    var zoomLevel = svgProperties.zoomLevel;
+	    if(Math.abs(zoomLevel - 1) > 0.0001){
+		svgProperties.width = parseInt(svgProperties.width/zoomLevel);
+		svgProperties.height = parseInt(svgProperties.height/zoomLevel);
+		svgProperties.scaleX = 1;
+		svgProperties.scaleY = 1;
+		svgProperties.zoomLevel = 1;
+	    }
+            paper.svgProperties = svgProperties;
             paper.elements = _state.elements;
             paper.links = _state.links;
             paper.properties = _state.properties.properties;

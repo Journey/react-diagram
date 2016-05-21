@@ -7,6 +7,7 @@ import {
     SELECT_CANVAS,
     CANVAS,
     COMMON_ELEMENT,
+    SAVE_SVG_PROPERTIES,
     SAVE_ELEMENT_PROPERTIES,
     SAVE_MEASURE_POINT_VALUE,
     UPDATE_GEOMETRIC_DATA,
@@ -40,6 +41,13 @@ export const properties = (state={type:CANVAS,selectedProperties:DataHelper.svgP
 	    gridSize: action.data.gridSize
 	};
 	return Object.assign({},state,{selectedProperties,type:CANVAS});
+	break;
+    case SAVE_SVG_PROPERTIES:
+	return Object.assign({},state,{selectedProperties: Object.assign({},state.selectedProperties,{
+	    width: action.width,
+	    height: action.height,
+	    gridSize: action.gridSize
+	})});
 	break;
     case SELECT_ELEMENT:
 	selectedProperties = state.properties[action.id];

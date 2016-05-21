@@ -64,11 +64,13 @@
 
 	var _StoreHelper = __webpack_require__(183);
 
-	var _API = __webpack_require__(212);
+	var _API = __webpack_require__(213);
 
 	var _DataHelper = __webpack_require__(182);
 
-	var _Data = __webpack_require__(213);
+	var _gridHelper = __webpack_require__(202);
+
+	var _Data = __webpack_require__(214);
 
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : { default: obj };
@@ -78,15 +80,16 @@
 		//DataHelper.papers = transformPapers(oPapers);
 		_DataHelper.DataHelper.palletGroup = (0, _Data.transfromPalletGroupData)(aPalletGroup);
 		_DataHelper.DataHelper.signalTypes = (0, _Data.transformSignalTypes)(aSingleTypes);
+		_gridHelper.GridHelper.init();
 		var store = (0, _redux.createStore)(_reducers2.default);
 		_StoreHelper.StoreHelper.setStore(store);
 		return {
-			dynamic: function dynamic(oPapers) {
-				(0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.App, null)), document.getElementById(domId));
+			dynamic: function dynamic(oPapers, sDomId) {
+				(0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.App, null)), document.getElementById(sDomId ? sDomId : domId));
 				_API.API.reset(oPapers);
 			},
-			static: function _static(oPapers) {
-				(0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.StaticApp, null)), document.getElementById(domId));
+			static: function _static(oPapers, sDomId) {
+				(0, _reactDom.render)(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_App.StaticApp, null)), document.getElementById(sDomId ? sDomId : domId));
 				_API.API.reset(oPapers);
 			}
 		};
@@ -21179,11 +21182,11 @@
 	var componentReducers = (0, _redux.combineReducers)({
 	    papers: _TabsReducer.papers,
 	    selects: _SelectsReducer.selects,
+	    properties: _PropertyReducer2.default,
 	    svgProperties: _CanvasReducer.svgProperties,
 	    groups: _PalletReducer2.default,
 	    elements: _CanvasReducer.elements,
 	    links: _CanvasReducer.links,
-	    properties: _PropertyReducer2.default,
 	    operator: _CanvasReducer.operator,
 	    selectedPaperId: _TabsReducer.selectedPaperId,
 	    secondLevelPage: _CanvasReducer.secondLevelPage
@@ -21202,14 +21205,30 @@
 
 	var _DataHelper = __webpack_require__(182);
 
+	var _consts = __webpack_require__(188);
+
 	/**
 	 * the data of the pallet component
 	 * @param {Object} state the data of the pallet element includes group infomation
 	 * @param {null} action no action
 	 * @returns {Object} the pallet element infomation
 	 */
-	var groups = function groups(state, action) {
-	  return _DataHelper.DataHelper.palletGroup;
+	var groups = function groups() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.palletGroup : arguments[0];
+	  var action = arguments[1];
+
+	  switch (action.type) {
+	    case _consts.TOGGLE_EXPAND:
+	      return state.map(function (oGroup) {
+	        var isExpand = false;
+	        if (action.data === oGroup.id) {
+	          isExpand = !oGroup.isExpand;
+	        }
+	        return Object.assign({}, oGroup, { isExpand: isExpand });
+	      });
+	      break;
+	  }
+	  return state;;
 	};
 	exports.default = groups;
 
@@ -21494,7 +21513,16 @@
 	            var _state = _store.getState();
 	            var _selectedPaperId = _state.selectedPaperId;
 	            var paper = _state.papers[_selectedPaperId];
-	            paper.svgProperties = Object.assign({}, _state.svgProperties);
+	            var svgProperties = Object.assign({}, _state.svgProperties);
+	            var zoomLevel = svgProperties.zoomLevel;
+	            if (Math.abs(zoomLevel - 1) > 0.0001) {
+	                svgProperties.width = parseInt(svgProperties.width / zoomLevel);
+	                svgProperties.height = parseInt(svgProperties.height / zoomLevel);
+	                svgProperties.scaleX = 1;
+	                svgProperties.scaleY = 1;
+	                svgProperties.zoomLevel = 1;
+	            }
+	            paper.svgProperties = svgProperties;
 	            paper.elements = _state.elements;
 	            paper.links = _state.links;
 	            paper.properties = _state.properties.properties;
@@ -21696,8 +21724,8 @@
 	                return _StoreHelper.StoreHelper.getSvgProperties();
 	            }
 	            return {
-	                width: 1000,
-	                height: 600,
+	                width: 800,
+	                height: 800,
 	                gridSize: 10,
 	                scaleX: 1,
 	                scaleY: 1,
@@ -22167,6 +22195,7 @@
 	var RESET_DIAGRAM = exports.RESET_DIAGRAM = "Reset diagram, happens when the switch to an completly new diagram";
 
 	var SAVE_PAGE_INFO = exports.SAVE_PAGE_INFO = "Save Page info - page name,bindningId(only for subPage)";
+	var TOGGLE_EXPAND = exports.TOGGLE_EXPAND = "Toggle expand on pallet group";
 
 /***/ },
 /* 189 */
@@ -22236,15 +22265,15 @@
 				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.svgProperties : arguments[0];
 				var action = arguments[1];
 
-				var newState;
+				var newState = state;
 				var _origZoomLevel = state.zoomLevel;
 				var _newZoomLevel = void 0;
 				switch (action.type) {
 							case _consts.ZOOM_IN:
 										_newZoomLevel = _origZoomLevel + 0.2;
 										newState = Object.assign({}, state, {
-													width: state.width / _origZoomLevel * _newZoomLevel,
-													height: state.height / _origZoomLevel * _newZoomLevel,
+													width: parseInt(state.width / _origZoomLevel * _newZoomLevel),
+													height: parseInt(state.height / _origZoomLevel * _newZoomLevel),
 													scaleX: _newZoomLevel,
 													scaleY: _newZoomLevel,
 													zoomLevel: _newZoomLevel
@@ -22256,8 +22285,8 @@
 													_newZoomLevel = 0.2;
 										}
 										newState = Object.assign({}, state, {
-													width: state.width / _origZoomLevel * _newZoomLevel,
-													height: state.height / _origZoomLevel * _newZoomLevel,
+													width: parseInt(state.width / _origZoomLevel * _newZoomLevel),
+													height: parseInt(state.height / _origZoomLevel * _newZoomLevel),
 													scaleX: _newZoomLevel,
 													scaleY: _newZoomLevel,
 													zoomLevel: _newZoomLevel
@@ -22276,8 +22305,9 @@
 							case _consts.RESET_DIAGRAM:
 										newState = _DataHelper.DataHelper.svgProperties;
 										break;
-							default:
-										newState = _DataHelper.DataHelper.svgProperties;
+							/*
+	         default:
+	      newState = DataHelper.svgProperties;*/
 				}
 				return newState;
 	};
@@ -22728,14 +22758,53 @@
 				if (hasPaper) {
 					return true;
 				} else {
-					invalideMessages.push("子页面" + oPapers[subPaperUUID].paperName + "绑定id:" + subPages[subPaperUUID] + " 不存在");
+					invalideMessages.push("子页面" + oPapers[subPaperUUID].paperName + "绑定设备:" + subPages[subPaperUUID] + " 不存在");
 					return false;
 				}
 			});
+			var duplicateInfo = this.checkDuplicateInfo(oPapers);
+			if (duplicateInfo) {
+				isValide = false;
+				invalideMessages = invalideMessages.concat(duplicateInfo);
+			}
 			return {
 				isValide: !!isValide,
 				messages: invalideMessages
 			};
+		},
+
+		/**
+	  * check if has duplicated infomation: same device numbers
+	  * @param {} oPaper
+	  * @returns {} 
+	  */
+		checkDuplicateInfo: function checkDuplicateInfo(oPapers) {
+			var oDeviceNumbers = {};
+			var aErrorMessages = [];
+			Object.keys(oPapers).forEach(function (sPaperKey) {
+				var oPaper = oPapers[sPaperKey];
+				var oProperties = oPaper.properties;
+				Object.keys(oProperties).forEach(function (key) {
+					var property = oProperties[key];
+					var deviceNumber = property && property.deviceInfo && property.deviceInfo.identifier;
+					if (deviceNumber) {
+						if (oDeviceNumbers[deviceNumber]) {
+							aErrorMessages.push("重复的设备编号:" + deviceNumber);
+						} else {
+							oDeviceNumbers[deviceNumber] = true;
+						}
+					}
+
+					var duplicateBindingInfo = paper.checkDuplicateBindingInfo(property);
+					if (duplicateBindingInfo) {
+						aErrorMessages = aErrorMessages.concat(duplicateBindingInfo);
+					}
+				});
+			});
+			if (aErrorMessages.length > 0) {
+				return aErrorMessages;
+			}
+			return false;
 		}
 	};
 
@@ -22765,6 +22834,23 @@
 				}
 				return false;
 			});
+		},
+		checkDuplicateBindingInfo: function checkDuplicateBindingInfo(oElementProperty) {
+			var oMeasureId = {};
+			var aErrorMessages = [];
+			var aMeasurePointInfos = oElementProperty.measurePointInfos;
+			if (aMeasurePointInfos && aMeasurePointInfos.length > 0) {
+				aMeasurePointInfos.forEach(function (oInfo) {
+					if (oInfo.identifier) {
+						if (oMeasureId[oInfo.identifier]) {
+							aErrorMessages.push("有重复的测点" + oInfo.identifier);
+						} else {
+							oMeasureId[oInfo.identifier] = true;
+						}
+					}
+				});
+			}
+			return aErrorMessages.length > 0 ? aErrorMessages : false;
 		}
 	};
 
@@ -22831,6 +22917,13 @@
 													gridSize: action.data.gridSize
 										};
 										return Object.assign({}, state, { selectedProperties: selectedProperties, type: _consts.CANVAS });
+										break;
+							case _consts.SAVE_SVG_PROPERTIES:
+										return Object.assign({}, state, { selectedProperties: Object.assign({}, state.selectedProperties, {
+																width: action.width,
+																height: action.height,
+																gridSize: action.gridSize
+													}) });
 										break;
 							case _consts.SELECT_ELEMENT:
 										selectedProperties = state.properties[action.id];
@@ -23057,15 +23150,15 @@
 
 	var _Canvas = __webpack_require__(200);
 
-	var _Property = __webpack_require__(205);
+	var _Property = __webpack_require__(206);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _Toolbar = __webpack_require__(207);
+	var _Toolbar = __webpack_require__(208);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _Tabs = __webpack_require__(210);
+	var _Tabs = __webpack_require__(211);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23094,7 +23187,7 @@
 	      ),
 	      _react2.default.createElement(
 	        "div",
-	        { className: "lat-col dia-border" },
+	        { className: "last-col dia-border" },
 	        _react2.default.createElement(_Property2.default, null)
 	      )
 	    )
@@ -23129,7 +23222,7 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+					value: true
 	});
 
 	var _reactRedux = __webpack_require__(159);
@@ -23145,22 +23238,26 @@
 	var _consts = __webpack_require__(188);
 
 	function _interopRequireDefault(obj) {
-	    return obj && obj.__esModule ? obj : { default: obj };
+					return obj && obj.__esModule ? obj : { default: obj };
 	}
 
 	var mapStateToProps = function mapStateToProps(state) {
-	    return {
-	        groups: state.groups
-	    };
+					return {
+									groups: state.groups
+					};
 	};
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
-	    return {
-	        onPalletElementDragStart: function onPalletElementDragStart(evt) {
-	            var elementId = evt.currentTarget.getAttribute("data-id");
-	            (0, _Utility.setDragContext)(evt, _consts.TYPE_PALLETELEMENT, elementId);
-	            _Utility.Position.logElementMistake(evt, evt.target, window, document);
-	        }
-	    };
+					return {
+									onPalletElementDragStart: function onPalletElementDragStart(evt) {
+													var elementId = evt.currentTarget.getAttribute("data-id");
+													(0, _Utility.setDragContext)(evt, _consts.TYPE_PALLETELEMENT, elementId);
+													_Utility.Position.logElementMistake(evt, evt.target, window, document);
+									},
+									toggleExpand: function toggleExpand(evt) {
+													var groupId = evt.currentTarget.getAttribute("data-group-id");
+													dispatch((0, _actions.toggleExpand)(parseInt(groupId)));
+									}
+					};
 	};
 
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Pallet2.default);
@@ -23169,7 +23266,7 @@
 /* 198 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -23189,9 +23286,14 @@
 	  var name = _ref.name;
 	  var id = _ref.id;
 	  return _react2.default.createElement(
-	    "li",
+	    'li',
 	    null,
-	    _react2.default.createElement("img", { src: image, "data-id": id, alt: name, title: name, draggable: "true", onDragStart: onDrag })
+	    _react2.default.createElement('img', { src: image, 'data-id': id, alt: name, title: name, draggable: 'true', onDragStart: onDrag }),
+	    _react2.default.createElement(
+	      'span',
+	      null,
+	      name
+	    )
 	  );
 	};
 	Item.propTypes = {
@@ -23202,17 +23304,30 @@
 	};
 
 	var Group = function Group(data) {
+	  var expandStatus = { 'dia-chevron-head': true, 'glyphicon': true, 'glyphicon-chevron-down': !data.isExpand, 'glyphicon-chevron-up': data.isExpand };
 	  return _react2.default.createElement(
-	    "div",
-	    { className: "pallet-group" },
+	    'div',
+	    { className: 'pallet-group' },
 	    _react2.default.createElement(
-	      "h4",
-	      null,
-	      data.groupName
+	      'h4',
+	      {
+	        'data-group-id': data.id,
+	        onClick: data.toggleExpand },
+	      _react2.default.createElement('span', { className: Object.keys(expandStatus).reduce(function (acc, key) {
+	          if (expandStatus[key]) {
+	            return acc + " " + key;
+	          }
+	          return acc;
+	        }, '') }),
+	      _react2.default.createElement(
+	        'span',
+	        null,
+	        data.groupName
+	      )
 	    ),
 	    _react2.default.createElement(
-	      "ul",
-	      null,
+	      'ul',
+	      { className: data.isExpand ? '' : 'hide' },
 	      data.items.map(function (item) {
 	        return _react2.default.createElement(Item, _extends({ key: item.id
 	        }, item, {
@@ -23236,21 +23351,22 @@
 
 	var Pallet = function Pallet(data) {
 	  return _react2.default.createElement(
-	    "div",
-	    { className: "pallet" },
+	    'div',
+	    { className: 'pallet' },
 	    _react2.default.createElement(
-	      "h3",
-	      { className: "dia-header" },
-	      "图元列表"
+	      'h3',
+	      { className: 'dia-header' },
+	      '图元列表'
 	    ),
 	    _react2.default.createElement(
-	      "div",
-	      { className: "pallet-content" },
+	      'div',
+	      { className: 'pallet-content' },
 	      data.groups.map(function (group) {
 	        return _react2.default.createElement(Group, _extends({
 	          key: group.id
 	        }, group, {
-	          onPalletElementDragStart: data.onPalletElementDragStart
+	          onPalletElementDragStart: data.onPalletElementDragStart,
+	          toggleExpand: data.toggleExpand
 	        }));
 	      })
 	    )
@@ -23276,7 +23392,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.savePageInfo = exports.resetDiagram = exports.updateStatus = exports.updateBindingData = exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.toggleExpand = exports.savePageInfo = exports.resetDiagram = exports.updateStatus = exports.updateBindingData = exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(188);
 
@@ -23555,6 +23671,13 @@
 	    };
 	};
 
+	var toggleExpand = exports.toggleExpand = function toggleExpand(groupId) {
+	    return {
+	        type: _consts.TOGGLE_EXPAND,
+	        data: groupId
+	    };
+	};
+
 /***/ },
 /* 200 */
 /***/ function(module, exports, __webpack_require__) {
@@ -23799,15 +23922,17 @@
 
 	var _Utility = __webpack_require__(191);
 
-	var _TextElement = __webpack_require__(202);
+	var _gridHelper = __webpack_require__(202);
+
+	var _TextElement = __webpack_require__(203);
 
 	var _TextElement2 = _interopRequireDefault(_TextElement);
 
-	var _PlaceHolder = __webpack_require__(203);
+	var _PlaceHolder = __webpack_require__(204);
 
 	var _PlaceHolder2 = _interopRequireDefault(_PlaceHolder);
 
-	var _GroupElement = __webpack_require__(204);
+	var _GroupElement = __webpack_require__(205);
 
 	var _GroupElement2 = _interopRequireDefault(_GroupElement);
 
@@ -23931,10 +24056,10 @@
 	var Canvas = function Canvas(data) {
 	  return _react2.default.createElement(
 	    "div",
-	    { className: "canvas", diplsy: true },
+	    { className: "canvas" },
 	    _react2.default.createElement(
 	      "svg",
-	      { width: data.width, height: data.height, onDrop: data.onDrop, onDragOver: data.dragOver, onDragEnd: data.onDragEnd, onDoubleClick: data.dbClickCanvas },
+	      { width: data.width, height: data.height, onDrop: data.onDrop, onDragOver: data.dragOver, onDragEnd: data.onDragEnd, onDoubleClick: data.dbClickCanvas, style: { background: 'url(' + _gridHelper.GridHelper.getBase64Image() + ")" } },
 	      _react2.default.createElement(
 	        "g",
 	        { transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
@@ -24032,6 +24157,59 @@
 
 /***/ },
 /* 202 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	function createCanvasElement(iSize) {
+	    var canvasElement = document.createElement("canvas");
+	    canvasElement.setAttribute("width", iSize);
+	    canvasElement.setAttribute("height", iSize);
+	    var context = canvasElement.getContext("2d");
+	    context.beginPath();
+	    context.arc(0.5, 0.5, 0.5, 0, 2 * Math.PI, false);
+	    setStyle(context);
+
+	    /*context.beginPath();
+	    context.arc(1, iSize-1, 1, 0, 2 * Math.PI, false);
+	    setStyle(context);
+	    
+	    context.beginPath();
+	    context.arc(iSize, iSize, 1, 0, 2 * Math.PI, false);
+	    setStyle(context);
+	    
+	    context.beginPath();
+	    context.arc(iSize, 0, 1, 0, 2 * Math.PI, false);*/
+	    return canvasElement;
+	}
+	function setStyle(context) {
+	    context.fillStyle = "rgba(3,3,3,0.3)";
+	    context.fill();
+	    context.lineWidth = 0;
+	    //context.strokeStyle = '#000000';
+	    context.stroke();
+	}
+	var _base64Grid = null;
+	var GridHelper = exports.GridHelper = {
+	    init: function init() {
+	        var container = document.createElement("div");
+	        container.setAttribute("class", "hide");
+	        var canvasElement = createCanvasElement(10);
+	        container.appendChild(canvasElement);
+	        _base64Grid = canvasElement.toDataURL();
+	        document.body.appendChild(container);
+	    },
+	    getBase64Image: function getBase64Image() {
+	        return _base64Grid;
+	    }
+	};
+
+/***/ },
+/* 203 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24112,7 +24290,7 @@
 	exports.default = TextElement;
 
 /***/ },
-/* 203 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24193,7 +24371,7 @@
 	exports.default = PlaceholderElement;
 
 /***/ },
-/* 204 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24269,7 +24447,7 @@
 	exports.default = GroupElement;
 
 /***/ },
-/* 205 */
+/* 206 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24280,7 +24458,7 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Property = __webpack_require__(206);
+	var _Property = __webpack_require__(207);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
@@ -24402,10 +24580,9 @@
 	var mapStateToProps = function mapStateToProps(state) {
 					var properties = state.properties;
 					var paperInfo = _DataHelper.DataHelper.getPaperInfo(state.selectedPaperId);
+					//todo:: why svgProperties can not synced automaticlly
 					if (properties.type === _consts.CANVAS) {
-									return Object.assign({}, state.properties, {
-													selectedProperties: state.svgProperties
-									}, {
+									return Object.assign({}, state.properties, { selectedProperties: state.svgProperties }, {
 													paperInfo: paperInfo
 									});
 					}
@@ -24492,7 +24669,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Property2.default);
 
 /***/ },
-/* 206 */
+/* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24513,11 +24690,11 @@
 
 	var _DefaultValues = __webpack_require__(184);
 
-	var _TextElement = __webpack_require__(202);
+	var _TextElement = __webpack_require__(203);
 
-	var _PlaceHolder = __webpack_require__(203);
+	var _PlaceHolder = __webpack_require__(204);
 
-	var _GroupElement = __webpack_require__(204);
+	var _GroupElement = __webpack_require__(205);
 
 	var _PaperHelper = __webpack_require__(192);
 
@@ -24548,7 +24725,7 @@
 	        null,
 	        "宽度"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "width", min: "200", defaultValue: width })
+	      _react2.default.createElement("input", { type: "number", name: "width", min: "300", defaultValue: width })
 	    ),
 	    _react2.default.createElement(
 	      "div",
@@ -24558,17 +24735,17 @@
 	        null,
 	        "高度"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "height", min: "200", defaultValue: height })
+	      _react2.default.createElement("input", { type: "number", name: "height", min: "300", defaultValue: height })
 	    ),
 	    _react2.default.createElement(
 	      "div",
-	      { className: "pro-row" },
+	      { className: "pro-row hide" },
 	      _react2.default.createElement(
 	        "label",
 	        null,
 	        "网格大小"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "gridSize", step: "5", min: "10", max: "100", defaultValue: gridSize })
+	      _react2.default.createElement("input", { type: "number", name: "gridSize", step: "10", min: "10", max: "30", defaultValue: gridSize })
 	    )
 	  );
 	};
@@ -24586,7 +24763,7 @@
 	      _react2.default.createElement(
 	        "label",
 	        null,
-	        "页面ID"
+	        "关联设备"
 	      ),
 	      _react2.default.createElement("input", { type: "text", name: "pageId", defaultValue: bindingId })
 	    );
@@ -24874,7 +25051,7 @@
 	exports.default = Property;
 
 /***/ },
-/* 207 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24889,9 +25066,9 @@
 
 	var _PaperHelper = __webpack_require__(192);
 
-	var _callbacks = __webpack_require__(208);
+	var _callbacks = __webpack_require__(209);
 
-	var _Toolbar = __webpack_require__(209);
+	var _Toolbar = __webpack_require__(210);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
@@ -24977,7 +25154,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Toolbar2.default);
 
 /***/ },
-/* 208 */
+/* 209 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -25000,7 +25177,7 @@
 	};
 
 /***/ },
-/* 209 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25039,7 +25216,7 @@
 	      _react2.default.createElement(
 	        "button",
 	        { name: "redo", onClick: state.onRedo },
-	        "Redo"
+	        "恢复"
 	      ),
 	      _react2.default.createElement(
 	        "button",
@@ -25110,7 +25287,7 @@
 	            _react2.default.createElement(
 	              "label",
 	              { className: "dia-label" },
-	              "id"
+	              "关联设备"
 	            ),
 	            _react2.default.createElement("input", { className: "dia-field", type: "text", name: "identify" })
 	          )
@@ -25137,7 +25314,7 @@
 	exports.default = Toolbar;
 
 /***/ },
-/* 210 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25155,7 +25332,7 @@
 
 	var _DataHelper = __webpack_require__(182);
 
-	var _Tabs = __webpack_require__(211);
+	var _Tabs = __webpack_require__(212);
 
 	var _actions = __webpack_require__(199);
 
@@ -25202,13 +25379,13 @@
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 211 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-			value: true
+	  value: true
 	});
 	exports.StaticTabs = exports.Tabs = undefined;
 
@@ -25221,89 +25398,85 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Tab = function Tab(_ref) {
-			var paperId = _ref.paperId;
-			var paperName = _ref.paperName;
-			var paperType = _ref.paperType;
-			var deletePaper = _ref.deletePaper;
-			var selectPaper = _ref.selectPaper;
-			var isSelected = _ref.isSelected;
-			return _react2.default.createElement(
-					"div",
-					{ className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
-					_react2.default.createElement(
-							"span",
-							{ onClick: selectPaper },
-							paperName
-					),
-					_react2.default.createElement(
-							"span",
-							{ className: "dia-del-tab", onClick: deletePaper },
-							"x"
-					)
-			);
+	  var paperId = _ref.paperId;
+	  var paperName = _ref.paperName;
+	  var paperType = _ref.paperType;
+	  var deletePaper = _ref.deletePaper;
+	  var selectPaper = _ref.selectPaper;
+	  var isSelected = _ref.isSelected;
+	  return _react2.default.createElement(
+	    "div",
+	    { className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
+	    _react2.default.createElement(
+	      "span",
+	      { onClick: selectPaper, className: "dia-tab-name" },
+	      paperName
+	    ),
+	    _react2.default.createElement("span", { className: "dia-del-tab bootstrap glyphicon glyphicon-remove", onClick: deletePaper })
+	  );
 	};
 	var StaticTab = function StaticTab(_ref2) {
-			var paperId = _ref2.paperId;
-			var paperName = _ref2.paperName;
-			var paperType = _ref2.paperType;
-			var selectPaper = _ref2.selectPaper;
-			var isSelected = _ref2.isSelected;
-			return _react2.default.createElement(
-					"div",
-					{ className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
-					_react2.default.createElement(
-							"span",
-							{ onClick: selectPaper },
-							paperName
-					)
-			);
+	  var paperId = _ref2.paperId;
+	  var paperName = _ref2.paperName;
+	  var paperType = _ref2.paperType;
+	  var selectPaper = _ref2.selectPaper;
+	  var isSelected = _ref2.isSelected;
+	  return _react2.default.createElement(
+	    "div",
+	    { className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
+	    _react2.default.createElement(
+	      "span",
+	      { onClick: selectPaper },
+	      paperName
+	    )
+	  );
 	};
 	var Tabs = function Tabs(data) {
-			return _react2.default.createElement(
-					"div",
-					{ className: "dia-tabs" },
-					Object.keys(data.papers).sort(function (pre, next) {
-							return data.papers[pre].order - data.papers[next].order;
-					}).map(function (key) {
-							var paper = data.papers[key];
-							return _react2.default.createElement(Tab, {
-									key: (0, _Utility.generateUUID)(),
-									paperId: key,
-									paperName: paper.paperName,
-									paperType: paper.paperType,
-									deletePaper: data.deletePaper,
-									selectPaper: data.clickPaper,
-									isSelected: data.selectedPaperId === key ? true : false });
-					})
-			);
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "dia-tabs" },
+	    Object.keys(data.papers).sort(function (pre, next) {
+	      return data.papers[pre].order - data.papers[next].order;
+	    }).map(function (key) {
+	      var paper = data.papers[key];
+	      return _react2.default.createElement(Tab, {
+	        key: (0, _Utility.generateUUID)(),
+	        paperId: key,
+	        paperName: paper.paperName,
+	        paperType: paper.paperType,
+	        deletePaper: data.deletePaper,
+	        selectPaper: data.clickPaper,
+	        isSelected: data.selectedPaperId === key ? true : false });
+	    })
+	  );
 	};
 
 	var StaticTabs = function StaticTabs(data) {
-			return _react2.default.createElement(
-					"div",
-					{ className: "dia-tabs" },
-					Object.keys(data.papers).sort(function (pre, next) {
-							return data.papers[pre].order - data.papers[next].order;
-					}).filter(function (key) {
-							return data.papers[key].paperType == 1;
-					}).map(function (key) {
-							var paper = data.papers[key];
-							return _react2.default.createElement(StaticTab, {
-									key: (0, _Utility.generateUUID)(),
-									paperId: key,
-									paperName: paper.paperName,
-									paperType: paper.paperType,
-									selectPaper: data.clickPaper,
-									isSelected: data.selectedPaperId === key ? true : false });
-					})
-			);
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "dia-tabs" },
+	    Object.keys(data.papers).sort(function (pre, next) {
+	      return data.papers[pre].order - data.papers[next].order;
+	    }).filter(function (key) {
+	      return data.papers[key].paperType == 1;
+	    }).map(function (key) {
+	      var paper = data.papers[key];
+	      return _react2.default.createElement(StaticTab, {
+	        key: (0, _Utility.generateUUID)(),
+	        paperId: key,
+	        paperName: paper.paperName,
+	        paperType: paper.paperType,
+	        selectPaper: data.clickPaper,
+	        isSelected: data.selectedPaperId === key ? true : false });
+	    })
+	  );
 	};
 
 	exports.Tabs = Tabs;
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 212 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25317,9 +25490,9 @@
 
 	var _StoreHelper = __webpack_require__(183);
 
-	var _callbacks = __webpack_require__(208);
+	var _callbacks = __webpack_require__(209);
 
-	var _Data = __webpack_require__(213);
+	var _Data = __webpack_require__(214);
 
 	var _actions = __webpack_require__(199);
 
@@ -25391,7 +25564,7 @@
 	}();
 
 /***/ },
-/* 213 */
+/* 214 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25401,7 +25574,7 @@
 	});
 	exports.transformPapers = exports.transfromPalletGroupData = exports.transformSignalTypes = exports.transformElementsStatus = exports.transformBindingData = undefined;
 
-	var _PalletData = __webpack_require__(214);
+	var _PalletData = __webpack_require__(215);
 
 	/**
 	 * transformBindingData transform binding data from array to Object.
@@ -25472,6 +25645,7 @@
 	    return {
 	      id: oGroup.id,
 	      groupName: oGroup.name,
+	      isExpand: false,
 	      items: deviceItems
 	    };
 	  });
@@ -25486,7 +25660,7 @@
 	};
 
 /***/ },
-/* 214 */
+/* 215 */
 /***/ function(module, exports) {
 
 	"use strict";

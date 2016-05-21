@@ -8,11 +8,11 @@ import {selects} from "./SelectsReducer";
 const componentReducers = combineReducers({
     papers,
     selects,
+    properties,
     svgProperties,
     groups,
     elements,
     links,
-    properties,
     operator,
     selectedPaperId,
     secondLevelPage

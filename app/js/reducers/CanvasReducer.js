@@ -41,15 +41,15 @@ import {updatePlaceholderValues,updateElementsStatus} from "../Util/PaperHelper"
  * @returns {} 
  */
 const svgProperties = (state=DataHelper.svgProperties, action) => {
-    var newState;
+    var newState = state;
     let _origZoomLevel = state.zoomLevel;
     let _newZoomLevel;
     switch(action.type){
     case ZOOM_IN:
 	_newZoomLevel = _origZoomLevel + 0.2;
 	newState = Object.assign({},state, {
-	    width: state.width/_origZoomLevel * _newZoomLevel,
-	    height: state.height/_origZoomLevel * _newZoomLevel,
+	    width: parseInt(state.width/_origZoomLevel * _newZoomLevel),
+	    height: parseInt(state.height/_origZoomLevel * _newZoomLevel),
 	    scaleX: _newZoomLevel,
 	    scaleY: _newZoomLevel,
 	    zoomLevel: _newZoomLevel
@@ -61,8 +61,8 @@ const svgProperties = (state=DataHelper.svgProperties, action) => {
 	    _newZoomLevel = 0.2;
 	}
 	newState = Object.assign({},state, {
-	    width: state.width/_origZoomLevel * _newZoomLevel,
-	    height: state.height/_origZoomLevel * _newZoomLevel,
+	    width: parseInt(state.width/_origZoomLevel * _newZoomLevel),
+	    height: parseInt(state.height/_origZoomLevel * _newZoomLevel),
 	    scaleX: _newZoomLevel,
 	    scaleY: _newZoomLevel,
 	    zoomLevel: _newZoomLevel
@@ -81,8 +81,9 @@ const svgProperties = (state=DataHelper.svgProperties, action) => {
     case RESET_DIAGRAM:
 	newState = DataHelper.svgProperties;
 	break;
+	/*
     default:
-	newState = DataHelper.svgProperties;
+	newState = DataHelper.svgProperties;*/
     }
     return newState;
 };

@@ -108,10 +108,9 @@ function getElementGeometricDataByEvent(event){
 const mapStateToProps = (state) => {
     let properties = state.properties;
     let paperInfo = DataHelper.getPaperInfo(state.selectedPaperId);
+    //todo:: why svgProperties can not synced automaticlly
     if(properties.type === CANVAS ) {
-	return Object.assign({},state.properties,{
-	    selectedProperties: state.svgProperties
-	},{
+	return Object.assign({},state.properties,{selectedProperties: state.svgProperties},{
 	    paperInfo: paperInfo
 	});
     }
