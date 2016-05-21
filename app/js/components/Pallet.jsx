@@ -16,7 +16,8 @@ const Group = (data)=>{
   var expandStatus = {'dia-chevron-head':true,'glyphicon':true,'glyphicon-chevron-down':!data.isExpand,'glyphicon-chevron-up':data.isExpand};
   return (
   <div className="pallet-group">
-    <h4
+    <div
+	    className="dia-header"
 	    data-group-id={data.id}
 	    onClick={data.toggleExpand}>
       <span className={Object.keys(expandStatus).reduce((acc,key)=>{
@@ -26,7 +27,7 @@ const Group = (data)=>{
 	  return acc;
 	},'')}></span>
       <span>{data.groupName}</span>
-    </h4>
+    </div>
     <ul className={data.isExpand? '' : 'hide'}>
       {
 	data.items.map(item =>
@@ -54,7 +55,7 @@ Group.propTypes = {
 
 const Pallet = (data) =>(
   <div className="pallet">
-    <h3 className="dia-header">图元列表</h3>
+    <div className="dia-title">图元列表</div>
     <div className="pallet-content">
       {
 	data.groups.map(group =>(

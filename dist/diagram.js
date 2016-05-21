@@ -22204,22 +22204,73 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+		value: true
 	});
 	/**
 	 * store the pallet data, is an array [group1, group2].
 	 * @returns {object} the getter/setter of the pallet data
 	 */
 	var PalletDataHelper = exports.PalletDataHelper = function () {
-	    var _palletData = null;
-	    return {
-	        get data() {
-	            return _palletData;
-	        },
-	        set data(aData) {
-	            _palletData = aData;
-	        }
-	    };
+		var _palletData = null;
+		return {
+			get data() {
+				return _palletData;
+			},
+			set data(aData) {
+				_palletData = aData;
+			},
+			/**
+	   * get element object by element id
+	   * @param {} deviceId
+	   */
+			getDeviceById: function getDeviceById(deviceId) {
+				return _palletData.find(function (oGroup) {
+					return oGroup.items.find(function (oElement) {
+						if (oElement.id === deviceId) {
+							return true;
+						}
+						return false;
+					});
+				});
+			},
+
+			/**
+	   * get element status image by status id
+	   * @param {} oElement
+	   * @param {} statusId
+	   */
+			getImageByStatus: function getImageByStatus(oElement, statusId) {
+				var oStatus = oElement.statuses.find(function (oStatus) {
+					if (oStatus.id === statusId) {
+						return true;
+					}
+					return false;
+				});
+				if (oStatus) {
+					return oStatus.image;
+				}
+				return null;
+			},
+			getDeviceStatusImage: function getDeviceStatusImage(deviceId, statusId) {
+				var oDevice = PalletDataHelper.getDeviceById(deviceId);
+				return PalletDataHelper.getImageByStatus(oDevice, statusId);
+			},
+			isXuqiuce: function isXuqiuce(elementTypeId) {
+				var oGroup;
+				oGroup = _palletData.find(function (oGroup) {
+					return oGroup.items.find(function (oItem) {
+						if (oItem.id === elementTypeId) {
+							return true;
+						}
+						return false;
+					});
+				});
+				if (oGroup.id === 3) {
+					return true;
+				}
+				return false;
+			}
+		};
 	}();
 
 /***/ },
@@ -22652,12 +22703,7 @@
 
 	var _ElementHelper = __webpack_require__(185);
 
-	/**
-	 * @Define PaperHeler Used to provide some helper method for update the binding data of the paper
-	 * @name PaperHeler.js
-	 * @author journey
-	 * @license BSD
-	 */
+	var _PalletDataHelper = __webpack_require__(189);
 
 	function _updatePlaceholdersValues(elements, properties, oValues) {
 		return Object.keys(elements).filter(function (sEleKey) {
@@ -22674,8 +22720,36 @@
 			return oPre;
 		}, {});
 	}
+	/**
+	 * update the element image url by path
+	 * @param {} elements
+	 * @param {} properties
+	 * @param {Object} oValues {devicenum:statusid}
+	 * @returns {} 
+	 */
+	/**
+	 * @Define PaperHeler Used to provide some helper method for update the binding data of the paper
+	 * @name PaperHeler.js
+	 * @author journey
+	 * @license BSD
+	 */
 	function _updateElementsStatus(elements, properties, oValues) {
-		return {};
+		var oElements = {};
+		Object.keys(oValues).forEach(function (sDeviceNum) {
+			var elementUUID = Object.keys(properties).find(function (uuid) {
+				var property = properties[uuid];
+				if (property && property.deviceInfo && property.deviceInfo.identifier === sDeviceNum) {
+					return true;
+				}
+				return false;
+			});
+			if (elementUUID) {
+				var element = elements[elementUUID];
+				var image = _PalletDataHelper.PalletDataHelper.getDeviceStatusImage(element.id, oValues[sDeviceNum]);
+				oElements[elementUUID] = Object.assign({}, elements[elementUUID], { image: image });
+			}
+		});
+		return oElements;
 	}
 	var updatePlaceholderValues = exports.updatePlaceholderValues = function updatePlaceholderValues(oValues) {
 		var elements = _StoreHelper.StoreHelper.getElements();
@@ -22708,14 +22782,14 @@
 
 		/**
 	  * 
-	  * @param {Object} oValues the values which represent element status
+	  * @param {Object} oValues the values which represent element status {devcieNum:statusId}
 	  * @returns {Object}  oPapers The papers with new status
 	  */
 		updateElementsStatus: function updateElementsStatus(oValues) {
 			var oPapers = _StoreHelper.StoreHelper.getPapers();
 			Object.keys(oPapers).forEach(function (paperKey) {
 				var paper = oPapers[paperKey];
-				var updatedElements = _updateElementsStatus(paper.elements, paper.properties);
+				var updatedElements = _updateElementsStatus(paper.elements, paper.properties, oValues);
 				papers.elements = Object.assign({}, paper.elements, updatedElements);
 			});
 			return oPapers;
@@ -22797,6 +22871,16 @@
 				return aErrorMessages;
 			}
 			return false;
+		},
+
+		getElementUUIDbyDeviceNumber: function getElementUUIDbyDeviceNumber(oPapers, sDeviceNumber) {
+			var oElement = Object.keys(oPapers).find(function (oPaper) {
+				return paper.getDeviceByDeviceNumber(oPaper, sDeviceNumber);
+			});
+			if (oElement) {
+				return oElement.uuid;
+			}
+			return null;
 		}
 	};
 
@@ -22817,6 +22901,17 @@
 			return false;
 		},
 		hasDeviceNumber: function hasDeviceNumber(paper, deviceNumber) {
+			var properties = paper.properties;
+			return Object.keys(properties).find(function (uuid) {
+				var property = properties[uuid];
+				var curDeviceNumber = _ElementHelper.ElementHelper.getDeviceNumber(property);
+				if (deviceNumber && curDeviceNumber === deviceNumber) {
+					return true;
+				}
+				return false;
+			});
+		},
+		getDeviceByDeviceNumber: function getDeviceByDeviceNumber(paper, deviceNumber) {
 			var properties = paper.properties;
 			return Object.keys(properties).find(function (uuid) {
 				var property = properties[uuid];
@@ -23168,7 +23263,7 @@
 	      { className: "diagram-component dia-flex" },
 	      _react2.default.createElement(
 	        "div",
-	        { className: "first-col dia-border" },
+	        { className: "first-col" },
 	        _react2.default.createElement(_Pallet2.default, null)
 	      ),
 	      _react2.default.createElement(
@@ -23179,7 +23274,7 @@
 	      ),
 	      _react2.default.createElement(
 	        "div",
-	        { className: "last-col dia-border" },
+	        { className: "last-col" },
 	        _react2.default.createElement(_Property2.default, null)
 	      )
 	    )
@@ -23301,8 +23396,9 @@
 	    'div',
 	    { className: 'pallet-group' },
 	    _react2.default.createElement(
-	      'h4',
+	      'div',
 	      {
+	        className: 'dia-header',
 	        'data-group-id': data.id,
 	        onClick: data.toggleExpand },
 	      _react2.default.createElement('span', { className: Object.keys(expandStatus).reduce(function (acc, key) {
@@ -23346,8 +23442,8 @@
 	    'div',
 	    { className: 'pallet' },
 	    _react2.default.createElement(
-	      'h3',
-	      { className: 'dia-header' },
+	      'div',
+	      { className: 'dia-title' },
 	      '图元列表'
 	    ),
 	    _react2.default.createElement(
@@ -23689,6 +23785,8 @@
 
 	var _DataHelper = __webpack_require__(182);
 
+	var _PalletDataHelper = __webpack_require__(189);
+
 	var _actions = __webpack_require__(199);
 
 	var _Utility = __webpack_require__(191);
@@ -23857,6 +23955,11 @@
 	            var identifier = _StoreHelper.StoreHelper.getPaperIdentifier(paper, elementKey);
 	            if (_StoreHelper.StoreHelper.hasSubPage(identifier)) {
 	                dispatch((0, _actions.openSubPage)(_DataHelper.DataHelper.getSubpaper(identifier)));
+	            }
+	            var elementInfo = _StoreHelper.StoreHelper.getCanvasElmentInfoById(elementKey);
+	            if (_PalletDataHelper.PalletDataHelper.isXuqiuce(elementInfo.id)) {
+	                //todo:: open in a new tab
+	                console.log("this is xuqiuce");
 	            }
 	        },
 	        closeSubPage: function closeSubPage(event) {
@@ -25012,8 +25115,8 @@
 	      "div",
 	      null,
 	      _react2.default.createElement(
-	        "h3",
-	        { className: "dia-header" },
+	        "div",
+	        { className: "dia-title" },
 	        "属性"
 	      )
 	    ),
@@ -25024,7 +25127,11 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "align-center" },
-	        _react2.default.createElement("input", { type: "button", "data-element-type-id": state.selectedProperties.elementTypeId, onClick: state.onSave, "data-key": state.selectedProperties.key, "data-selected-type": state.type, value: "保存" })
+	        _react2.default.createElement(
+	          "button",
+	          { "data-element-type-id": state.selectedProperties.elementTypeId, onClick: state.onSave, "data-key": state.selectedProperties.key, "data-selected-type": state.type },
+	          "保存"
+	        )
 	      )
 	    )
 	  );
@@ -25224,7 +25331,7 @@
 	        { className: "dia-sub-create" },
 	        _react2.default.createElement(
 	          "div",
-	          { className: "dia-center" },
+	          { className: "dia-center dia-title" },
 	          "创建子图"
 	        ),
 	        _react2.default.createElement(
@@ -25578,6 +25685,7 @@
 	  aData.forEach(function (oData) {
 	    var oDeviceData = void 0;
 	    var deviceno = oData.deviceno;
+
 	    if (!oBindingData[deviceno]) {
 	      oBindingData[deviceno] = [];
 	    }
@@ -25587,10 +25695,40 @@
 	  return oBindingData;
 	};
 
+	/**
+	 * transform external element status data. will be used to update element image by status
+	 * @param {Array} aData
+	 *   [{
+	 *     "$id":"1",
+	 *     "datasource":null,
+	 *     "deviceno":"N5-BC",
+	 *     "deviceproperty":"电池电量",
+	 *     "propertyvalue":"true",
+	 *     "occurtime":"2015-04-30T16:07:51",
+	 *     "id":null,"name":"电池"
+	 *   }]
+	 */
 	var transformElementsStatus = exports.transformElementsStatus = function transformElementsStatus(aData) {
-	  //todo
-	  console.log("todo");
+	  var oStatus = {};
+	  aData.forEach(function (oData) {
+	    oStatus[oData.deviceno] = _transfromStatusValue(oData.propertyvalue);
+	  });
+	  return oStatus;
 	};
+
+	/**
+	 * transfrom status value to status id in pallet data.
+	 * @param {} sValue
+	 * @returns {} 
+	 */
+	function _transfromStatusValue(sValue) {
+	  //todo
+	  if (sValue) {
+	    //运行
+	    return 1;
+	  }
+	  return 3; //停机
+	}
 
 	/**
 	 * transfrom signal type data which will be used on the common element property section

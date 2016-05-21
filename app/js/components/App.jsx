@@ -11,14 +11,14 @@ const App = () => (
       <Toolbar />
     </div>
     <div className="diagram-component dia-flex">
-      <div className="first-col dia-border">
+      <div className="first-col">
 	<Pallet />
       </div>
       <div className="mid-col dia-border">
 	<Tabs />
 	<Canvas />
       </div>
-      <div className="last-col dia-border">
+      <div className="last-col">
 	<Property />
       </div>
     </div>

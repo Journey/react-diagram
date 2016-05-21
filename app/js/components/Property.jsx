@@ -179,12 +179,12 @@ const PropertyFactory = (state) => {
 const Property = (state) =>(
   <div className="pro-area">
     <div>
-      <h3 className="dia-header">属性</h3>
+      <div className="dia-title">属性</div>
     </div>
     <div>
       {PropertyFactory(state)}
       <div className="align-center">
-	<input type="button" data-element-type-id={state.selectedProperties.elementTypeId} onClick={state.onSave} data-key={state.selectedProperties.key} data-selected-type={state.type} value="保存" />
+	<button data-element-type-id={state.selectedProperties.elementTypeId} onClick={state.onSave} data-key={state.selectedProperties.key} data-selected-type={state.type}>保存</button>
       </div>
     </div>
   </div>

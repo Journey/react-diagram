@@ -14,7 +14,7 @@ const Toolbar = (state) =>(
   </div>
   <div className="dia-overlay" style={{display:'none'}}>
   <div className="dia-sub-create">
-    <div className="dia-center">创建子图</div>
+    <div className="dia-center dia-title">创建子图</div>
     <ul>
       <li className="dia-center">
 	<label className="dia-label">类型</label>

@@ -9,13 +9,26 @@
 .dia-toolbar{
     text-align: center;
 }
+.dia-toolbar button{
+    display: inline-block;
+    margin: 3px 3px;
+}
+.dia-header{
+    font-size: 1.2rem;
+    line-height: 3rem;
+}
+.dia-title{
+    font-size: 2rem;
+    line-height: 4rem;
+    font-weight: 700;
+}
 .dia-flex{
-    position:relative;
+    /*position:relative;*/
 }
 .diagram-component .canvas{
 }
 .dia-border{
-    border: 1px solid #ccc;
+    border: 1px solid  #2890CB;
     border-bottom: none;
 }
 .dia-flex .first-col{
@@ -152,12 +165,17 @@ g.link path{
 }
 .dia-tab{
     display: inline-block;
-    padding: 6px;
-    border: 1px solid #666;
     position: relative;
+    display: inline-block;
+    border: 1px solid #2890CB;
+    border-bottom: none;
+    padding: 8px;
+    margin: 6px 6px 0 0;
+    cursor: pointer;
+    border-radius: 4px;
 }
 .dia-tab.selected{
-    border: 2px solid #000;
+    border-width: 2px;
 }
 .dia-tab span{
     cursor: pointer;
@@ -203,9 +221,13 @@ span.dia-del-tab{
     display: inline-block;
     width: 170px;
 }
+.dia-sub-create li{
+    margin: 6px 6px;
+}
 .dia-sub-create label{
     display: inline-block;
-    width: 100px;
+    width: 60px;
+    padding: 6px;
     text-align: right;
 }
 .dia-sub-create button{
