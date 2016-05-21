@@ -68,8 +68,8 @@ const ElementOperator = ({id,x,y,width,height,onRemoveClick}) => {
 }
 const Canvas = (data) =>(
   <div className="canvas">
-    <svg width={data.width} height={data.height} onDrop={data.onDrop} onDragOver={data.dragOver} onDragEnd={data.onDragEnd} onDoubleClick={data.dbClickCanvas} style={{background:'url('+GridHelper.getBase64Image()+")"}}>
-    <g transform={`scale(${data.scaleX},${data.scaleY})`}>
+    <svg width={data.width*data.zoomLevel} height={data.height*data.zoomLevel} onDrop={data.onDrop} onDragOver={data.dragOver} onDragEnd={data.onDragEnd} onDoubleClick={data.dbClickCanvas} style={{background:'url('+GridHelper.getBase64Image()+")"}}>
+    <g transform={`scale(${data.zoomLevel},${data.zoomLevel})`}>
       <g className="links">
 	{
 	  Object.keys(data.links).map(key =>{
@@ -106,7 +106,7 @@ const Canvas = (data) =>(
 const StaticCanvas = (data) => (
   <div className="canvas">
     <svg width={data.width} height={data.height} onDrop={dummyFunction} onDragOver={dummyFunction} onDragEnd={dummyFunction} onDoubleClick={dummyFunction}>
-      <g transform={`scale(${data.scaleX},${data.scaleY})`}>
+      <g transform={`scale(1,1)`}>
 	<g className="links">
 	  {
 	    Object.keys(data.links).map(key =>{

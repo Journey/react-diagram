@@ -43,7 +43,7 @@ const mapDispatchtoProps = (dispatch) => {
 	    var id = idEle.value;
 	    var uuid = generateUUID();
 	    if(!id){
-		id = uuid;
+		id = "";
 	    }
 	    
 	    dispatch(createSubPage({

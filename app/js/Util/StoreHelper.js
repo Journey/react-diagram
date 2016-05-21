@@ -75,7 +75,7 @@ export const StoreHelper = (() => {
 	getScale: () => {
 	    var svgProperties = _getSvgProperties();
 	    if(svgProperties){
-		return svgProperties.scaleX;
+		return svgProperties.zoomLevel;
 	    }
 	    return 1;
 	},

@@ -24,7 +24,7 @@ const Toolbar = (state) =>(
 	</select>
       </li>
       <li className="dia-center"><label className="dia-label">名称</label><input className="dia-field" type="text" name="name"/></li>
-      <li className="dia-center"><label className="dia-label">关联设备</label><input  className="dia-field" type="text" name="identify"/></li>
+      <li className="dia-center hide"><label className="dia-label">关联设备</label><input  className="dia-field" type="text" name="identify"/></li>
     </ul>
     <div className="dia-center">
       <button onClick={state.onSaveSubPage}>保存</button>

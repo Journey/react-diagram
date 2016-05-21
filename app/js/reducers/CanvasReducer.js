@@ -48,10 +48,6 @@ const svgProperties = (state=DataHelper.svgProperties, action) => {
     case ZOOM_IN:
 	_newZoomLevel = _origZoomLevel + 0.2;
 	newState = Object.assign({},state, {
-	    width: parseInt(state.width/_origZoomLevel * _newZoomLevel),
-	    height: parseInt(state.height/_origZoomLevel * _newZoomLevel),
-	    scaleX: _newZoomLevel,
-	    scaleY: _newZoomLevel,
 	    zoomLevel: _newZoomLevel
 	});
 	break;
@@ -61,10 +57,6 @@ const svgProperties = (state=DataHelper.svgProperties, action) => {
 	    _newZoomLevel = 0.2;
 	}
 	newState = Object.assign({},state, {
-	    width: parseInt(state.width/_origZoomLevel * _newZoomLevel),
-	    height: parseInt(state.height/_origZoomLevel * _newZoomLevel),
-	    scaleX: _newZoomLevel,
-	    scaleY: _newZoomLevel,
 	    zoomLevel: _newZoomLevel
 	});
 	break;

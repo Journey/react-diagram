@@ -13,16 +13,16 @@ import {paper as PaperHelper} from "../Util/PaperHelper";
 * @param {} gridSize
 * @returns {} 
 */
-const SVGProperties = ({width,height,gridSize}) =>{
+const SVGProperties = ({width,height,gridSize,zoomLevel}) =>{
   return (
   <div>
     <div className="pro-row">
       <label>宽度</label>
-      <input type="number" name="width" min="300" defaultValue={width} />
+      <input type="number" name="width" min="300" defaultValue={parseInt(width*zoomLevel)} />
     </div>
     <div className="pro-row">
       <label>高度</label>
-      <input type="number" name="height" min="300" defaultValue={height} />
+      <input type="number" name="height" min="300" defaultValue={parseInt(height*zoomLevel)} />
     </div>
     <div className="pro-row hide">
       <label>网格大小</label>

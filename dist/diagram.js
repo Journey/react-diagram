@@ -21490,7 +21490,7 @@
 	        getScale: function getScale() {
 	            var svgProperties = _getSvgProperties();
 	            if (svgProperties) {
-	                return svgProperties.scaleX;
+	                return svgProperties.zoomLevel;
 	            }
 	            return 1;
 	        },
@@ -22272,10 +22272,6 @@
 							case _consts.ZOOM_IN:
 										_newZoomLevel = _origZoomLevel + 0.2;
 										newState = Object.assign({}, state, {
-													width: parseInt(state.width / _origZoomLevel * _newZoomLevel),
-													height: parseInt(state.height / _origZoomLevel * _newZoomLevel),
-													scaleX: _newZoomLevel,
-													scaleY: _newZoomLevel,
 													zoomLevel: _newZoomLevel
 										});
 										break;
@@ -22285,10 +22281,6 @@
 													_newZoomLevel = 0.2;
 										}
 										newState = Object.assign({}, state, {
-													width: parseInt(state.width / _origZoomLevel * _newZoomLevel),
-													height: parseInt(state.height / _origZoomLevel * _newZoomLevel),
-													scaleX: _newZoomLevel,
-													scaleY: _newZoomLevel,
 													zoomLevel: _newZoomLevel
 										});
 										break;
@@ -24059,10 +24051,10 @@
 	    { className: "canvas" },
 	    _react2.default.createElement(
 	      "svg",
-	      { width: data.width, height: data.height, onDrop: data.onDrop, onDragOver: data.dragOver, onDragEnd: data.onDragEnd, onDoubleClick: data.dbClickCanvas, style: { background: 'url(' + _gridHelper.GridHelper.getBase64Image() + ")" } },
+	      { width: data.width * data.zoomLevel, height: data.height * data.zoomLevel, onDrop: data.onDrop, onDragOver: data.dragOver, onDragEnd: data.onDragEnd, onDoubleClick: data.dbClickCanvas, style: { background: 'url(' + _gridHelper.GridHelper.getBase64Image() + ")" } },
 	      _react2.default.createElement(
 	        "g",
-	        { transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
+	        { transform: "scale(" + data.zoomLevel + "," + data.zoomLevel + ")" },
 	        _react2.default.createElement(
 	          "g",
 	          { className: "links" },
@@ -24104,7 +24096,7 @@
 	      { width: data.width, height: data.height, onDrop: _Utility.dummyFunction, onDragOver: _Utility.dummyFunction, onDragEnd: _Utility.dummyFunction, onDoubleClick: _Utility.dummyFunction },
 	      _react2.default.createElement(
 	        "g",
-	        { transform: "scale(" + data.scaleX + "," + data.scaleY + ")" },
+	        { transform: "scale(1,1)" },
 	        _react2.default.createElement(
 	          "g",
 	          { className: "links" },
@@ -24173,17 +24165,6 @@
 	    context.beginPath();
 	    context.arc(0.5, 0.5, 0.5, 0, 2 * Math.PI, false);
 	    setStyle(context);
-
-	    /*context.beginPath();
-	    context.arc(1, iSize-1, 1, 0, 2 * Math.PI, false);
-	    setStyle(context);
-	    
-	    context.beginPath();
-	    context.arc(iSize, iSize, 1, 0, 2 * Math.PI, false);
-	    setStyle(context);
-	    
-	    context.beginPath();
-	    context.arc(iSize, 0, 1, 0, 2 * Math.PI, false);*/
 	    return canvasElement;
 	}
 	function setStyle(context) {
@@ -24713,6 +24694,7 @@
 	  var width = _ref.width;
 	  var height = _ref.height;
 	  var gridSize = _ref.gridSize;
+	  var zoomLevel = _ref.zoomLevel;
 
 	  return _react2.default.createElement(
 	    "div",
@@ -24725,7 +24707,7 @@
 	        null,
 	        "宽度"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "width", min: "300", defaultValue: width })
+	      _react2.default.createElement("input", { type: "number", name: "width", min: "300", defaultValue: parseInt(width * zoomLevel) })
 	    ),
 	    _react2.default.createElement(
 	      "div",
@@ -24735,7 +24717,7 @@
 	        null,
 	        "高度"
 	      ),
-	      _react2.default.createElement("input", { type: "number", name: "height", min: "300", defaultValue: height })
+	      _react2.default.createElement("input", { type: "number", name: "height", min: "300", defaultValue: parseInt(height * zoomLevel) })
 	    ),
 	    _react2.default.createElement(
 	      "div",
@@ -25116,7 +25098,7 @@
 				var id = idEle.value;
 				var uuid = (0, _Utility.generateUUID)();
 				if (!id) {
-					id = uuid;
+					id = "";
 				}
 
 				dispatch((0, _actions.createSubPage)({
@@ -25283,7 +25265,7 @@
 	          ),
 	          _react2.default.createElement(
 	            "li",
-	            { className: "dia-center" },
+	            { className: "dia-center hide" },
 	            _react2.default.createElement(
 	              "label",
 	              { className: "dia-label" },
