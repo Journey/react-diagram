@@ -19,6 +19,7 @@ export const transformBindingData = (aData) => {
     aData.forEach((oData)=> {
 	let oDeviceData;
 	var deviceno = oData.deviceno;
+	
 	if(!oBindingData[deviceno]){
 	    oBindingData[deviceno] = [];
 	}
@@ -28,10 +29,39 @@ export const transformBindingData = (aData) => {
     return oBindingData;
 };
 
+/**
+ * transform external element status data. will be used to update element image by status
+ * @param {Array} aData
+ *   [{
+ *     "$id":"1",
+ *     "datasource":null,
+ *     "deviceno":"N5-BC",
+ *     "deviceproperty":"电池电量",
+ *     "propertyvalue":"true",
+ *     "occurtime":"2015-04-30T16:07:51",
+ *     "id":null,"name":"电池"
+ *   }]
+ */
 export const transformElementsStatus = (aData) => {
-    //todo
-    console.log("todo");
+    var oStatus = {};
+    aData.forEach((oData)=> {
+	oStatus[oData.deviceno] =  _transfromStatusValue(oData.propertyvalue);
+    });
+    return oStatus;
 };
+
+/**
+ * transfrom status value to status id in pallet data.
+ * @param {} sValue
+ * @returns {} 
+ */
+function _transfromStatusValue(sValue){
+    //todo
+    if(sValue){//运行
+	return 1;
+    }
+    return 3; //停机
+}
 
 /**
  * transfrom signal type data which will be used on the common element property section

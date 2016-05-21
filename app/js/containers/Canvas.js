@@ -11,6 +11,7 @@ import {
 }
 from "../Util/StoreHelper";
 import {DataHelper} from "../Util/DataHelper";
+import {PalletDataHelper} from "../Util/PalletDataHelper";
 import {
     addElement,
     moveElement,
@@ -131,9 +132,10 @@ const mapDispatchtoProps = (dispatch) => {
             var key = evt.currentTarget.getAttribute("data-key");
             let elementInfo = StoreHelper.getCanvasElmentInfoById(key);
             let [x, y, width, height] = [elementInfo.x, elementInfo.y, elementInfo.width, elementInfo.height];
-            dispatch(selectElement(key, x, y, width, height));
-            evt.preventDefault();
-            evt.stopPropagation();
+	    
+		dispatch(selectElement(key, x, y, width, height));
+	    evt.preventDefault();
+	    evt.stopPropagation();
         },
         /**
          * dbclick on the blan area, will trigger the whole canvas selected
@@ -193,6 +195,11 @@ const mapDispatchtoProps = (dispatch) => {
             if (StoreHelper.hasSubPage(identifier)) {
                 dispatch(openSubPage(DataHelper.getSubpaper(identifier)));
             }
+	    let elementInfo = StoreHelper.getCanvasElmentInfoById(elementKey);
+	    if(PalletDataHelper.isXuqiuce(elementInfo.id)){
+		//todo:: open in a new tab
+		console.log("this is xuqiuce");
+	    } 
         },
 	closeSubPage:(event) => {
 	    dispatch(closeSubPage());  

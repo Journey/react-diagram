@@ -8,6 +8,8 @@ import {
     StoreHelper
 } from "./StoreHelper";
 import {ElementHelper} from "./ElementHelper";
+import {PalletDataHelper} from "./PalletDataHelper";
+
 function _updatePlaceholdersValues(elements,properties,oValues){
     return Object.keys(elements).filter((sEleKey)=>{
 	if(ElementHelper.isPlaceHolder(elements[sEleKey].id)){
@@ -23,8 +25,30 @@ function _updatePlaceholdersValues(elements,properties,oValues){
 	return oPre;
     },{});
 }
+/**
+ * update the element image url by path
+ * @param {} elements
+ * @param {} properties
+ * @param {Object} oValues {devicenum:statusid}
+ * @returns {} 
+ */
 function _updateElementsStatus(elements,properties,oValues){
-    return {};
+    var oElements = {};
+    Object.keys(oValues).forEach((sDeviceNum)=> {
+	var elementUUID = Object.keys(properties).find((uuid)=>{
+	    var property = properties[uuid];
+	    if(property && property.deviceInfo && property.deviceInfo.identifier === sDeviceNum){
+		return true;
+	    }
+	    return false;
+	});
+	if(elementUUID){
+	    var element = elements[elementUUID];
+	    var image = PalletDataHelper.getDeviceStatusImage(element.id, oValues[sDeviceNum]);
+	    oElements[elementUUID] = Object.assign({},elements[elementUUID],{image:image});
+	}
+    });
+    return oElements;
 }
 export const updatePlaceholderValues = (oValues) => {
     var elements = StoreHelper.getElements();
@@ -56,7 +80,7 @@ export const papers = {
 	},
     /**
      * 
-     * @param {Object} oValues the values which represent element status
+     * @param {Object} oValues the values which represent element status {devcieNum:statusId}
      * @returns {Object}  oPapers The papers with new status
      */
     updateElementsStatus(oValues){
@@ -64,7 +88,7 @@ export const papers = {
 	Object.keys(oPapers)
 	    .forEach((paperKey)=>{
 		var paper = oPapers[paperKey];
-		var updatedElements = _updateElementsStatus(paper.elements,paper.properties);
+		var updatedElements = _updateElementsStatus(paper.elements,paper.properties,oValues);
 		papers.elements = Object.assign({},paper.elements,updatedElements);
 	    });
 	return oPapers;
@@ -146,6 +170,15 @@ export const papers = {
 	    return aErrorMessages;
 	}
 	return false;
+    },
+    getElementUUIDbyDeviceNumber: function(oPapers,sDeviceNumber){
+	var oElement = Object.keys(oPapers).find((oPaper) => {
+	    return paper.getDeviceByDeviceNumber(oPaper,sDeviceNumber);
+	});
+	if(oElement){
+	    return oElement.uuid;
+	}
+	return null;
     }
 };
 
@@ -175,6 +208,20 @@ export const paper = {
 		return false;
 	    });
     },
+    getDeviceByDeviceNumber(paper, deviceNumber){
+	var properties = paper.properties;
+	return Object.keys(properties)
+	    .find((uuid)=>{
+		var property = properties[uuid];
+		var curDeviceNumber = ElementHelper.getDeviceNumber(property);
+		if(deviceNumber && curDeviceNumber === deviceNumber){
+		    return true;
+		}
+		return false;
+	    });
+    },
+        
+
     
     checkDuplicateBindingInfo(oElementProperty){
 	var oMeasureId = {};
