@@ -12,6 +12,7 @@ import {
 from "../Util/StoreHelper";
 import {DataHelper} from "../Util/DataHelper";
 import {PalletDataHelper} from "../Util/PalletDataHelper";
+import {callbacks} from "../ext/callbacks";
 import {
     addElement,
     moveElement,
@@ -199,6 +200,7 @@ const mapDispatchtoProps = (dispatch) => {
 	    if(PalletDataHelper.isXuqiuce(elementInfo.id)){
 		//todo:: open in a new tab
 		console.log("this is xuqiuce");
+		callbacks.openNew(identifier);
 	    } 
         },
 	closeSubPage:(event) => {

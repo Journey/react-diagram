@@ -56,6 +56,9 @@ export const API = (() => {
 	registeSaveDiagram(fSave){
 	    callbacks.saveDiagram = fSave;
 	},
+	registeCallback(fCallback){
+	    callbacks.openNew = fCallback;
+	},
 	reset(oPapers){
 	    oPapers = transformPapers(oPapers);
 	    DataHelper.inResetting = true;

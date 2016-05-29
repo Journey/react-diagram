@@ -6,6 +6,7 @@ import {TextProperties} from "./TextElement.jsx";
 import {PlaceholderProperties} from "./PlaceHolder.jsx";
 import {GroupProperties} from "./GroupElement.jsx";
 import {paper as PaperHelper} from "../Util/PaperHelper";
+import {DataHelper} from "../Util/DataHelper";
 /**
 * 
 * @param {} width
@@ -71,7 +72,7 @@ const MeasureInfo = ({name,identifier,type,onRemoveMeasurePoint,index,onMeasureP
 	  <label>类型</label>
 	  <select name="type" defaultValue={type} data-index={index} onChange={onMeasurePointValueChange}>
 	    {
-	      DefaultValues.signalTypes.map((oType)=>{
+	      DataHelper.signalTypes.map((oType)=>{
 		return <option key={generateUUID()} value={oType.id}>{oType.name}</option>
 	      })
 	    }

@@ -23237,11 +23237,11 @@
 
 	var _Canvas = __webpack_require__(200);
 
-	var _Property = __webpack_require__(206);
+	var _Property = __webpack_require__(207);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _Toolbar = __webpack_require__(208);
+	var _Toolbar = __webpack_require__(209);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
@@ -23787,6 +23787,8 @@
 
 	var _PalletDataHelper = __webpack_require__(189);
 
+	var _callbacks = __webpack_require__(206);
+
 	var _actions = __webpack_require__(199);
 
 	var _Utility = __webpack_require__(191);
@@ -23960,6 +23962,7 @@
 	            if (_PalletDataHelper.PalletDataHelper.isXuqiuce(elementInfo.id)) {
 	                //todo:: open in a new tab
 	                console.log("this is xuqiuce");
+	                _callbacks.callbacks.openNew(identifier);
 	            }
 	        },
 	        closeSubPage: function closeSubPage(event) {
@@ -24532,6 +24535,37 @@
 
 /***/ },
 /* 206 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	   value: true
+	});
+	//callback function for saveDiagram
+	var _saveDiagram = null;
+	var _openNew = null;
+	var callbacks = exports.callbacks = {
+	   get saveDiagram() {
+	      return _saveDiagram;
+	   },
+	   set saveDiagram(fSave) {
+	      _saveDiagram = fSave;
+	   },
+	   clear: function clear() {
+	      _saveDiagram = null;
+	   },
+
+	   get openNew() {
+	      return _openNew;
+	   },
+	   set openNew(fValue) {
+	      _openNew = fValue;
+	   }
+	};
+
+/***/ },
+/* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24542,7 +24576,7 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Property = __webpack_require__(207);
+	var _Property = __webpack_require__(208);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
@@ -24753,7 +24787,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Property2.default);
 
 /***/ },
-/* 207 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24781,6 +24815,8 @@
 	var _GroupElement = __webpack_require__(205);
 
 	var _PaperHelper = __webpack_require__(192);
+
+	var _DataHelper = __webpack_require__(182);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24923,7 +24959,7 @@
 	        _react2.default.createElement(
 	          "select",
 	          { name: "type", defaultValue: type, "data-index": index, onChange: onMeasurePointValueChange },
-	          _DefaultValues.DefaultValues.signalTypes.map(function (oType) {
+	          _DataHelper.DataHelper.signalTypes.map(function (oType) {
 	            return _react2.default.createElement(
 	              "option",
 	              { key: (0, _Utility.generateUUID)(), value: oType.id },
@@ -25140,7 +25176,7 @@
 	exports.default = Property;
 
 /***/ },
-/* 208 */
+/* 209 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25155,7 +25191,7 @@
 
 	var _PaperHelper = __webpack_require__(192);
 
-	var _callbacks = __webpack_require__(209);
+	var _callbacks = __webpack_require__(206);
 
 	var _Toolbar = __webpack_require__(210);
 
@@ -25241,29 +25277,6 @@
 	};
 
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Toolbar2.default);
-
-/***/ },
-/* 209 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	   value: true
-	});
-	//callback function for saveDiagram
-	var _saveDiagram = null;
-	var callbacks = exports.callbacks = {
-	   get saveDiagram() {
-	      return _saveDiagram;
-	   },
-	   set saveDiagram(fSave) {
-	      _saveDiagram = fSave;
-	   },
-	   clear: function clear() {
-	      _saveDiagram = null;
-	   }
-	};
 
 /***/ },
 /* 210 */
@@ -25579,7 +25592,7 @@
 
 	var _StoreHelper = __webpack_require__(183);
 
-	var _callbacks = __webpack_require__(209);
+	var _callbacks = __webpack_require__(206);
 
 	var _Data = __webpack_require__(214);
 
@@ -25639,6 +25652,9 @@
 									},
 									registeSaveDiagram: function registeSaveDiagram(fSave) {
 													_callbacks.callbacks.saveDiagram = fSave;
+									},
+									registeCallback: function registeCallback(fCallback) {
+													_callbacks.callbacks.openNew = fCallback;
 									},
 									reset: function reset(oPapers) {
 													oPapers = (0, _Data.transformPapers)(oPapers);
