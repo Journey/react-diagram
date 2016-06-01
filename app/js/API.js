@@ -1,5 +1,6 @@
 import {DataHelper} from "./Util/DataHelper";
 import {StoreHelper} from "./Util/StoreHelper";
+import {OperationWrapper} from "./Util/OperationHistory";
 import {callbacks} from "./ext/callbacks";
 import {transformBindingData, transformElementsStatus, transformPapers} from "./Adapter/Data";
 import {updateBindingData,updateStatus, resetDiagram} from "./actions";
@@ -64,6 +65,7 @@ export const API = (() => {
 	    DataHelper.inResetting = true;
 	    DataHelper.papers = oPapers;
 	    this.dispatch(resetDiagram(oPapers));
+	    OperationWrapper.reset();
 	    DataHelper.inResetting = false;
 	}
     };

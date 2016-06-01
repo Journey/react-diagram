@@ -12,7 +12,9 @@ import {
 from "../Util/StoreHelper";
 import {DataHelper} from "../Util/DataHelper";
 import {PalletDataHelper} from "../Util/PalletDataHelper";
+import {OperationWrapper} from "../Util/OperationHistory";
 import {callbacks} from "../ext/callbacks";
+import {UNDO_REDO_LINKS,UNDO_REDO_ELEMENTS,UNDO_REDO_SVGPROPERTIES} from "../consts";
 import {
     addElement,
     moveElement,
@@ -43,6 +45,13 @@ import {
 }
 from "../consts";
 
+function logElements(){
+    OperationWrapper.addUndoElements();
+}
+function logLinks(){
+    OperationWrapper.addUndoLinks();
+}
+
 const mapStateToProps = (state) => {
     return {
         width: state.svgProperties.width,
@@ -72,7 +81,8 @@ const mapDispatchtoProps = (dispatch) => {
             position = Position.correctElementPosition(position);
             let oContext = getDragContextObject(evt);
             switch (oContext.type) {
-                case TYPE_PALLETELEMENT:
+            case TYPE_PALLETELEMENT:
+		logElements();
                     dispatch(addElement(oContext.id, position.x, position.y));
                     break;
                 case TYPE_CANVASELEMENT:
@@ -95,6 +105,8 @@ const mapDispatchtoProps = (dispatch) => {
          */
         removeElement: (evt) => {
             let key = evt.currentTarget.getAttribute("data-element-key");
+	    logElements();
+	    logLinks();
             dispatch(removeLines(key));
             dispatch(removeElement(key));
             let {
@@ -104,6 +116,7 @@ const mapDispatchtoProps = (dispatch) => {
         },
         removeLine: (event) => {
             let key = event.currentTarget.getAttribute("data-line-key");
+	    logLinks();
             dispatch(removeLine(key));
         },
         /**
@@ -181,6 +194,7 @@ const mapDispatchtoProps = (dispatch) => {
             if (LineHelper.isSamePort(startInfo, endInfo)) {
                 LineHelper.clearStartInfo();
             } else {
+		logLinks();
                 dispatch(addLine(startInfo, endInfo));
             }
         },

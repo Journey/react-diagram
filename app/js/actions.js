@@ -33,7 +33,10 @@ import {
     UI_STATUS_UPDATE,
     RESET_DIAGRAM,
     SAVE_PAGE_INFO,
-    TOGGLE_EXPAND
+    TOGGLE_EXPAND,
+    UNDO_REDO_SVGPROPERTIES,
+    UNDO_REDO_ELEMENTS,
+    UNDO_REDO_LINKS
 } from "./consts";
 export const palletElementDragStart = (id) => {
     return {
@@ -309,5 +312,23 @@ export const toggleExpand = (groupId) => {
     return {
 	type: TOGGLE_EXPAND,
 	data: groupId
+    };
+};
+export const undoRedoSVGProerties = (oSvgProperties) => {
+    return {
+	type: UNDO_REDO_SVGPROPERTIES,
+	data: oSvgProperties
+    };
+};
+export const undoRedoElements = (oElements) => {
+    return {
+	type: UNDO_REDO_ELEMENTS,
+	data: oElements
+    };
+};
+export const undoRedoLinks = (oLinks) => {
+    return {
+	type: UNDO_REDO_LINKS,
+	data: oLinks
     };
 };

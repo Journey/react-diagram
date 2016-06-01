@@ -79,6 +79,9 @@ export const StoreHelper = (() => {
 	    }
 	    return 1;
 	},
+	getLinks:()=>{
+	    return _getLinks();
+	},
 	getElements: ()=>{
 	    return _getElements();
 	},

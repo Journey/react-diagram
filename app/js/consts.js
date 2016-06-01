@@ -53,3 +53,6 @@ export const RESET_DIAGRAM = "Reset diagram, happens when the switch to an compl
 
 export const SAVE_PAGE_INFO = "Save Page info - page name,bindningId(only for subPage)";
 export const TOGGLE_EXPAND = "Toggle expand on pallet group";
+export const UNDO_REDO_SVGPROPERTIES = "UNDO redo svgproperties";
+export const UNDO_REDO_ELEMENTS = "undo redo elements";
+export const UNDO_REDO_LINKS = "undo redo links";
