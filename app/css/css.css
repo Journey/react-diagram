@@ -14,13 +14,13 @@
     margin: 3px 3px;
 }
 .dia-header{
-    font-size: 1.2rem;
-    line-height: 3rem;
+   /* font-size: 1.2rem;
+    line-height: 3rem;*/
 }
 .dia-title{
-    font-size: 2rem;
+   /* font-size: 2rem;
     line-height: 4rem;
-    font-weight: 700;
+    font-weight: 700;*/
 }
 .dia-flex{
     /*position:relative;*/
@@ -119,8 +119,8 @@ g.link path{
     margin: 8px 6px;
 }
 .pro-area .pro-header{
-    font-size: 16px;
-    font-weight: 800;
+   /* font-size: 16px;
+    font-weight: 800;*/
 }
 .operator-hightlight{
     stroke: #ffb7b7;

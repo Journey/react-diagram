@@ -60,17 +60,17 @@
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
-	var _App = __webpack_require__(196);
+	var _App = __webpack_require__(197);
 
 	var _StoreHelper = __webpack_require__(183);
 
-	var _API = __webpack_require__(213);
+	var _API = __webpack_require__(214);
 
 	var _DataHelper = __webpack_require__(182);
 
-	var _gridHelper = __webpack_require__(202);
+	var _gridHelper = __webpack_require__(203);
 
-	var _Data = __webpack_require__(214);
+	var _Data = __webpack_require__(215);
 
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : { default: obj };
@@ -21167,13 +21167,13 @@
 
 	var _CanvasReducer = __webpack_require__(190);
 
-	var _PropertyReducer = __webpack_require__(193);
+	var _PropertyReducer = __webpack_require__(194);
 
 	var _PropertyReducer2 = _interopRequireDefault(_PropertyReducer);
 
-	var _TabsReducer = __webpack_require__(194);
+	var _TabsReducer = __webpack_require__(195);
 
-	var _SelectsReducer = __webpack_require__(195);
+	var _SelectsReducer = __webpack_require__(196);
 
 	function _interopRequireDefault(obj) {
 	    return obj && obj.__esModule ? obj : { default: obj };
@@ -21493,6 +21493,9 @@
 	                return svgProperties.zoomLevel;
 	            }
 	            return 1;
+	        },
+	        getLinks: function getLinks() {
+	            return _getLinks();
 	        },
 	        getElements: function getElements() {
 	            return _getElements();
@@ -22196,6 +22199,9 @@
 
 	var SAVE_PAGE_INFO = exports.SAVE_PAGE_INFO = "Save Page info - page name,bindningId(only for subPage)";
 	var TOGGLE_EXPAND = exports.TOGGLE_EXPAND = "Toggle expand on pallet group";
+	var UNDO_REDO_SVGPROPERTIES = exports.UNDO_REDO_SVGPROPERTIES = "UNDO redo svgproperties";
+	var UNDO_REDO_ELEMENTS = exports.UNDO_REDO_ELEMENTS = "undo redo elements";
+	var UNDO_REDO_LINKS = exports.UNDO_REDO_LINKS = "undo redo links";
 
 /***/ },
 /* 189 */
@@ -22280,7 +22286,7 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-				value: true
+	    value: true
 	});
 	exports.secondLevelPage = exports.operator = exports.links = exports.elements = exports.svgProperties = undefined;
 
@@ -22298,12 +22304,14 @@
 
 	var _PaperHelper = __webpack_require__(192);
 
+	var _OperationHistory = __webpack_require__(193);
+
 	function _defineProperty(obj, key, value) {
-				if (key in obj) {
-							Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
-				} else {
-							obj[key] = value;
-				}return obj;
+	    if (key in obj) {
+	        Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+	    } else {
+	        obj[key] = value;
+	    }return obj;
 	}
 
 	/**
@@ -22313,46 +22321,49 @@
 	 * @returns {} 
 	 */
 	var svgProperties = function svgProperties() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.svgProperties : arguments[0];
-				var action = arguments[1];
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.svgProperties : arguments[0];
+	    var action = arguments[1];
 
-				var newState = state;
-				var _origZoomLevel = state.zoomLevel;
-				var _newZoomLevel = void 0;
-				switch (action.type) {
-							case _consts.ZOOM_IN:
-										_newZoomLevel = _origZoomLevel + 0.2;
-										newState = Object.assign({}, state, {
-													zoomLevel: _newZoomLevel
-										});
-										break;
-							case _consts.ZOOM_OUT:
-										_newZoomLevel = _origZoomLevel - 0.2;
-										if (_newZoomLevel <= 0) {
-													_newZoomLevel = 0.2;
-										}
-										newState = Object.assign({}, state, {
-													zoomLevel: _newZoomLevel
-										});
-										break;
-							case _consts.SAVE_SVG_PROPERTIES:
-										newState = Object.assign({}, state, {
-													width: action.width,
-													height: action.height,
-													gridSize: action.gridSize
-										});
-										break;
-							case _consts.SWITCH_SUB_PAPER:
-										newState = Object.assign({}, action.paper.svgProperties);
-										break;
-							case _consts.RESET_DIAGRAM:
-										newState = _DataHelper.DataHelper.svgProperties;
-										break;
-							/*
-	         default:
-	      newState = DataHelper.svgProperties;*/
-				}
-				return newState;
+	    var newState = state;
+	    var _origZoomLevel = state.zoomLevel;
+	    var _newZoomLevel = void 0;
+	    var paperId = _StoreHelper.StoreHelper.getSelectedPaperId();
+	    switch (action.type) {
+	        case _consts.ZOOM_IN:
+	            _newZoomLevel = _origZoomLevel + 0.2;
+	            newState = Object.assign({}, state, {
+	                zoomLevel: _newZoomLevel
+	            });
+	            break;
+	        case _consts.ZOOM_OUT:
+	            _newZoomLevel = _origZoomLevel - 0.2;
+	            if (_newZoomLevel <= 0) {
+	                _newZoomLevel = 0.2;
+	            }
+	            newState = Object.assign({}, state, {
+	                zoomLevel: _newZoomLevel
+	            });
+	            break;
+	        case _consts.SAVE_SVG_PROPERTIES:
+	            newState = Object.assign({}, state, {
+	                width: action.width,
+	                height: action.height,
+	                gridSize: action.gridSize
+	            });
+	            break;
+	        case _consts.SWITCH_SUB_PAPER:
+	            newState = Object.assign({}, action.paper.svgProperties);
+	            break;
+	        case _consts.RESET_DIAGRAM:
+	            newState = _DataHelper.DataHelper.svgProperties;
+	            break;
+	        case _consts.UNDO_REDO_SVGPROPERTIES:
+	            newState = Object.assign({}, action.data);
+	        /*
+	        default:
+	        newState = DataHelper.svgProperties;*/
+	    }
+	    return newState;
 	};
 	/**
 	 * the elements of the canvas
@@ -22361,65 +22372,75 @@
 	 * @returns {} 
 	 */
 	var elements = function elements() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.elements : arguments[0];
-				var action = arguments[1];
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.elements : arguments[0];
+	    var action = arguments[1];
 
-				var newState = void 0,
-				    newElement = void 0;
-				switch (action.type) {
-							case _consts.UPDATE_GEOMETRIC_DATA:
-										//save geometric data to elements
-										var key = action.id;
-										newElement = Object.assign({}, state[key], {
-													width: action.width,
-													height: action.height,
-													x: action.x,
-													y: action.y
-										});
-										newState = Object.assign({}, state, _defineProperty({}, key, newElement));
-										break;
-							case _consts.ADD_ELEMENT:
-										key = (0, _Utility.generateUUID)();
-										var element = _StoreHelper.StoreHelper.getPalletElementInfoById(action.id);
-										newElement = Object.assign({}, element, { key: key, x: action.x, y: action.y });
-										newState = Object.assign({}, state);
-										newState[key] = newElement;
-										break;
-							case _consts.MOVE_ELEMENT:
-										var currentElement = state[action.id];
-										var updatedElement = Object.assign({}, currentElement, {
-													x: action.x,
-													y: action.y
-										});
-										var wrapElement = _defineProperty({}, action.id, updatedElement);
-										newState = Object.assign({}, state, wrapElement);
-										break;
-							case _consts.REMOVE_ELEMENT:
-										newState = Object.assign({}, state);
-										delete newState[action.id];
-										break;
-							case _consts.SWITCH_SUB_PAPER:
-										newState = Object.assign({}, action.paper.elements);
-										break;
-							case _consts.UPDATE_TEXT_ELEMENT:
-										var textElement = Object.assign({}, state[action.elementId], { text: action.text });
-										newState = Object.assign({}, state, _defineProperty({}, textElement.key, textElement));
-										break;
-							case _consts.UI_DATA_UPDATE:
-										var oNewPlaceholders = (0, _PaperHelper.updatePlaceholderValues)(action.data);
-										newState = Object.assign({}, state, oNewPlaceholders);
-										break;
-							case _consts.UI_STATUS_UPDATE:
-										var oNewElements = (0, _PaperHelper.updateElementsStatus)(action.data);
-										newState = Object.assign({}, state, oNewElements);
-										break;
-							case _consts.RESET_DIAGRAM:
-										newState = Object.assign({}, _DataHelper.DataHelper.elements);
-										break;
-							default:
-										newState = state;
-				}
-				return newState;
+	    var newState = void 0,
+	        newElement = void 0;
+	    var paperId = _StoreHelper.StoreHelper.getSelectedPaperId();
+	    switch (action.type) {
+	        case _consts.UPDATE_GEOMETRIC_DATA:
+	            //save geometric data to elements
+	            var key = action.id;
+	            newElement = Object.assign({}, state[key], {
+	                width: action.width,
+	                height: action.height,
+	                x: action.x,
+	                y: action.y
+	            });
+	            newState = Object.assign({}, state, _defineProperty({}, key, newElement));
+	            break;
+	        case _consts.ADD_ELEMENT:
+	            key = (0, _Utility.generateUUID)();
+	            var element = _StoreHelper.StoreHelper.getPalletElementInfoById(action.id);
+	            newElement = Object.assign({}, element, {
+	                key: key,
+	                x: action.x,
+	                y: action.y
+	            });
+	            newState = Object.assign({}, state);
+	            newState[key] = newElement;
+	            break;
+	        case _consts.MOVE_ELEMENT:
+	            var currentElement = state[action.id];
+	            var updatedElement = Object.assign({}, currentElement, {
+	                x: action.x,
+	                y: action.y
+	            });
+	            var wrapElement = _defineProperty({}, action.id, updatedElement);
+	            newState = Object.assign({}, state, wrapElement);
+	            break;
+	        case _consts.REMOVE_ELEMENT:
+	            newState = Object.assign({}, state);
+	            delete newState[action.id];
+	            break;
+	        case _consts.SWITCH_SUB_PAPER:
+	            newState = Object.assign({}, action.paper.elements);
+	            break;
+	        case _consts.UPDATE_TEXT_ELEMENT:
+	            var textElement = Object.assign({}, state[action.elementId], {
+	                text: action.text
+	            });
+	            newState = Object.assign({}, state, _defineProperty({}, textElement.key, textElement));
+	            break;
+	        case _consts.UI_DATA_UPDATE:
+	            var oNewPlaceholders = (0, _PaperHelper.updatePlaceholderValues)(action.data);
+	            newState = Object.assign({}, state, oNewPlaceholders);
+	            break;
+	        case _consts.UI_STATUS_UPDATE:
+	            var oNewElements = (0, _PaperHelper.updateElementsStatus)(action.data);
+	            newState = Object.assign({}, state, oNewElements);
+	            break;
+	        case _consts.RESET_DIAGRAM:
+	            newState = Object.assign({}, _DataHelper.DataHelper.elements);
+	            break;
+	        case _consts.UNDO_REDO_ELEMENTS:
+	            newState = Object.assign({}, action.data);
+	            break;
+	        default:
+	            newState = state;
+	    }
+	    return newState;
 	};
 	/**
 	 * the links which connected the elements
@@ -22428,107 +22449,117 @@
 	 * @returns {} 
 	 */
 	var links = function links() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.links : arguments[0];
-				var action = arguments[1];
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.links : arguments[0];
+	    var action = arguments[1];
 
-				switch (action.type) {
-							case _consts.UPDATE_LINES:
-										//todo update lines which related to the element
-										var aRefLinks = _StoreHelper.StoreHelper.getRefLinksByElementKey(action.id);
-										var oUpdatedLinks = _StoreHelper.StoreHelper.getUpdatedLinks(aRefLinks);
-										return Object.assign({}, state, oUpdatedLinks);
-										break;
-							case _consts.REMOVE_LINES:
-										aRefLinks = _StoreHelper.StoreHelper.getRefLinksByElementKey(action.id);
-										var newLinks = Object.assign({}, state);
-										aRefLinks.forEach(function (key) {
-													delete newLinks[key];
-										});
-										return newLinks;
-										break;
-							case _consts.REMOVE_LINE:
-										newLinks = Object.assign({}, state);
-										delete newLinks[action.id];
-										return newLinks;
-										break;
-							case _consts.ADD_LINE:
-										var key = (0, _Utility.generateUUID)();
-										var startPoint = _StoreHelper.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
-										var endPoint = _StoreHelper.StoreHelper.getPortPosition(action.endPort.elementKey, action.endPort.position);
-										var path = _Utility.LineHelper.getPath(startPoint, endPoint);
-										return Object.assign({}, state, _defineProperty({}, key, {
-													key: key,
-													startPort: action.startPort,
-													endPort: action.endPort,
-													path: path
-										}));
-										break;
-							case _consts.SWITCH_SUB_PAPER:
-										return Object.assign({}, action.paper.links);
-										break;
-							case _consts.RESET_DIAGRAM:
-										return Object.assign({}, _DataHelper.DataHelper.links);
-										break;
-				}
-				return state;
+	    var paperId = _StoreHelper.StoreHelper.getSelectedPaperId();
+	    switch (action.type) {
+	        case _consts.UPDATE_LINES:
+	            //todo update lines which related to the element
+	            var aRefLinks = _StoreHelper.StoreHelper.getRefLinksByElementKey(action.id);
+	            var oUpdatedLinks = _StoreHelper.StoreHelper.getUpdatedLinks(aRefLinks);
+	            return Object.assign({}, state, oUpdatedLinks);
+	            break;
+	        case _consts.REMOVE_LINES:
+	            aRefLinks = _StoreHelper.StoreHelper.getRefLinksByElementKey(action.id);
+	            var newLinks = Object.assign({}, state);
+	            aRefLinks.forEach(function (key) {
+	                delete newLinks[key];
+	            });
+	            return newLinks;
+	            break;
+	        case _consts.REMOVE_LINE:
+	            newLinks = Object.assign({}, state);
+	            delete newLinks[action.id];
+	            return newLinks;
+	            break;
+	        case _consts.ADD_LINE:
+	            var key = (0, _Utility.generateUUID)();
+	            var startPoint = _StoreHelper.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
+	            var endPoint = _StoreHelper.StoreHelper.getPortPosition(action.endPort.elementKey, action.endPort.position);
+	            var path = _Utility.LineHelper.getPath(startPoint, endPoint);
+	            return Object.assign({}, state, _defineProperty({}, key, {
+	                key: key,
+	                startPort: action.startPort,
+	                endPort: action.endPort,
+	                path: path
+	            }));
+	            break;
+	        case _consts.SWITCH_SUB_PAPER:
+	            return Object.assign({}, action.paper.links);
+	            break;
+	        case _consts.UNDO_REDO_LINKS:
+	            return Object.assign({}, action.data);
+	            break;
+	        case _consts.RESET_DIAGRAM:
+	            return Object.assign({}, _DataHelper.DataHelper.links);
+	            break;
+	    }
+	    return state;
 	};
 	var operator = function operator() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.operator : arguments[0];
-				var action = arguments[1];
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.operator : arguments[0];
+	    var action = arguments[1];
 
-				switch (action.type) {
-							case _consts.MOVE_ELEMENT:
-										if (state.id === action.id) {
-													return Object.assign({}, state, {
-																x: action.x,
-																y: action.y
-													});
-										}
-										return state;
-										break;
-							case _consts.REMOVE_ELEMENT:
-							case _consts.SELECT_CANVAS:
-										return _DefaultValues.DefaultValues.getOperator();
-										break;
-							case _consts.SELECT_ELEMENT:
-							case _consts.UPDATE_GEOMETRIC_DATA:
-										return {
-													id: action.id,
-													x: action.x,
-													y: action.y,
-													width: action.width,
-													height: action.height
-										};
-										break;
-							case _consts.SELECT_LINE:
-										return Object.assign({}, state, { lineId: action.id });
-										break;
-							case _consts.SWITCH_SUB_PAPER:
-										return Object.assign({}, action.paper.operator);
-										break;
-							case _consts.RESET_DIAGRAM:
-										return Object.assign({}, _DataHelper.DataHelper.operator);
-										break;
-							default:
-										return state;
-				}
+	    switch (action.type) {
+	        case _consts.MOVE_ELEMENT:
+	            if (state.id === action.id) {
+	                return Object.assign({}, state, {
+	                    x: action.x,
+	                    y: action.y
+	                });
+	            }
+	            return state;
+	            break;
+	        case _consts.REMOVE_ELEMENT:
+	        case _consts.SELECT_CANVAS:
+	            return _DefaultValues.DefaultValues.getOperator();
+	            break;
+	        case _consts.SELECT_ELEMENT:
+	        case _consts.UPDATE_GEOMETRIC_DATA:
+	            return {
+	                id: action.id,
+	                x: action.x,
+	                y: action.y,
+	                width: action.width,
+	                height: action.height
+	            };
+	            break;
+	        case _consts.SELECT_LINE:
+	            return Object.assign({}, state, {
+	                lineId: action.id
+	            });
+	            break;
+	        case _consts.SWITCH_SUB_PAPER:
+	            return Object.assign({}, action.paper.operator);
+	            break;
+	        case _consts.RESET_DIAGRAM:
+	            return Object.assign({}, _DataHelper.DataHelper.operator);
+	            break;
+	        default:
+	            return state;
+	    }
 	};
 	var secondLevelPage = function secondLevelPage() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.secondLevelPage : arguments[0];
-				var action = arguments[1];
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.secondLevelPage : arguments[0];
+	    var action = arguments[1];
 
-				switch (action.type) {
-							case _consts.OPEN_SUB_PAGE:
-										return Object.assign({}, action.paper, { hide: false });
-										break;
-							case _consts.CLOSE_SUB_PAGE:
-										return Object.assign({}, state, { hide: true });
-										break;
-							case _consts.RESET_DIAGRAM:
-										return Object.assign({}, _DataHelper.DataHelper.secondLevelPage);
-										break;
-				}
-				return state;
+	    switch (action.type) {
+	        case _consts.OPEN_SUB_PAGE:
+	            return Object.assign({}, action.paper, {
+	                hide: false
+	            });
+	            break;
+	        case _consts.CLOSE_SUB_PAGE:
+	            return Object.assign({}, state, {
+	                hide: true
+	            });
+	            break;
+	        case _consts.RESET_DIAGRAM:
+	            return Object.assign({}, _DataHelper.DataHelper.secondLevelPage);
+	            break;
+	    }
+	    return state;
 	};
 	exports.svgProperties = svgProperties;
 	exports.elements = elements;
@@ -22950,6 +22981,112 @@
 	Object.defineProperty(exports, "__esModule", {
 				value: true
 	});
+	exports.OperationWrapper = exports.OperationHistory = undefined;
+
+	var _StoreHelper = __webpack_require__(183);
+
+	var _consts = __webpack_require__(188);
+
+	/**
+	 * undo history: {paperid:[{type:"",data:[]}]}
+	 */
+	var _undos = {};
+	var _redos = {};
+	var _currentProjectId = null;
+
+	function addOperation(type, data, aHistory) {
+				data = JSON.parse(data);
+				aHistory.push({
+							type: type,
+							data: data
+				});
+	}
+
+	var OperationHistory = exports.OperationHistory = {
+				clear: function clear() {
+							_currentProjectId = null;
+							_undos = {};
+							_redos = {};
+				},
+				addUndo: function addUndo(paperId, type, data) {
+							if (!_undos[paperId]) {
+										_undos[paperId] = [];
+							}
+							data = JSON.stringify(data);
+							if (data) {
+										addOperation(type, data, _undos[paperId]);
+							}
+				},
+				addRedo: function addRedo(paperId, type, data) {
+							if (!_redos[paperId]) {
+										_redos[paperId] = [];
+							}
+							data = JSON.stringify(data);
+							if (data) {
+										addOperation(type, data, _redos[paperId]);
+							}
+				},
+				popUndo: function popUndo(paperId) {
+							if (_undos[paperId] && _undos[paperId].length > 0) {
+										return _undos[paperId].pop();
+							}
+							return null;
+				},
+				popRedo: function popRedo(paperId) {
+							if (_redos[paperId] && _redos[paperId].length > 0) {
+										return _redos[paperId].pop();
+							}
+							return null;
+				}
+	};
+
+	var OperationWrapper = exports.OperationWrapper = {
+				addRedoElements: function addRedoElements() {
+							var data = _StoreHelper.StoreHelper.getElements();
+							OperationWrapper.addRedo(_consts.UNDO_REDO_ELEMENTS, data);
+				},
+				addRedoLinks: function addRedoLinks() {
+							var data = _StoreHelper.StoreHelper.getLinks();
+							OperationWrapper.addRedo(_consts.UNDO_REDO_LINKS, data);
+				},
+				addRedo: function addRedo(type, data) {
+							var paperId = _StoreHelper.StoreHelper.getSelectedPaperId();
+							OperationHistory.addRedo(paperId, type, data);
+				},
+				addUndoElements: function addUndoElements() {
+							var data = _StoreHelper.StoreHelper.getElements();
+							OperationWrapper.addUndo(_consts.UNDO_REDO_ELEMENTS, data);
+				},
+				addUndoLinks: function addUndoLinks() {
+							var data = _StoreHelper.StoreHelper.getLinks();
+							OperationHistory.addUndo(_consts.UNDO_REDO_LINKS, data);
+				},
+				addUndo: function addUndo(type, data) {
+							var paperId = _StoreHelper.StoreHelper.getSelectedPaperId();
+							OperationHistory.addUndo(paperId, type, data);
+				},
+				popUndo: function popUndo() {
+							var paperId = _StoreHelper.StoreHelper.getSelectedPaperId();
+							return OperationHistory.popUndo(paperId);
+				},
+				popRedo: function popRedo() {
+							var paperId = _StoreHelper.StoreHelper.getSelectedPaperId();
+							return OperationHistory.popRedo(paperId);
+				},
+				reset: function reset() {
+							OperationHistory.clear();
+				}
+	};
+
+/***/ },
+/* 194 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+				value: true
+	});
 	exports.pageInfo = exports.properties = undefined;
 
 	var _Utility = __webpack_require__(191);
@@ -23087,7 +23224,7 @@
 	exports.default = properties;
 
 /***/ },
-/* 194 */
+/* 195 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23163,7 +23300,7 @@
 	exports.selectedPaperId = selectedPaperId;
 
 /***/ },
-/* 195 */
+/* 196 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23217,7 +23354,7 @@
 	};
 
 /***/ },
-/* 196 */
+/* 197 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23231,21 +23368,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Pallet = __webpack_require__(197);
+	var _Pallet = __webpack_require__(198);
 
 	var _Pallet2 = _interopRequireDefault(_Pallet);
 
-	var _Canvas = __webpack_require__(200);
+	var _Canvas = __webpack_require__(201);
 
-	var _Property = __webpack_require__(207);
+	var _Property = __webpack_require__(208);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _Toolbar = __webpack_require__(209);
+	var _Toolbar = __webpack_require__(210);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _Tabs = __webpack_require__(211);
+	var _Tabs = __webpack_require__(212);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23303,7 +23440,7 @@
 	exports.StaticApp = StaticApp;
 
 /***/ },
-/* 197 */
+/* 198 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23314,11 +23451,11 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Pallet = __webpack_require__(198);
+	var _Pallet = __webpack_require__(199);
 
 	var _Pallet2 = _interopRequireDefault(_Pallet);
 
-	var _actions = __webpack_require__(199);
+	var _actions = __webpack_require__(200);
 
 	var _Utility = __webpack_require__(191);
 
@@ -23350,7 +23487,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Pallet2.default);
 
 /***/ },
-/* 198 */
+/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23472,7 +23609,7 @@
 	exports.default = Pallet;
 
 /***/ },
-/* 199 */
+/* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23480,7 +23617,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.toggleExpand = exports.savePageInfo = exports.resetDiagram = exports.updateStatus = exports.updateBindingData = exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
+	exports.undoRedoLinks = exports.undoRedoElements = exports.undoRedoSVGProerties = exports.toggleExpand = exports.savePageInfo = exports.resetDiagram = exports.updateStatus = exports.updateBindingData = exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
 	var _consts = __webpack_require__(188);
 
@@ -23765,9 +23902,27 @@
 	        data: groupId
 	    };
 	};
+	var undoRedoSVGProerties = exports.undoRedoSVGProerties = function undoRedoSVGProerties(oSvgProperties) {
+	    return {
+	        type: _consts.UNDO_REDO_SVGPROPERTIES,
+	        data: oSvgProperties
+	    };
+	};
+	var undoRedoElements = exports.undoRedoElements = function undoRedoElements(oElements) {
+	    return {
+	        type: _consts.UNDO_REDO_ELEMENTS,
+	        data: oElements
+	    };
+	};
+	var undoRedoLinks = exports.undoRedoLinks = function undoRedoLinks(oLinks) {
+	    return {
+	        type: _consts.UNDO_REDO_LINKS,
+	        data: oLinks
+	    };
+	};
 
 /***/ },
-/* 200 */
+/* 201 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23779,7 +23934,7 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Canvas = __webpack_require__(201);
+	var _Canvas = __webpack_require__(202);
 
 	var _StoreHelper = __webpack_require__(183);
 
@@ -23787,13 +23942,22 @@
 
 	var _PalletDataHelper = __webpack_require__(189);
 
-	var _callbacks = __webpack_require__(206);
+	var _OperationHistory = __webpack_require__(193);
 
-	var _actions = __webpack_require__(199);
+	var _callbacks = __webpack_require__(207);
+
+	var _consts = __webpack_require__(188);
+
+	var _actions = __webpack_require__(200);
 
 	var _Utility = __webpack_require__(191);
 
-	var _consts = __webpack_require__(188);
+	function logElements() {
+	    _OperationHistory.OperationWrapper.addUndoElements();
+	}
+	function logLinks() {
+	    _OperationHistory.OperationWrapper.addUndoLinks();
+	}
 
 	var mapStateToProps = function mapStateToProps(state) {
 	    return {
@@ -23825,6 +23989,7 @@
 	            var oContext = (0, _Utility.getDragContextObject)(evt);
 	            switch (oContext.type) {
 	                case _consts.TYPE_PALLETELEMENT:
+	                    logElements();
 	                    dispatch((0, _actions.addElement)(oContext.id, position.x, position.y));
 	                    break;
 	                case _consts.TYPE_CANVASELEMENT:
@@ -23847,6 +24012,8 @@
 	         */
 	        removeElement: function removeElement(evt) {
 	            var key = evt.currentTarget.getAttribute("data-element-key");
+	            logElements();
+	            logLinks();
 	            dispatch((0, _actions.removeLines)(key));
 	            dispatch((0, _actions.removeElement)(key));
 
@@ -23860,6 +24027,7 @@
 	        },
 	        removeLine: function removeLine(event) {
 	            var key = event.currentTarget.getAttribute("data-line-key");
+	            logLinks();
 	            dispatch((0, _actions.removeLine)(key));
 	        },
 	        /**
@@ -23943,6 +24111,7 @@
 	            if (_Utility.LineHelper.isSamePort(startInfo, endInfo)) {
 	                _Utility.LineHelper.clearStartInfo();
 	            } else {
+	                logLinks();
 	                dispatch((0, _actions.addLine)(startInfo, endInfo));
 	            }
 	        },
@@ -24000,7 +24169,7 @@
 	exports.StaticSecondLevelCanvas = StaticSecondLevelCanvas;
 
 /***/ },
-/* 201 */
+/* 202 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24020,17 +24189,17 @@
 
 	var _Utility = __webpack_require__(191);
 
-	var _gridHelper = __webpack_require__(202);
+	var _gridHelper = __webpack_require__(203);
 
-	var _TextElement = __webpack_require__(203);
+	var _TextElement = __webpack_require__(204);
 
 	var _TextElement2 = _interopRequireDefault(_TextElement);
 
-	var _PlaceHolder = __webpack_require__(204);
+	var _PlaceHolder = __webpack_require__(205);
 
 	var _PlaceHolder2 = _interopRequireDefault(_PlaceHolder);
 
-	var _GroupElement = __webpack_require__(205);
+	var _GroupElement = __webpack_require__(206);
 
 	var _GroupElement2 = _interopRequireDefault(_GroupElement);
 
@@ -24254,7 +24423,7 @@
 	exports.StaticCanvasWithClose = StaticCanvasWithClose;
 
 /***/ },
-/* 202 */
+/* 203 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -24296,7 +24465,7 @@
 	};
 
 /***/ },
-/* 203 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24377,7 +24546,7 @@
 	exports.default = TextElement;
 
 /***/ },
-/* 204 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24458,7 +24627,7 @@
 	exports.default = PlaceholderElement;
 
 /***/ },
-/* 205 */
+/* 206 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24534,7 +24703,7 @@
 	exports.default = GroupElement;
 
 /***/ },
-/* 206 */
+/* 207 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -24565,7 +24734,7 @@
 	};
 
 /***/ },
-/* 207 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24576,11 +24745,11 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Property = __webpack_require__(208);
+	var _Property = __webpack_require__(209);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _actions = __webpack_require__(199);
+	var _actions = __webpack_require__(200);
 
 	var _consts = __webpack_require__(188);
 
@@ -24787,7 +24956,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Property2.default);
 
 /***/ },
-/* 208 */
+/* 209 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24808,11 +24977,11 @@
 
 	var _DefaultValues = __webpack_require__(184);
 
-	var _TextElement = __webpack_require__(203);
+	var _TextElement = __webpack_require__(204);
 
-	var _PlaceHolder = __webpack_require__(204);
+	var _PlaceHolder = __webpack_require__(205);
 
-	var _GroupElement = __webpack_require__(205);
+	var _GroupElement = __webpack_require__(206);
 
 	var _PaperHelper = __webpack_require__(192);
 
@@ -25176,13 +25345,13 @@
 	exports.default = Property;
 
 /***/ },
-/* 209 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	    value: true
 	});
 
 	var _reactRedux = __webpack_require__(159);
@@ -25191,95 +25360,130 @@
 
 	var _PaperHelper = __webpack_require__(192);
 
-	var _callbacks = __webpack_require__(206);
+	var _callbacks = __webpack_require__(207);
 
-	var _Toolbar = __webpack_require__(210);
+	var _Toolbar = __webpack_require__(211);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _actions = __webpack_require__(199);
+	var _OperationHistory = __webpack_require__(193);
+
+	var _consts = __webpack_require__(188);
+
+	var _actions = __webpack_require__(200);
 
 	function _interopRequireDefault(obj) {
-		return obj && obj.__esModule ? obj : { default: obj };
+	    return obj && obj.__esModule ? obj : { default: obj };
 	}
 
 	var mapStateToProps = function mapStateToProps(state) {
-		return {
-			selectedPaperId: state.selectedPaperId,
-			papers: state.papers
-		};
+	    return {
+	        selectedPaperId: state.selectedPaperId,
+	        papers: state.papers
+	    };
 	};
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
-		return {
-			onZoomIn: function onZoomIn(evt) {
-				dispatch((0, _actions.zoomIn)());
-			},
-			onZoomOut: function onZoomOut() {
-				dispatch((0, _actions.zoomOut)());
-			},
-			onRedo: function onRedo(event) {
-				dispatch((0, _actions.redo)());
-			},
-			onUndo: function onUndo(event) {
-				dispatch((0, _actions.undo)());
-			},
-			onCreateSubPage: function onCreateSubPage(event) {
-				var containerEle = event.target.parentElement.parentElement;
-				var overlayEle = containerEle.querySelector("div.dia-overlay");
-				overlayEle.style.display = "";
-			},
-			onSaveSubPage: function onSaveSubPage(event) {
-				var subCreateEle = event.target.parentElement.parentElement.parentElement;
-				var typeEle = subCreateEle.querySelector("select");
-				var nameEle = subCreateEle.querySelector("input[name=name]");
-				var idEle = subCreateEle.querySelector("input[name=identify]");
-				var name = nameEle.value;
-				var paperType = parseInt(typeEle.value);
-				if (!name) {
-					return;
-				}
-				var id = idEle.value;
-				var uuid = (0, _Utility.generateUUID)();
-				if (!id) {
-					id = "";
-				}
+	    return {
+	        onZoomIn: function onZoomIn(evt) {
+	            dispatch((0, _actions.zoomIn)());
+	        },
+	        onZoomOut: function onZoomOut() {
+	            dispatch((0, _actions.zoomOut)());
+	        },
+	        onRedo: function onRedo(event) {
+	            var operation = _OperationHistory.OperationWrapper.popRedo();
+	            if (operation) {
+	                switch (operation.type) {
+	                    case _consts.UNDO_REDO_LINKS:
+	                        _OperationHistory.OperationWrapper.addUndoLinks();
+	                        dispatch((0, _actions.undoRedoLinks)(operation.data));
+	                        break;
+	                    case _consts.UNDO_REDO_SVGPROPERTIES:
+	                        dispatch((0, _actions.undoRedoSVGProerties)(operation.data));
+	                        break;
+	                    case _consts.UNDO_REDO_ELEMENTS:
+	                        _OperationHistory.OperationWrapper.addUndoElements();
+	                        dispatch((0, _actions.undoRedoElements)(operation.data));
+	                        break;
+	                }
+	            }
+	        },
+	        onUndo: function onUndo(event) {
+	            var operation = _OperationHistory.OperationWrapper.popUndo();
+	            if (operation) {
+	                switch (operation.type) {
+	                    case _consts.UNDO_REDO_SVGPROPERTIES:
+	                        dispatch((0, _actions.undoRedoSVGProerties)(operation.data));
+	                        break;
+	                    case _consts.UNDO_REDO_ELEMENTS:
+	                        _OperationHistory.OperationWrapper.addRedoElements();
+	                        dispatch((0, _actions.undoRedoElements)(operation.data));
+	                        break;
+	                    case _consts.UNDO_REDO_LINKS:
+	                        _OperationHistory.OperationWrapper.addRedoLinks();
+	                        dispatch((0, _actions.undoRedoLinks)(operation.data));
+	                        break;
+	                }
+	            }
+	        },
+	        onCreateSubPage: function onCreateSubPage(event) {
+	            var containerEle = event.target.parentElement.parentElement;
+	            var overlayEle = containerEle.querySelector("div.dia-overlay");
+	            overlayEle.style.display = "";
+	        },
+	        onSaveSubPage: function onSaveSubPage(event) {
+	            var subCreateEle = event.target.parentElement.parentElement.parentElement;
+	            var typeEle = subCreateEle.querySelector("select");
+	            var nameEle = subCreateEle.querySelector("input[name=name]");
+	            var idEle = subCreateEle.querySelector("input[name=identify]");
+	            var name = nameEle.value;
+	            var paperType = parseInt(typeEle.value);
+	            if (!name) {
+	                return;
+	            }
+	            var id = idEle.value;
+	            var uuid = (0, _Utility.generateUUID)();
+	            if (!id) {
+	                id = "";
+	            }
 
-				dispatch((0, _actions.createSubPage)({
-					name: name,
-					type: paperType,
-					key: id,
-					uuid: uuid
-				}));
-				subCreateEle.style.display = "none";
-				nameEle.value = "";
-				idEle.value = "";
-			},
-			onCancelSubPage: function onCancelSubPage(event) {
-				var overlayEle = event.target.parentElement.parentElement.parentElement;
-				overlayEle.style.display = "none";
-			},
-			onSave: function onSave(event) {
-				_Utility.StoreHelper.storeData();
-				var oValideResult = _PaperHelper.papers.validateData();
-				if (oValideResult.isValide) {
-					console.log(JSON.stringify(_Utility.StoreHelper.getPapers(), function (key, value) {
-						return value;
-					}));
-					oValideResult.data = _Utility.StoreHelper.getPapers();
-					console.log(_Utility.StoreHelper.getPapers());
-					_callbacks.callbacks.saveDiagram && _callbacks.callbacks.saveDiagram(oValideResult);
-				} else {
-					console.log("papgers failed validation");
-					console.log(oValideResult);
-				}
-			}
-		};
+	            dispatch((0, _actions.createSubPage)({
+	                name: name,
+	                type: paperType,
+	                key: id,
+	                uuid: uuid
+	            }));
+	            subCreateEle.style.display = "none";
+	            nameEle.value = "";
+	            idEle.value = "";
+	        },
+	        onCancelSubPage: function onCancelSubPage(event) {
+	            var overlayEle = event.target.parentElement.parentElement.parentElement;
+	            overlayEle.style.display = "none";
+	        },
+	        onSave: function onSave(event) {
+	            _Utility.StoreHelper.storeData();
+	            var oValideResult = _PaperHelper.papers.validateData();
+	            if (oValideResult.isValide) {
+	                console.log(JSON.stringify(_Utility.StoreHelper.getPapers(), function (key, value) {
+	                    return value;
+	                }));
+	                oValideResult.data = _Utility.StoreHelper.getPapers();
+	                console.log(_Utility.StoreHelper.getPapers());
+	                _callbacks.callbacks.saveDiagram && _callbacks.callbacks.saveDiagram(oValideResult);
+	            } else {
+	                console.log("papgers failed validation");
+	                console.log(oValideResult);
+	                _callbacks.callbacks.saveDiagram && _callbacks.callbacks.saveDiagram(oValideResult);
+	            }
+	        }
+	    };
 	};
 
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Toolbar2.default);
 
 /***/ },
-/* 210 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25416,7 +25620,7 @@
 	exports.default = Toolbar;
 
 /***/ },
-/* 211 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25434,9 +25638,9 @@
 
 	var _DataHelper = __webpack_require__(182);
 
-	var _Tabs = __webpack_require__(212);
+	var _Tabs = __webpack_require__(213);
 
-	var _actions = __webpack_require__(199);
+	var _actions = __webpack_require__(200);
 
 	var mapStateToProps = function mapStateToProps(state) {
 					return {
@@ -25481,7 +25685,7 @@
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 212 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25578,7 +25782,7 @@
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 213 */
+/* 214 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25592,11 +25796,13 @@
 
 	var _StoreHelper = __webpack_require__(183);
 
-	var _callbacks = __webpack_require__(206);
+	var _OperationHistory = __webpack_require__(193);
 
-	var _Data = __webpack_require__(214);
+	var _callbacks = __webpack_require__(207);
 
-	var _actions = __webpack_require__(199);
+	var _Data = __webpack_require__(215);
+
+	var _actions = __webpack_require__(200);
 
 	/**
 	 * ApiSingletone: used to store global data of the Component- e.g palletGroup,papers
@@ -25661,6 +25867,7 @@
 													_DataHelper.DataHelper.inResetting = true;
 													_DataHelper.DataHelper.papers = oPapers;
 													this.dispatch((0, _actions.resetDiagram)(oPapers));
+													_OperationHistory.OperationWrapper.reset();
 													_DataHelper.DataHelper.inResetting = false;
 									}
 					};
@@ -25669,7 +25876,7 @@
 	}();
 
 /***/ },
-/* 214 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25679,7 +25886,7 @@
 	});
 	exports.transformPapers = exports.transfromPalletGroupData = exports.transformSignalTypes = exports.transformElementsStatus = exports.transformBindingData = undefined;
 
-	var _PalletData = __webpack_require__(215);
+	var _PalletData = __webpack_require__(216);
 
 	/**
 	 * transformBindingData transform binding data from array to Object.
@@ -25796,7 +26003,7 @@
 	};
 
 /***/ },
-/* 215 */
+/* 216 */
 /***/ function(module, exports) {
 
 	"use strict";
