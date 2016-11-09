@@ -12,26 +12,31 @@ const Toolbar = (state) =>(
     <button name="creat_sub_page" onClick={state.onCreateSubPage}>创建子图</button>
     <button name="delete_sub_page" onClick={state.onSave}>保存</button>
   </div>
-  <div className="dia-overlay" style={{display:'none'}}>
-  <div className="dia-sub-create">
-    <div className="dia-center dia-title">创建子图</div>
-    <ul>
-      <li className="dia-center">
-	<label className="dia-label">类型</label>
-	<select className="dia-field" name="page-type">
-	  <option value="1" defaultVaule>普通页面</option>
-	  <option value="2">二级页面</option>
-	</select>
-      </li>
-      <li className="dia-center"><label className="dia-label">名称</label><input className="dia-field" type="text" name="name"/></li>
-      <li className="dia-center hide"><label className="dia-label">关联设备</label><input  className="dia-field" type="text" name="identify"/></li>
-    </ul>
-    <div className="dia-center">
-      <button onClick={state.onSaveSubPage}>保存</button>
-      <button onClick={state.onCancelSubPage}>取消</button>
-    </div>
-  </div>
-  </div>
+  <div className="modal fade" tabIndex="-1" role="dialog">
+      <div className="modal-dialog">
+	  <div className="modal-content">
+	      <div className="modal-header">
+		  <h4 className="modal-title">创建子图</h4>
+	      </div>
+	      <div className="modal-body">
+		  <ul className="react-form">
+		      <li className="dia-center">
+			  <label className="dia-label">类型</label>
+			  <select className="dia-field" name="page-type">
+			      <option value="1" defaultVaule>普通页面</option>
+			      <option value="2">二级页面</option>
+			  </select>
+		      </li>
+		      <li className="dia-center"><label className="dia-label">名称</label><input className="dia-field" type="text" name="name"/></li>
+		  </ul>
+	      </div>
+	      <div className="modal-footer">
+		  <button type="button" className="btn btn-default" onClick={state.onSaveSubPage}>保存</button>
+		  <button type="button" className="btn btn-primary" onClick={state.onCancelSubPage}>取消</button>
+	      </div>
+	  </div>
+      </div>
+  </div>     
   </div>
 );
 

@@ -24048,6 +24048,18 @@
 	            evt.dataTransfer.dropEffect = "copy";
 	            evt.dataTransfer.effectAllowed = "copyMove";
 	            _Utility.Position.logElementMistake(evt, evt.target, window, document);
+
+	            /*var clientRect = evt.target.getBoundingClientRect();
+	            var offsetX    = (evt.clientX - clientRect.left);
+	            var offsetY    = (evt.clientY - clientRect.top);
+	            var dragImage = new Image();
+	            var image = evt.target;
+	            dragImage.src = image.getAttribute("xlink:href");
+	            dragImage.width = image.getAttribute("width");
+	            dragImage.height = image.getAttribute("height");
+	            evt.dataTransfer.setDragImage(dragImage, offsetX, offsetY);*/
+	            //evt.preventDefault();
+	            //return false;
 	        },
 	        /**
 	         * todo::double click on an elements
@@ -24616,7 +24628,7 @@
 	        _react2.default.createElement(
 	          "label",
 	          null,
-	          "id"
+	          "测点编号"
 	        ),
 	        _react2.default.createElement("input", { name: "binding-id", "data-element-key": elementKey, type: "text", defaultValue: bindingId })
 	      )
@@ -24962,7 +24974,7 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+			value: true
 	});
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -24999,347 +25011,347 @@
 	* @returns {} 
 	*/
 	var SVGProperties = function SVGProperties(_ref) {
-	  var width = _ref.width;
-	  var height = _ref.height;
-	  var gridSize = _ref.gridSize;
-	  var zoomLevel = _ref.zoomLevel;
+			var width = _ref.width;
+			var height = _ref.height;
+			var gridSize = _ref.gridSize;
+			var zoomLevel = _ref.zoomLevel;
 
-	  return _react2.default.createElement(
-	    "div",
-	    null,
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-row" },
-	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "宽度"
-	      ),
-	      _react2.default.createElement("input", { type: "number", name: "width", min: "300", defaultValue: parseInt(width * zoomLevel) })
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-row" },
-	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "高度"
-	      ),
-	      _react2.default.createElement("input", { type: "number", name: "height", min: "300", defaultValue: parseInt(height * zoomLevel) })
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-row hide" },
-	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "网格大小"
-	      ),
-	      _react2.default.createElement("input", { type: "number", name: "gridSize", step: "10", min: "10", max: "30", defaultValue: gridSize })
-	    )
-	  );
+			return _react2.default.createElement(
+					"div",
+					null,
+					_react2.default.createElement(
+							"div",
+							{ className: "pro-row" },
+							_react2.default.createElement(
+									"label",
+									null,
+									"页面宽度"
+							),
+							_react2.default.createElement("input", { type: "number", name: "width", min: "300", defaultValue: parseInt(width * zoomLevel) })
+					),
+					_react2.default.createElement(
+							"div",
+							{ className: "pro-row" },
+							_react2.default.createElement(
+									"label",
+									null,
+									"页面高度"
+							),
+							_react2.default.createElement("input", { type: "number", name: "height", min: "300", defaultValue: parseInt(height * zoomLevel) })
+					),
+					_react2.default.createElement(
+							"div",
+							{ className: "pro-row hide" },
+							_react2.default.createElement(
+									"label",
+									null,
+									"网格大小"
+							),
+							_react2.default.createElement("input", { type: "number", name: "gridSize", step: "10", min: "10", max: "30", defaultValue: gridSize })
+					)
+			);
 	};
 	//only for 二级界面，更改绑定的信息
 	var PaperProperties = function PaperProperties(_ref2) {
-	  var paperType = _ref2.paperType;
-	  var paperName = _ref2.paperName;
-	  var bindingId = _ref2.bindingId;
+			var paperType = _ref2.paperType;
+			var paperName = _ref2.paperName;
+			var bindingId = _ref2.bindingId;
 
-	  var paperId = "";
-	  if (_PaperHelper.paper.isSubPage(paperType)) {
-	    paperId = _react2.default.createElement(
-	      "div",
-	      { className: "pro-row" },
-	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "关联设备"
-	      ),
-	      _react2.default.createElement("input", { type: "text", name: "pageId", defaultValue: bindingId })
-	    );
-	  }
-	  return _react2.default.createElement(
-	    "div",
-	    null,
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-row" },
-	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "页面名称"
-	      ),
-	      _react2.default.createElement("input", { type: "text", name: "pageName", defaultValue: paperName })
-	    ),
-	    paperId
-	  );
+			var paperId = "";
+			if (_PaperHelper.paper.isSubPage(paperType)) {
+					paperId = _react2.default.createElement(
+							"div",
+							{ className: "pro-row" },
+							_react2.default.createElement(
+									"label",
+									null,
+									"关联设备"
+							),
+							_react2.default.createElement("input", { type: "text", name: "pageId", defaultValue: bindingId })
+					);
+			}
+			return _react2.default.createElement(
+					"div",
+					null,
+					_react2.default.createElement(
+							"div",
+							{ className: "pro-row" },
+							_react2.default.createElement(
+									"label",
+									null,
+									"页面名称"
+							),
+							_react2.default.createElement("input", { type: "text", name: "pageName", defaultValue: paperName })
+					),
+					paperId
+			);
 	};
 	var MeasureInfo = function MeasureInfo(_ref3) {
-	  var name = _ref3.name;
-	  var identifier = _ref3.identifier;
-	  var type = _ref3.type;
-	  var onRemoveMeasurePoint = _ref3.onRemoveMeasurePoint;
-	  var index = _ref3.index;
-	  var onMeasurePointValueChange = _ref3.onMeasurePointValueChange;
+			var name = _ref3.name;
+			var identifier = _ref3.identifier;
+			var type = _ref3.type;
+			var onRemoveMeasurePoint = _ref3.onRemoveMeasurePoint;
+			var index = _ref3.index;
+			var onMeasurePointValueChange = _ref3.onMeasurePointValueChange;
 
-	  return _react2.default.createElement(
-	    "div",
-	    { className: "measure-template" },
-	    _react2.default.createElement(
-	      "div",
-	      { className: "measure-remove", style: { display: "block" } },
-	      _react2.default.createElement(
-	        "button",
-	        { onClick: onRemoveMeasurePoint, "data-index": index },
-	        "删除"
-	      )
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      null,
-	      _react2.default.createElement(
-	        "div",
-	        { className: "pro-row" },
-	        _react2.default.createElement(
-	          "label",
-	          null,
-	          "名称"
-	        ),
-	        _react2.default.createElement("input", { type: "text", name: "name", defaultValue: name, "data-index": index, onChange: onMeasurePointValueChange })
-	      ),
-	      _react2.default.createElement(
-	        "div",
-	        { className: "pro-row" },
-	        _react2.default.createElement(
-	          "label",
-	          null,
-	          "编号"
-	        ),
-	        _react2.default.createElement("input", { type: "text", name: "identifier", defaultValue: identifier, "data-index": index, onChange: onMeasurePointValueChange })
-	      ),
-	      _react2.default.createElement(
-	        "div",
-	        { className: "pro-row" },
-	        _react2.default.createElement(
-	          "label",
-	          null,
-	          "类型"
-	        ),
-	        _react2.default.createElement(
-	          "select",
-	          { name: "type", defaultValue: type, "data-index": index, onChange: onMeasurePointValueChange },
-	          _DataHelper.DataHelper.signalTypes.map(function (oType) {
-	            return _react2.default.createElement(
-	              "option",
-	              { key: (0, _Utility.generateUUID)(), value: oType.id },
-	              oType.name
-	            );
-	          })
-	        )
-	      )
-	    )
-	  );
+			return _react2.default.createElement(
+					"div",
+					{ className: "measure-template" },
+					_react2.default.createElement(
+							"div",
+							{ className: "measure-remove", style: { display: "block" } },
+							_react2.default.createElement(
+									"button",
+									{ onClick: onRemoveMeasurePoint, "data-index": index },
+									"删除"
+							)
+					),
+					_react2.default.createElement(
+							"div",
+							null,
+							_react2.default.createElement(
+									"div",
+									{ className: "pro-row" },
+									_react2.default.createElement(
+											"label",
+											null,
+											"名称"
+									),
+									_react2.default.createElement("input", { type: "text", name: "name", defaultValue: name, "data-index": index, onChange: onMeasurePointValueChange })
+							),
+							_react2.default.createElement(
+									"div",
+									{ className: "pro-row" },
+									_react2.default.createElement(
+											"label",
+											null,
+											"编号"
+									),
+									_react2.default.createElement("input", { type: "text", name: "identifier", defaultValue: identifier, "data-index": index, onChange: onMeasurePointValueChange })
+							),
+							_react2.default.createElement(
+									"div",
+									{ className: "pro-row" },
+									_react2.default.createElement(
+											"label",
+											null,
+											"类型"
+									),
+									_react2.default.createElement(
+											"select",
+											{ name: "type", defaultValue: type, "data-index": index, onChange: onMeasurePointValueChange },
+											_DataHelper.DataHelper.signalTypes.map(function (oType) {
+													return _react2.default.createElement(
+															"option",
+															{ key: (0, _Utility.generateUUID)(), value: oType.id },
+															oType.name
+													);
+											})
+									)
+							)
+					)
+			);
 	};
 	var GeometricDataElement = function GeometricDataElement(_ref4) {
-	  var width = _ref4.width;
-	  var height = _ref4.height;
-	  var x = _ref4.x;
-	  var y = _ref4.y;
-	  var onGeometricDataChange = _ref4.onGeometricDataChange;
+			var width = _ref4.width;
+			var height = _ref4.height;
+			var x = _ref4.x;
+			var y = _ref4.y;
+			var onGeometricDataChange = _ref4.onGeometricDataChange;
 
-	  return _react2.default.createElement(
-	    "div",
-	    { className: "pro-geo-data" },
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-header" },
-	      "几何数据"
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-row" },
-	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "宽度"
-	      ),
-	      _react2.default.createElement("input", { type: "number", name: "width", step: "1", min: "10", max: "1000", defaultValue: width, onBlur: onGeometricDataChange })
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-row" },
-	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "高度"
-	      ),
-	      _react2.default.createElement("input", { type: "number", name: "height", step: "1", min: "10", max: "1000", defaultValue: height, onBlur: onGeometricDataChange })
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-row" },
-	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "x轴"
-	      ),
-	      _react2.default.createElement("input", { type: "number", name: "xAxies", step: "1", min: "10", max: "1000", defaultValue: x, onBlur: onGeometricDataChange })
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-row" },
-	      _react2.default.createElement(
-	        "label",
-	        null,
-	        "y轴"
-	      ),
-	      _react2.default.createElement("input", { type: "number", name: "yAxies", step: "1", min: "10", max: "1000", defaultValue: y, onBlur: onGeometricDataChange })
-	    )
-	  );
+			return _react2.default.createElement(
+					"div",
+					{ className: "pro-geo-data" },
+					_react2.default.createElement(
+							"div",
+							{ className: "pro-header" },
+							"几何数据"
+					),
+					_react2.default.createElement(
+							"div",
+							{ className: "pro-row" },
+							_react2.default.createElement(
+									"label",
+									null,
+									"宽度"
+							),
+							_react2.default.createElement("input", { type: "number", name: "width", step: "1", min: "10", max: "1000", defaultValue: width, onBlur: onGeometricDataChange })
+					),
+					_react2.default.createElement(
+							"div",
+							{ className: "pro-row" },
+							_react2.default.createElement(
+									"label",
+									null,
+									"高度"
+							),
+							_react2.default.createElement("input", { type: "number", name: "height", step: "1", min: "10", max: "1000", defaultValue: height, onBlur: onGeometricDataChange })
+					),
+					_react2.default.createElement(
+							"div",
+							{ className: "pro-row" },
+							_react2.default.createElement(
+									"label",
+									null,
+									"x 轴"
+							),
+							_react2.default.createElement("input", { type: "number", name: "xAxies", step: "1", min: "10", max: "1000", defaultValue: x, onBlur: onGeometricDataChange })
+					),
+					_react2.default.createElement(
+							"div",
+							{ className: "pro-row" },
+							_react2.default.createElement(
+									"label",
+									null,
+									"y 轴"
+							),
+							_react2.default.createElement("input", { type: "number", name: "yAxies", step: "1", min: "10", max: "1000", defaultValue: y, onBlur: onGeometricDataChange })
+					)
+			);
 	};
 	var CommonElement = function CommonElement(_ref5) {
-	  var geometricData = _ref5.geometricData;
-	  var elementKey = _ref5.elementKey;
-	  var deviceInfo = _ref5.deviceInfo;
-	  var measurePointInfos = _ref5.measurePointInfos;
-	  var onAddMeasurePoint = _ref5.onAddMeasurePoint;
-	  var onRemoveMeasurePoint = _ref5.onRemoveMeasurePoint;
-	  var onMeasurePointValueChange = _ref5.onMeasurePointValueChange;
-	  var onGeometricDataChange = _ref5.onGeometricDataChange;
+			var geometricData = _ref5.geometricData;
+			var elementKey = _ref5.elementKey;
+			var deviceInfo = _ref5.deviceInfo;
+			var measurePointInfos = _ref5.measurePointInfos;
+			var onAddMeasurePoint = _ref5.onAddMeasurePoint;
+			var onRemoveMeasurePoint = _ref5.onRemoveMeasurePoint;
+			var onMeasurePointValueChange = _ref5.onMeasurePointValueChange;
+			var onGeometricDataChange = _ref5.onGeometricDataChange;
 
 
-	  return _react2.default.createElement(
-	    "div",
-	    null,
-	    _react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, geometricData, { onGeometricDataChange: onGeometricDataChange })),
-	    _react2.default.createElement(
-	      "div",
-	      { className: "pro-deviceInfo", "data-element-key": elementKey },
-	      _react2.default.createElement(
-	        "div",
-	        { className: "pro-header" },
-	        "设备"
-	      ),
-	      _react2.default.createElement(
-	        "div",
-	        { className: "pro-row" },
-	        _react2.default.createElement(
-	          "label",
-	          null,
-	          "名称"
-	        ),
-	        _react2.default.createElement("input", { type: "text", name: "name", defaultValue: deviceInfo.name })
-	      ),
-	      _react2.default.createElement(
-	        "div",
-	        { className: "pro-row" },
-	        _react2.default.createElement(
-	          "label",
-	          null,
-	          "编号"
-	        ),
-	        _react2.default.createElement("input", { type: "text", name: "identifier", defaultValue: deviceInfo.identifier })
-	      )
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      { className: "measure-info" },
-	      _react2.default.createElement(
-	        "div",
-	        { className: "pro-header" },
-	        _react2.default.createElement(
-	          "span",
-	          null,
-	          "测点"
-	        ),
-	        " ",
-	        _react2.default.createElement(
-	          "button",
-	          { type: "button", onClick: onAddMeasurePoint },
-	          "+"
-	        ),
-	        " "
-	      ),
-	      measurePointInfos.map(function (oBinding, index) {
-	        return _react2.default.createElement(MeasureInfo, _extends({}, oBinding, { key: (0, _Utility.generateUUID)(), index: index, onRemoveMeasurePoint: onRemoveMeasurePoint, onMeasurePointValueChange: onMeasurePointValueChange }));
-	      })
-	    )
-	  );
+			return _react2.default.createElement(
+					"div",
+					null,
+					_react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, geometricData, { onGeometricDataChange: onGeometricDataChange })),
+					_react2.default.createElement(
+							"div",
+							{ className: "pro-deviceInfo", "data-element-key": elementKey },
+							_react2.default.createElement(
+									"div",
+									{ className: "pro-header" },
+									"设备"
+							),
+							_react2.default.createElement(
+									"div",
+									{ className: "pro-row" },
+									_react2.default.createElement(
+											"label",
+											null,
+											"名称"
+									),
+									_react2.default.createElement("input", { type: "text", name: "name", defaultValue: deviceInfo.name })
+							),
+							_react2.default.createElement(
+									"div",
+									{ className: "pro-row" },
+									_react2.default.createElement(
+											"label",
+											null,
+											"编号"
+									),
+									_react2.default.createElement("input", { type: "text", name: "identifier", defaultValue: deviceInfo.identifier })
+							)
+					),
+					_react2.default.createElement(
+							"div",
+							{ className: "measure-info" },
+							_react2.default.createElement(
+									"div",
+									{ className: "pro-header" },
+									_react2.default.createElement(
+											"span",
+											null,
+											"测点"
+									),
+									" ",
+									_react2.default.createElement(
+											"button",
+											{ type: "button", onClick: onAddMeasurePoint },
+											"+"
+									),
+									" "
+							),
+							measurePointInfos.map(function (oBinding, index) {
+									return _react2.default.createElement(MeasureInfo, _extends({}, oBinding, { key: (0, _Utility.generateUUID)(), index: index, onRemoveMeasurePoint: onRemoveMeasurePoint, onMeasurePointValueChange: onMeasurePointValueChange }));
+							})
+					)
+			);
 	};
 
 	var PropertyFactory = function PropertyFactory(state) {
-	  switch (state.type) {
-	    case _consts.CANVAS:
-	      return _react2.default.createElement(
-	        "div",
-	        null,
-	        _react2.default.createElement(SVGProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties)),
-	        _react2.default.createElement(PaperProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.paperInfo))
-	      );
-	      break;
-	    case _consts.COMMON_ELEMENT:
-	      var elementTypeId = state.selectedProperties.elementTypeId;
-	      if (_Utility.ElementHelper.isText(elementTypeId)) {
-	        return _react2.default.createElement(
-	          "div",
-	          null,
-	          _react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties.geometricData, { onGeometricDataChange: state.onGeometricDataChange })),
-	          _react2.default.createElement(_TextElement.TextProperties, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties))
-	        );
-	      } else if (_Utility.ElementHelper.isGroup(elementTypeId)) {
-	        return _react2.default.createElement(
-	          "div",
-	          null,
-	          _react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties.geometricData, _defineProperty({ onGeometricDataChange: state.onGeometricDataChange }, "onGeometricDataChange", state.onGeometricDataChange))),
-	          _react2.default.createElement(_GroupElement.GroupProperties, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties))
-	        );
-	      } else if (_Utility.ElementHelper.isPlaceHolder(elementTypeId)) {
-	        return _react2.default.createElement(
-	          "div",
-	          null,
-	          _react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties.geometricData, { onGeometricDataChange: state.onGeometricDataChange })),
-	          _react2.default.createElement(_PlaceHolder.PlaceholderProperties, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties))
-	        );
-	      } else {
-	        return _react2.default.createElement(CommonElement, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties, { onAddMeasurePoint: state.onAddMeasurePoint, onRemoveMeasurePoint: state.onRemoveMeasurePoint, onMeasurePointValueChange: state.onMeasurePointValueChange, onGeometricDataChange: state.onGeometricDataChange }));
-	      }
-	      break;
-	    default:
-	      return _react2.default.createElement(
-	        "div",
-	        null,
-	        "empty"
-	      );
-	  }
+			switch (state.type) {
+					case _consts.CANVAS:
+							return _react2.default.createElement(
+									"div",
+									null,
+									_react2.default.createElement(SVGProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties)),
+									_react2.default.createElement(PaperProperties, _extends({ key: (0, _Utility.generateUUID)() }, state.paperInfo))
+							);
+							break;
+					case _consts.COMMON_ELEMENT:
+							var elementTypeId = state.selectedProperties.elementTypeId;
+							if (_Utility.ElementHelper.isText(elementTypeId)) {
+									return _react2.default.createElement(
+											"div",
+											null,
+											_react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties.geometricData, { onGeometricDataChange: state.onGeometricDataChange })),
+											_react2.default.createElement(_TextElement.TextProperties, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties))
+									);
+							} else if (_Utility.ElementHelper.isGroup(elementTypeId)) {
+									return _react2.default.createElement(
+											"div",
+											null,
+											_react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties.geometricData, _defineProperty({ onGeometricDataChange: state.onGeometricDataChange }, "onGeometricDataChange", state.onGeometricDataChange))),
+											_react2.default.createElement(_GroupElement.GroupProperties, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties))
+									);
+							} else if (_Utility.ElementHelper.isPlaceHolder(elementTypeId)) {
+									return _react2.default.createElement(
+											"div",
+											null,
+											_react2.default.createElement(GeometricDataElement, _extends({ key: (0, _Utility.generateUUID)() }, state.selectedProperties.geometricData, { onGeometricDataChange: state.onGeometricDataChange })),
+											_react2.default.createElement(_PlaceHolder.PlaceholderProperties, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties))
+									);
+							} else {
+									return _react2.default.createElement(CommonElement, _extends({ key: (0, _Utility.generateUUID)(), elementKey: state.selectedProperties.key }, state.selectedProperties, { onAddMeasurePoint: state.onAddMeasurePoint, onRemoveMeasurePoint: state.onRemoveMeasurePoint, onMeasurePointValueChange: state.onMeasurePointValueChange, onGeometricDataChange: state.onGeometricDataChange }));
+							}
+							break;
+					default:
+							return _react2.default.createElement(
+									"div",
+									null,
+									"empty"
+							);
+			}
 	};
 	var Property = function Property(state) {
-	  return _react2.default.createElement(
-	    "div",
-	    { className: "pro-area" },
-	    _react2.default.createElement(
-	      "div",
-	      null,
-	      _react2.default.createElement(
-	        "div",
-	        { className: "dia-title" },
-	        "属性"
-	      )
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      null,
-	      PropertyFactory(state),
-	      _react2.default.createElement(
-	        "div",
-	        { className: "align-center" },
-	        _react2.default.createElement(
-	          "button",
-	          { "data-element-type-id": state.selectedProperties.elementTypeId, onClick: state.onSave, "data-key": state.selectedProperties.key, "data-selected-type": state.type },
-	          "保存"
-	        )
-	      )
-	    )
-	  );
+			return _react2.default.createElement(
+					"div",
+					{ className: "pro-area" },
+					_react2.default.createElement(
+							"div",
+							null,
+							_react2.default.createElement(
+									"div",
+									{ className: "dia-title" },
+									"属性"
+							)
+					),
+					_react2.default.createElement(
+							"div",
+							null,
+							PropertyFactory(state),
+							_react2.default.createElement(
+									"div",
+									{ className: "align-center" },
+									_react2.default.createElement(
+											"button",
+											{ "data-element-type-id": state.selectedProperties.elementTypeId, onClick: state.onSave, "data-key": state.selectedProperties.key, "data-selected-type": state.type },
+											"保存"
+									)
+							)
+					)
+			);
 	};
 
 	exports.default = Property;
@@ -25381,7 +25393,8 @@
 	        selectedPaperId: state.selectedPaperId,
 	        papers: state.papers
 	    };
-	};
+	}; //depends on bootstrap.js
+
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
 	    return {
 	        onZoomIn: function onZoomIn(evt) {
@@ -25428,38 +25441,36 @@
 	        },
 	        onCreateSubPage: function onCreateSubPage(event) {
 	            var containerEle = event.target.parentElement.parentElement;
-	            var overlayEle = containerEle.querySelector("div.dia-overlay");
-	            overlayEle.style.display = "";
+	            var overlayEle = containerEle.querySelector("div.modal");
+	            $(overlayEle).modal('show');
 	        },
 	        onSaveSubPage: function onSaveSubPage(event) {
-	            var subCreateEle = event.target.parentElement.parentElement.parentElement;
+	            //get root elements of the modal dialogue
+	            var subCreateEle = event.target.parentElement.parentElement.parentElement.parentElement;
 	            var typeEle = subCreateEle.querySelector("select");
 	            var nameEle = subCreateEle.querySelector("input[name=name]");
-	            var idEle = subCreateEle.querySelector("input[name=identify]");
 	            var name = nameEle.value;
 	            var paperType = parseInt(typeEle.value);
 	            if (!name) {
 	                return;
 	            }
-	            var id = idEle.value;
+	            var id = "";
 	            var uuid = (0, _Utility.generateUUID)();
-	            if (!id) {
-	                id = "";
-	            }
-
 	            dispatch((0, _actions.createSubPage)({
 	                name: name,
 	                type: paperType,
 	                key: id,
 	                uuid: uuid
 	            }));
-	            subCreateEle.style.display = "none";
+
 	            nameEle.value = "";
-	            idEle.value = "";
+	            //depends on bootstrap
+	            $(subCreateEle).modal('hide');
 	        },
 	        onCancelSubPage: function onCancelSubPage(event) {
-	            var overlayEle = event.target.parentElement.parentElement.parentElement;
-	            overlayEle.style.display = "none";
+	            //get root element of the modal, depends on bootstrap
+	            var overlayEle = event.target.parentElement.parentElement.parentElement.parentElement;
+	            $(overlayEle).modal('hide');
 	        },
 	        onSave: function onSave(event) {
 	            _Utility.StoreHelper.storeData();
@@ -25472,7 +25483,6 @@
 	                console.log(_Utility.StoreHelper.getPapers());
 	                _callbacks.callbacks.saveDiagram && _callbacks.callbacks.saveDiagram(oValideResult);
 	            } else {
-	                console.log("papgers failed validation");
 	                console.log(oValideResult);
 	                _callbacks.callbacks.saveDiagram && _callbacks.callbacks.saveDiagram(oValideResult);
 	            }
@@ -25489,7 +25499,7 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+		value: true
 	});
 
 	var _react = __webpack_require__(1);
@@ -25503,118 +25513,120 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Toolbar = function Toolbar(state) {
-	  return _react2.default.createElement(
-	    "div",
-	    null,
-	    _react2.default.createElement(
-	      "div",
-	      { className: "dia-toolbar" },
-	      _react2.default.createElement(
-	        "button",
-	        { name: "zoomin", onClick: state.onZoomIn },
-	        "放大"
-	      ),
-	      _react2.default.createElement(
-	        "button",
-	        { name: "zoomout", onClick: state.onZoomOut },
-	        "缩小"
-	      ),
-	      _react2.default.createElement(
-	        "button",
-	        { name: "redo", onClick: state.onRedo },
-	        "恢复"
-	      ),
-	      _react2.default.createElement(
-	        "button",
-	        { name: "undo", onClick: state.onUndo },
-	        "撤销"
-	      ),
-	      _react2.default.createElement(
-	        "button",
-	        { name: "creat_sub_page", onClick: state.onCreateSubPage },
-	        "创建子图"
-	      ),
-	      _react2.default.createElement(
-	        "button",
-	        { name: "delete_sub_page", onClick: state.onSave },
-	        "保存"
-	      )
-	    ),
-	    _react2.default.createElement(
-	      "div",
-	      { className: "dia-overlay", style: { display: 'none' } },
-	      _react2.default.createElement(
-	        "div",
-	        { className: "dia-sub-create" },
-	        _react2.default.createElement(
-	          "div",
-	          { className: "dia-center dia-title" },
-	          "创建子图"
-	        ),
-	        _react2.default.createElement(
-	          "ul",
-	          null,
-	          _react2.default.createElement(
-	            "li",
-	            { className: "dia-center" },
-	            _react2.default.createElement(
-	              "label",
-	              { className: "dia-label" },
-	              "类型"
-	            ),
-	            _react2.default.createElement(
-	              "select",
-	              { className: "dia-field", name: "page-type" },
-	              _react2.default.createElement(
-	                "option",
-	                { value: "1", defaultVaule: true },
-	                "普通页面"
-	              ),
-	              _react2.default.createElement(
-	                "option",
-	                { value: "2" },
-	                "二级页面"
-	              )
-	            )
-	          ),
-	          _react2.default.createElement(
-	            "li",
-	            { className: "dia-center" },
-	            _react2.default.createElement(
-	              "label",
-	              { className: "dia-label" },
-	              "名称"
-	            ),
-	            _react2.default.createElement("input", { className: "dia-field", type: "text", name: "name" })
-	          ),
-	          _react2.default.createElement(
-	            "li",
-	            { className: "dia-center hide" },
-	            _react2.default.createElement(
-	              "label",
-	              { className: "dia-label" },
-	              "关联设备"
-	            ),
-	            _react2.default.createElement("input", { className: "dia-field", type: "text", name: "identify" })
-	          )
-	        ),
-	        _react2.default.createElement(
-	          "div",
-	          { className: "dia-center" },
-	          _react2.default.createElement(
-	            "button",
-	            { onClick: state.onSaveSubPage },
-	            "保存"
-	          ),
-	          _react2.default.createElement(
-	            "button",
-	            { onClick: state.onCancelSubPage },
-	            "取消"
-	          )
-	        )
-	      )
-	    )
-	  );
+		return _react2.default.createElement(
+			"div",
+			null,
+			_react2.default.createElement(
+				"div",
+				{ className: "dia-toolbar" },
+				_react2.default.createElement(
+					"button",
+					{ name: "zoomin", onClick: state.onZoomIn },
+					"放大"
+				),
+				_react2.default.createElement(
+					"button",
+					{ name: "zoomout", onClick: state.onZoomOut },
+					"缩小"
+				),
+				_react2.default.createElement(
+					"button",
+					{ name: "redo", onClick: state.onRedo },
+					"恢复"
+				),
+				_react2.default.createElement(
+					"button",
+					{ name: "undo", onClick: state.onUndo },
+					"撤销"
+				),
+				_react2.default.createElement(
+					"button",
+					{ name: "creat_sub_page", onClick: state.onCreateSubPage },
+					"创建子图"
+				),
+				_react2.default.createElement(
+					"button",
+					{ name: "delete_sub_page", onClick: state.onSave },
+					"保存"
+				)
+			),
+			_react2.default.createElement(
+				"div",
+				{ className: "modal fade", tabIndex: "-1", role: "dialog" },
+				_react2.default.createElement(
+					"div",
+					{ className: "modal-dialog" },
+					_react2.default.createElement(
+						"div",
+						{ className: "modal-content" },
+						_react2.default.createElement(
+							"div",
+							{ className: "modal-header" },
+							_react2.default.createElement(
+								"h4",
+								{ className: "modal-title" },
+								"创建子图"
+							)
+						),
+						_react2.default.createElement(
+							"div",
+							{ className: "modal-body" },
+							_react2.default.createElement(
+								"ul",
+								{ className: "react-form" },
+								_react2.default.createElement(
+									"li",
+									{ className: "dia-center" },
+									_react2.default.createElement(
+										"label",
+										{ className: "dia-label" },
+										"类型"
+									),
+									_react2.default.createElement(
+										"select",
+										{ className: "dia-field", name: "page-type" },
+										_react2.default.createElement(
+											"option",
+											{ value: "1", defaultVaule: true },
+											"普通页面"
+										),
+										_react2.default.createElement(
+											"option",
+											{ value: "2" },
+											"二级页面"
+										)
+									)
+								),
+								_react2.default.createElement(
+									"li",
+									{ className: "dia-center" },
+									_react2.default.createElement(
+										"label",
+										{ className: "dia-label" },
+										"名称"
+									),
+									_react2.default.createElement("input", { className: "dia-field", type: "text", name: "name" })
+								)
+							)
+						),
+						_react2.default.createElement(
+							"div",
+							{ className: "modal-footer" },
+							_react2.default.createElement(
+								"button",
+								{ type: "button", className: "btn btn-default", onClick: state.onSaveSubPage },
+								"保存"
+							),
+							_react2.default.createElement(
+								"button",
+								{ type: "button", className: "btn btn-primary", onClick: state.onCancelSubPage },
+								"取消"
+							)
+						)
+					)
+				)
+			)
+		);
 	};
 
 	exports.default = Toolbar;
@@ -25642,6 +25654,9 @@
 
 	var _actions = __webpack_require__(200);
 
+	function _getDeletepageConfirmDialog() {
+					return $("#react-diagram-delete-page-confirm");
+	}
 	var mapStateToProps = function mapStateToProps(state) {
 					return {
 									selectedPaperId: state.selectedPaperId,
@@ -25649,16 +25664,26 @@
 					};
 	};
 	var mapDispatchtoProps = function mapDispatchtoProps(dispatch) {
+					var _storedPageId = null;
 					return {
-									deletePaper: function deletePaper(event) {
+									onDeletePressed: function onDeletePressed(event) {
+													//open confirm dialog
 													if (_StoreHelper.StoreHelper.isLastPaper()) {
 																	return;
 													}
-													var paperId = event.target.parentElement.getAttribute("data-paper-id");
-													dispatch((0, _actions.deleteSubPage)(paperId));
-													var paper = _DataHelper.DataHelper.getPaper();;
+													var overlayEle = _getDeletepageConfirmDialog();
+													_storedPageId = event.target.parentElement.getAttribute("data-paper-id");
+													$(overlayEle).modal('show');
+									},
+									hideDeleteConfirm: function hideDeleteConfirm() {
+													_getDeletepageConfirmDialog().modal("hide");
+									},
+									deletePaper: function deletePaper(event) {
+													dispatch((0, _actions.deleteSubPage)(_storedPageId));
+													var paper = _DataHelper.DataHelper.getPaper();
 													dispatch((0, _actions.switchSubPage)(paper));
 													dispatch((0, _actions.selectCanvas)(paper.svgProperties));
+													_getDeletepageConfirmDialog().modal("hide");
 									},
 									clickPaper: function clickPaper(event) {
 													var paperId = event.target.parentElement.getAttribute("data-paper-id");
@@ -25691,7 +25716,7 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+			value: true
 	});
 	exports.StaticTabs = exports.Tabs = undefined;
 
@@ -25703,79 +25728,126 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var Confirm = function Confirm(state) {
+			return _react2.default.createElement(
+					"div",
+					{ className: "modal fade", tabIndex: "-1", role: "dialog", id: "react-diagram-delete-page-confirm" },
+					_react2.default.createElement(
+							"div",
+							{ className: "modal-dialog" },
+							_react2.default.createElement(
+									"div",
+									{ className: "modal-content" },
+									_react2.default.createElement(
+											"div",
+											{ className: "modal-header" },
+											_react2.default.createElement(
+													"h4",
+													{ className: "modal-title" },
+													"确认"
+											)
+									),
+									_react2.default.createElement(
+											"div",
+											{ className: "modal-body" },
+											"确认删除该页面？"
+									),
+									_react2.default.createElement(
+											"div",
+											{ className: "modal-footer" },
+											_react2.default.createElement(
+													"button",
+													{ type: "button", className: "btn btn-default", onClick: state.deletePaper },
+													"确认"
+											),
+											_react2.default.createElement(
+													"button",
+													{ type: "button", className: "btn btn-primary", onClick: state.hideDeleteConfirm },
+													"取消"
+											)
+									)
+							)
+					)
+			);
+	};
 	var Tab = function Tab(_ref) {
-	  var paperId = _ref.paperId;
-	  var paperName = _ref.paperName;
-	  var paperType = _ref.paperType;
-	  var deletePaper = _ref.deletePaper;
-	  var selectPaper = _ref.selectPaper;
-	  var isSelected = _ref.isSelected;
-	  return _react2.default.createElement(
-	    "div",
-	    { className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
-	    _react2.default.createElement(
-	      "span",
-	      { onClick: selectPaper, className: "dia-tab-name" },
-	      paperName
-	    ),
-	    _react2.default.createElement("span", { className: "dia-del-tab bootstrap glyphicon glyphicon-remove", onClick: deletePaper })
-	  );
+			var paperId = _ref.paperId;
+			var paperName = _ref.paperName;
+			var paperType = _ref.paperType;
+			var deletePaper = _ref.deletePaper;
+			var selectPaper = _ref.selectPaper;
+			var isSelected = _ref.isSelected;
+			return _react2.default.createElement(
+					"div",
+					{ className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
+					_react2.default.createElement(
+							"span",
+							{ onClick: selectPaper, className: "dia-tab-name" },
+							paperName
+					),
+					_react2.default.createElement("span", { className: "dia-del-tab bootstrap glyphicon glyphicon-remove", onClick: deletePaper })
+			);
 	};
 	var StaticTab = function StaticTab(_ref2) {
-	  var paperId = _ref2.paperId;
-	  var paperName = _ref2.paperName;
-	  var paperType = _ref2.paperType;
-	  var selectPaper = _ref2.selectPaper;
-	  var isSelected = _ref2.isSelected;
-	  return _react2.default.createElement(
-	    "div",
-	    { className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
-	    _react2.default.createElement(
-	      "span",
-	      { onClick: selectPaper },
-	      paperName
-	    )
-	  );
+			var paperId = _ref2.paperId;
+			var paperName = _ref2.paperName;
+			var paperType = _ref2.paperType;
+			var selectPaper = _ref2.selectPaper;
+			var isSelected = _ref2.isSelected;
+			return _react2.default.createElement(
+					"div",
+					{ className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
+					_react2.default.createElement(
+							"span",
+							{ onClick: selectPaper },
+							paperName
+					)
+			);
 	};
 	var Tabs = function Tabs(data) {
-	  return _react2.default.createElement(
-	    "div",
-	    { className: "dia-tabs" },
-	    Object.keys(data.papers).sort(function (pre, next) {
-	      return data.papers[pre].order - data.papers[next].order;
-	    }).map(function (key) {
-	      var paper = data.papers[key];
-	      return _react2.default.createElement(Tab, {
-	        key: (0, _Utility.generateUUID)(),
-	        paperId: key,
-	        paperName: paper.paperName,
-	        paperType: paper.paperType,
-	        deletePaper: data.deletePaper,
-	        selectPaper: data.clickPaper,
-	        isSelected: data.selectedPaperId === key ? true : false });
-	    })
-	  );
+			return _react2.default.createElement(
+					"div",
+					null,
+					_react2.default.createElement(Confirm, { deletePaper: data.deletePaper, hideDeleteConfirm: data.hideDeleteConfirm }),
+					_react2.default.createElement(
+							"div",
+							{ className: "dia-tabs" },
+							Object.keys(data.papers).sort(function (pre, next) {
+									return data.papers[pre].order - data.papers[next].order;
+							}).map(function (key) {
+									var paper = data.papers[key];
+									return _react2.default.createElement(Tab, {
+											key: (0, _Utility.generateUUID)(),
+											paperId: key,
+											paperName: paper.paperName,
+											paperType: paper.paperType,
+											deletePaper: data.onDeletePressed,
+											selectPaper: data.clickPaper,
+											isSelected: data.selectedPaperId === key ? true : false });
+							})
+					)
+			);
 	};
 
 	var StaticTabs = function StaticTabs(data) {
-	  return _react2.default.createElement(
-	    "div",
-	    { className: "dia-tabs" },
-	    Object.keys(data.papers).sort(function (pre, next) {
-	      return data.papers[pre].order - data.papers[next].order;
-	    }).filter(function (key) {
-	      return data.papers[key].paperType == 1;
-	    }).map(function (key) {
-	      var paper = data.papers[key];
-	      return _react2.default.createElement(StaticTab, {
-	        key: (0, _Utility.generateUUID)(),
-	        paperId: key,
-	        paperName: paper.paperName,
-	        paperType: paper.paperType,
-	        selectPaper: data.clickPaper,
-	        isSelected: data.selectedPaperId === key ? true : false });
-	    })
-	  );
+			return _react2.default.createElement(
+					"div",
+					{ className: "dia-tabs" },
+					Object.keys(data.papers).sort(function (pre, next) {
+							return data.papers[pre].order - data.papers[next].order;
+					}).filter(function (key) {
+							return data.papers[key].paperType == 1;
+					}).map(function (key) {
+							var paper = data.papers[key];
+							return _react2.default.createElement(StaticTab, {
+									key: (0, _Utility.generateUUID)(),
+									paperId: key,
+									paperName: paper.paperName,
+									paperType: paper.paperType,
+									selectPaper: data.clickPaper,
+									isSelected: data.selectedPaperId === key ? true : false });
+					})
+			);
 	};
 
 	exports.Tabs = Tabs;

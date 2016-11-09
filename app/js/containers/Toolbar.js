@@ -1,3 +1,4 @@
+//depends on bootstrap.js
 import {
     connect
 }
@@ -81,38 +82,36 @@ const mapDispatchtoProps = (dispatch) => {
         },
         onCreateSubPage: (event) => {
             var containerEle = event.target.parentElement.parentElement;
-            var overlayEle = containerEle.querySelector("div.dia-overlay");
-            overlayEle.style.display = "";
+            var overlayEle = containerEle.querySelector("div.modal");
+	    $(overlayEle).modal('show');
         },
         onSaveSubPage: (event) => {
-            var subCreateEle = event.target.parentElement.parentElement.parentElement;
+	    //get root elements of the modal dialogue
+            var subCreateEle = event.target.parentElement.parentElement.parentElement.parentElement;
             var typeEle = subCreateEle.querySelector("select");
             var nameEle = subCreateEle.querySelector("input[name=name]");
-            var idEle = subCreateEle.querySelector("input[name=identify]");
             var name = nameEle.value;
             var paperType = parseInt(typeEle.value);
             if (!name) {
                 return;
             }
-            var id = idEle.value;
+            var id = "";
             var uuid = generateUUID();
-            if (!id) {
-                id = "";
-            }
-
             dispatch(createSubPage({
                 name: name,
                 type: paperType,
                 key: id,
                 uuid: uuid
             }));
-            subCreateEle.style.display = "none";
+            
             nameEle.value = "";
-            idEle.value = "";
+	    //depends on bootstrap
+	    $(subCreateEle).modal('hide');
         },
         onCancelSubPage: (event) => {
-            var overlayEle = event.target.parentElement.parentElement.parentElement;
-            overlayEle.style.display = "none";
+	    //get root element of the modal, depends on bootstrap
+            var overlayEle = event.target.parentElement.parentElement.parentElement.parentElement;
+            $(overlayEle).modal('hide');
         },
         onSave: (event) => {
             StoreHelper.storeData();
@@ -125,7 +124,6 @@ const mapDispatchtoProps = (dispatch) => {
                 console.log(StoreHelper.getPapers());
                 callbacks.saveDiagram && callbacks.saveDiagram(oValideResult);
             } else {
-                console.log("papgers failed validation");
                 console.log(oValideResult);
 		callbacks.saveDiagram && callbacks.saveDiagram(oValideResult);
             }

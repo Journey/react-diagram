@@ -137,6 +137,18 @@ const mapDispatchtoProps = (dispatch) => {
             evt.dataTransfer.dropEffect = "copy";
             evt.dataTransfer.effectAllowed = "copyMove";
             Position.logElementMistake(evt, evt.target, window, document);
+
+	    /*var clientRect = evt.target.getBoundingClientRect();
+	    var offsetX    = (evt.clientX - clientRect.left);
+	    var offsetY    = (evt.clientY - clientRect.top);
+	    var dragImage = new Image();
+	    var image = evt.target;
+	    dragImage.src = image.getAttribute("xlink:href");
+	    dragImage.width = image.getAttribute("width");
+	    dragImage.height = image.getAttribute("height");
+	    evt.dataTransfer.setDragImage(dragImage, offsetX, offsetY);*/
+	    //evt.preventDefault();
+	    //return false;
         },
         /**
          * todo::double click on an elements
@@ -146,8 +158,7 @@ const mapDispatchtoProps = (dispatch) => {
             var key = evt.currentTarget.getAttribute("data-key");
             let elementInfo = StoreHelper.getCanvasElmentInfoById(key);
             let [x, y, width, height] = [elementInfo.x, elementInfo.y, elementInfo.width, elementInfo.height];
-	    
-		dispatch(selectElement(key, x, y, width, height));
+	    dispatch(selectElement(key, x, y, width, height));
 	    evt.preventDefault();
 	    evt.stopPropagation();
         },

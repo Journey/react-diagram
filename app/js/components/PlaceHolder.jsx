@@ -19,7 +19,7 @@ export const PlaceholderProperties = ({elementKey,bindingId}) => {
       <div className="pro-header">绑定信息</div>
     <div className="pro-placeholder">
       <div className="pro-row">
-	<label>id</label>
+	<label>测点编号</label>
 	<input name="binding-id" data-element-key={elementKey} type="text" defaultValue={bindingId}/>
       </div>
     </div>

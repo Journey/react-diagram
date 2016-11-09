@@ -18,35 +18,35 @@ const SVGProperties = ({width,height,gridSize,zoomLevel}) =>{
   return (
   <div>
     <div className="pro-row">
-      <label>宽度</label>
-      <input type="number" name="width" min="300" defaultValue={parseInt(width*zoomLevel)} />
+	<label>页面宽度</label>
+	<input type="number" name="width" min="300" defaultValue={parseInt(width*zoomLevel)} />
     </div>
     <div className="pro-row">
-      <label>高度</label>
-      <input type="number" name="height" min="300" defaultValue={parseInt(height*zoomLevel)} />
+	<label>页面高度</label>
+	<input type="number" name="height" min="300" defaultValue={parseInt(height*zoomLevel)} />
     </div>
     <div className="pro-row hide">
-      <label>网格大小</label>
-      <input type="number" name="gridSize" step="10" min="10" max="30" defaultValue={gridSize} />
+	<label>网格大小</label>
+	<input type="number" name="gridSize" step="10" min="10" max="30" defaultValue={gridSize} />
     </div>
   </div>
-    );
+  );
 };
 //only for 二级界面，更改绑定的信息
 const PaperProperties = ({paperType,paperName,bindingId}) => {
-  var paperId = "";
+    var paperId = "";
     if(PaperHelper.isSubPage(paperType)){
-      paperId = (
-      <div className="pro-row">
-	<label>关联设备</label>
-	<input type="text" name="pageId" defaultValue={bindingId} />
-      </div>
-    )
-  }
-  return (
-    <div>
-      <div className="pro-row">
-	<label>页面名称</label>
+	paperId = (
+	    <div className="pro-row">
+		<label>关联设备</label>
+		<input type="text" name="pageId" defaultValue={bindingId} />
+	    </div>
+	)
+    }
+    return (
+	<div>
+	    <div className="pro-row">
+		<label>页面名称</label>
 	<input type="text" name="pageName" defaultValue= {paperName}/>
       </div>
      {paperId}
@@ -95,11 +95,11 @@ const GeometricDataElement = ({width,height,x,y,onGeometricDataChange}) => {
 	<input type="number" name="height" step="1" min="10" max="1000" defaultValue={height}  onBlur={onGeometricDataChange}/>
       </div>
       <div className="pro-row">
-	<label>x轴</label>
+	<label>x 轴</label>
 	<input type="number" name="xAxies" step="1" min="10" max="1000" defaultValue={x}  onBlur={onGeometricDataChange}/>
       </div>
       <div className="pro-row">
-	<label>y轴</label>
+	<label>y 轴</label>
 	<input type="number" name="yAxies" step="1" min="10" max="1000" defaultValue={y}  onBlur={onGeometricDataChange}/>
       </div>
     </div>

@@ -4,7 +4,9 @@ import {StoreHelper} from "../Util/StoreHelper";
 import {DataHelper} from "../Util/DataHelper";
 import {Tabs as TabsView,StaticTabs as StaticTabsView} from "../components/Tabs.jsx";
 import {zoomIn,zoomOut,redo,undo,createSubPage,deleteSubPage,switchSubPage,selectCanvas} from "../actions";
-
+function _getDeletepageConfirmDialog() {
+    return $("#react-diagram-delete-page-confirm");
+}
 const mapStateToProps = (state) => {
     return {
 	selectedPaperId: state.selectedPaperId,
@@ -12,16 +14,25 @@ const mapStateToProps = (state) => {
     };
 };
 const mapDispatchtoProps = (dispatch) => {
+    var _storedPageId = null;
     return {
-	deletePaper: (event) => {
+	onDeletePressed: (event) => { //open confirm dialog
 	    if(StoreHelper.isLastPaper()){
 		return;
 	    }
-	    var paperId = event.target.parentElement.getAttribute("data-paper-id");
-	    dispatch(deleteSubPage(paperId));
-	    var paper = DataHelper.getPaper();  ;
+            var overlayEle = _getDeletepageConfirmDialog();
+	    _storedPageId = event.target.parentElement.getAttribute("data-paper-id");
+	    $(overlayEle).modal('show');
+	},
+	hideDeleteConfirm: () => {
+	    _getDeletepageConfirmDialog().modal("hide");
+	},
+	deletePaper: (event) => {
+	    dispatch(deleteSubPage(_storedPageId));
+	    var paper = DataHelper.getPaper();
 	    dispatch(switchSubPage(paper));
 	    dispatch(selectCanvas(paper.svgProperties));
+	    _getDeletepageConfirmDialog().modal("hide");
 	},
 	clickPaper: (event)=>{
 	    var paperId = event.target.parentElement.getAttribute("data-paper-id");
