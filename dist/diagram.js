@@ -54,23 +54,23 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _redux = __webpack_require__(165);
+	var _redux = __webpack_require__(166);
 
-	var _reducers = __webpack_require__(180);
+	var _reducers = __webpack_require__(189);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
-	var _App = __webpack_require__(197);
+	var _App = __webpack_require__(206);
 
-	var _StoreHelper = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(192);
 
-	var _API = __webpack_require__(214);
+	var _API = __webpack_require__(223);
 
-	var _DataHelper = __webpack_require__(182);
+	var _DataHelper = __webpack_require__(191);
 
-	var _gridHelper = __webpack_require__(203);
+	var _gridHelper = __webpack_require__(212);
 
-	var _Data = __webpack_require__(215);
+	var _Data = __webpack_require__(224);
 
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : { default: obj };
@@ -252,14 +252,103 @@
 /***/ function(module, exports) {
 
 	// shim for using process in browser
-
 	var process = module.exports = {};
+
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
+	(function () {
+	    try {
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
+	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
+	    }
+	    try {
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
+	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+
+
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+
+
+
+	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
 	var queueIndex = -1;
 
 	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
 	    draining = false;
 	    if (currentQueue.length) {
 	        queue = currentQueue.concat(queue);
@@ -275,7 +364,7 @@
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = setTimeout(cleanUpNextTick);
+	    var timeout = runTimeout(cleanUpNextTick);
 	    draining = true;
 
 	    var len = queue.length;
@@ -292,7 +381,7 @@
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    clearTimeout(timeout);
+	    runClearTimeout(timeout);
 	}
 
 	process.nextTick = function (fun) {
@@ -304,7 +393,7 @@
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        setTimeout(drainQueue, 0);
+	        runTimeout(drainQueue);
 	    }
 	};
 
@@ -7994,6 +8083,10 @@
 	  }
 	};
 
+	function registerNullComponentID() {
+	  ReactEmptyComponentRegistry.registerNullComponentID(this._rootNodeID);
+	}
+
 	var ReactEmptyComponent = function (instantiate) {
 	  this._currentElement = null;
 	  this._rootNodeID = null;
@@ -8002,7 +8095,7 @@
 	assign(ReactEmptyComponent.prototype, {
 	  construct: function (element) {},
 	  mountComponent: function (rootID, transaction, context) {
-	    ReactEmptyComponentRegistry.registerNullComponentID(rootID);
+	    transaction.getReactMountReady().enqueue(registerNullComponentID, this);
 	    this._rootNodeID = rootID;
 	    return ReactReconciler.mountComponent(this._renderedComponent, rootID, transaction, context);
 	  },
@@ -18725,7 +18818,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.7';
+	module.exports = '0.14.8';
 
 /***/ },
 /* 147 */
@@ -19709,7 +19802,7 @@
 
 	var _Provider2 = _interopRequireDefault(_Provider);
 
-	var _connect = __webpack_require__(162);
+	var _connect = __webpack_require__(163);
 
 	var _connect2 = _interopRequireDefault(_connect);
 
@@ -19733,6 +19826,10 @@
 
 	var _storeShape2 = _interopRequireDefault(_storeShape);
 
+	var _warning = __webpack_require__(162);
+
+	var _warning2 = _interopRequireDefault(_warning);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -19748,11 +19845,7 @@
 	  }
 	  didWarnAboutReceivingStore = true;
 
-	  /* eslint-disable no-console */
-	  if (typeof console !== 'undefined' && typeof console.error === 'function') {
-	    console.error('<Provider> does not support changing `store` on the fly. ' + 'It is most likely that you see this error because you updated to ' + 'Redux 2.x and React Redux 2.x which no longer hot reload reducers ' + 'automatically. See https://github.com/rackt/react-redux/releases/' + 'tag/v2.0.0 for the migration instructions.');
-	  }
-	  /* eslint-disable no-console */
+	  (0, _warning2["default"])('<Provider> does not support changing `store` on the fly. ' + 'It is most likely that you see this error because you updated to ' + 'Redux 2.x and React Redux 2.x which no longer hot reload reducers ' + 'automatically. See https://github.com/reactjs/react-redux/releases/' + 'tag/v2.0.0 for the migration instructions.');
 	}
 
 	var Provider = function (_Component) {
@@ -19772,9 +19865,7 @@
 	  }
 
 	  Provider.prototype.render = function render() {
-	    var children = this.props.children;
-
-	    return _react.Children.only(children);
+	    return _react.Children.only(this.props.children);
 	  };
 
 	  return Provider;
@@ -19782,10 +19873,12 @@
 
 	exports["default"] = Provider;
 
+
 	if (process.env.NODE_ENV !== 'production') {
 	  Provider.prototype.componentWillReceiveProps = function (nextProps) {
 	    var store = this.store;
 	    var nextStore = nextProps.store;
+
 
 	    if (store !== nextStore) {
 	      warnAboutReceivingStore();
@@ -19820,13 +19913,44 @@
 
 /***/ },
 /* 162 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports["default"] = warning;
+	/**
+	 * Prints a warning in the console if it exists.
+	 *
+	 * @param {String} message The warning message.
+	 * @returns {void}
+	 */
+	function warning(message) {
+	  /* eslint-disable no-console */
+	  if (typeof console !== 'undefined' && typeof console.error === 'function') {
+	    console.error(message);
+	  }
+	  /* eslint-enable no-console */
+	  try {
+	    // This error was thrown as a convenience so that if you enable
+	    // "break on all exceptions" in your console,
+	    // it would pause the execution at this line.
+	    throw new Error(message);
+	    /* eslint-disable no-empty */
+	  } catch (e) {}
+	  /* eslint-enable no-empty */
+	}
+
+/***/ },
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
+	exports.__esModule = true;
+
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	exports.__esModule = true;
 	exports["default"] = connect;
 
 	var _react = __webpack_require__(1);
@@ -19835,23 +19959,27 @@
 
 	var _storeShape2 = _interopRequireDefault(_storeShape);
 
-	var _shallowEqual = __webpack_require__(163);
+	var _shallowEqual = __webpack_require__(164);
 
 	var _shallowEqual2 = _interopRequireDefault(_shallowEqual);
 
-	var _wrapActionCreators = __webpack_require__(164);
+	var _wrapActionCreators = __webpack_require__(165);
 
 	var _wrapActionCreators2 = _interopRequireDefault(_wrapActionCreators);
 
-	var _isPlainObject = __webpack_require__(175);
+	var _warning = __webpack_require__(162);
+
+	var _warning2 = _interopRequireDefault(_warning);
+
+	var _isPlainObject = __webpack_require__(168);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _hoistNonReactStatics = __webpack_require__(178);
+	var _hoistNonReactStatics = __webpack_require__(187);
 
 	var _hoistNonReactStatics2 = _interopRequireDefault(_hoistNonReactStatics);
 
-	var _invariant = __webpack_require__(179);
+	var _invariant = __webpack_require__(188);
 
 	var _invariant2 = _interopRequireDefault(_invariant);
 
@@ -19877,39 +20005,62 @@
 	  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
 	}
 
-	function checkStateShape(stateProps, dispatch) {
-	  (0, _invariant2["default"])((0, _isPlainObject2["default"])(stateProps), '`%sToProps` must return an object. Instead received %s.', dispatch ? 'mapDispatch' : 'mapState', stateProps);
-	  return stateProps;
+	var errorObject = { value: null };
+	function tryCatch(fn, ctx) {
+	  try {
+	    return fn.apply(ctx);
+	  } catch (e) {
+	    errorObject.value = e;
+	    return errorObject;
+	  }
 	}
 
 	// Helps track hot reloading.
 	var nextVersion = 0;
 
 	function connect(mapStateToProps, mapDispatchToProps, mergeProps) {
-	  var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
+	  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
 	  var shouldSubscribe = Boolean(mapStateToProps);
 	  var mapState = mapStateToProps || defaultMapStateToProps;
-	  var mapDispatch = (0, _isPlainObject2["default"])(mapDispatchToProps) ? (0, _wrapActionCreators2["default"])(mapDispatchToProps) : mapDispatchToProps || defaultMapDispatchToProps;
 
-	  var finalMergeProps = mergeProps || defaultMergeProps;
-	  var checkMergedEquals = finalMergeProps !== defaultMergeProps;
-	  var _options$pure = options.pure;
-	  var pure = _options$pure === undefined ? true : _options$pure;
-	  var _options$withRef = options.withRef;
-	  var withRef = _options$withRef === undefined ? false : _options$withRef;
-
-	  // Helps track hot reloading.
-
-	  var version = nextVersion++;
-
-	  function computeMergedProps(stateProps, dispatchProps, parentProps) {
-	    var mergedProps = finalMergeProps(stateProps, dispatchProps, parentProps);
-	    (0, _invariant2["default"])((0, _isPlainObject2["default"])(mergedProps), '`mergeProps` must return an object. Instead received %s.', mergedProps);
-	    return mergedProps;
+	  var mapDispatch = void 0;
+	  if (typeof mapDispatchToProps === 'function') {
+	    mapDispatch = mapDispatchToProps;
+	  } else if (!mapDispatchToProps) {
+	    mapDispatch = defaultMapDispatchToProps;
+	  } else {
+	    mapDispatch = (0, _wrapActionCreators2["default"])(mapDispatchToProps);
 	  }
 
+	  var finalMergeProps = mergeProps || defaultMergeProps;
+	  var _options$pure = options.pure,
+	      pure = _options$pure === undefined ? true : _options$pure,
+	      _options$withRef = options.withRef,
+	      withRef = _options$withRef === undefined ? false : _options$withRef;
+
+	  var checkMergedEquals = pure && finalMergeProps !== defaultMergeProps;
+
+	  // Helps track hot reloading.
+	  var version = nextVersion++;
+
 	  return function wrapWithConnect(WrappedComponent) {
+	    var connectDisplayName = 'Connect(' + getDisplayName(WrappedComponent) + ')';
+
+	    function checkStateShape(props, methodName) {
+	      if (!(0, _isPlainObject2["default"])(props)) {
+	        (0, _warning2["default"])(methodName + '() in ' + connectDisplayName + ' must return a plain object. ' + ('Instead received ' + props + '.'));
+	      }
+	    }
+
+	    function computeMergedProps(stateProps, dispatchProps, parentProps) {
+	      var mergedProps = finalMergeProps(stateProps, dispatchProps, parentProps);
+	      if (process.env.NODE_ENV !== 'production') {
+	        checkStateShape(mergedProps, 'mergeProps');
+	      }
+	      return mergedProps;
+	    }
+
 	    var Connect = function (_Component) {
 	      _inherits(Connect, _Component);
 
@@ -19925,7 +20076,7 @@
 	        _this.version = version;
 	        _this.store = props.store || context.store;
 
-	        (0, _invariant2["default"])(_this.store, 'Could not find "store" in either the context or ' + ('props of "' + _this.constructor.displayName + '". ') + 'Either wrap the root component in a <Provider>, ' + ('or explicitly pass "store" as a prop to "' + _this.constructor.displayName + '".'));
+	        (0, _invariant2["default"])(_this.store, 'Could not find "store" in either the context or ' + ('props of "' + connectDisplayName + '". ') + 'Either wrap the root component in a <Provider>, ' + ('or explicitly pass "store" as a prop to "' + connectDisplayName + '".'));
 
 	        var storeState = _this.store.getState();
 	        _this.state = { storeState: storeState };
@@ -19941,7 +20092,10 @@
 	        var state = store.getState();
 	        var stateProps = this.doStatePropsDependOnOwnProps ? this.finalMapStateToProps(state, props) : this.finalMapStateToProps(state);
 
-	        return checkStateShape(stateProps);
+	        if (process.env.NODE_ENV !== 'production') {
+	          checkStateShape(stateProps, 'mapStateToProps');
+	        }
+	        return stateProps;
 	      };
 
 	      Connect.prototype.configureFinalMapState = function configureFinalMapState(store, props) {
@@ -19951,7 +20105,14 @@
 	        this.finalMapStateToProps = isFactory ? mappedState : mapState;
 	        this.doStatePropsDependOnOwnProps = this.finalMapStateToProps.length !== 1;
 
-	        return isFactory ? this.computeStateProps(store, props) : checkStateShape(mappedState);
+	        if (isFactory) {
+	          return this.computeStateProps(store, props);
+	        }
+
+	        if (process.env.NODE_ENV !== 'production') {
+	          checkStateShape(mappedState, 'mapStateToProps');
+	        }
+	        return mappedState;
 	      };
 
 	      Connect.prototype.computeDispatchProps = function computeDispatchProps(store, props) {
@@ -19963,7 +20124,10 @@
 
 	        var dispatchProps = this.doDispatchPropsDependOnOwnProps ? this.finalMapDispatchToProps(dispatch, props) : this.finalMapDispatchToProps(dispatch);
 
-	        return checkStateShape(dispatchProps, true);
+	        if (process.env.NODE_ENV !== 'production') {
+	          checkStateShape(dispatchProps, 'mapDispatchToProps');
+	        }
+	        return dispatchProps;
 	      };
 
 	      Connect.prototype.configureFinalMapDispatch = function configureFinalMapDispatch(store, props) {
@@ -19973,7 +20137,14 @@
 	        this.finalMapDispatchToProps = isFactory ? mappedDispatch : mapDispatch;
 	        this.doDispatchPropsDependOnOwnProps = this.finalMapDispatchToProps.length !== 1;
 
-	        return isFactory ? this.computeDispatchProps(store, props) : checkStateShape(mappedDispatch, true);
+	        if (isFactory) {
+	          return this.computeDispatchProps(store, props);
+	        }
+
+	        if (process.env.NODE_ENV !== 'production') {
+	          checkStateShape(mappedDispatch, 'mapDispatchToProps');
+	        }
+	        return mappedDispatch;
 	      };
 
 	      Connect.prototype.updateStatePropsIfNeeded = function updateStatePropsIfNeeded() {
@@ -20045,6 +20216,8 @@
 	        this.mergedProps = null;
 	        this.haveOwnPropsChanged = true;
 	        this.hasStoreStateChanged = true;
+	        this.haveStatePropsBeenPrecalculated = false;
+	        this.statePropsPrecalculationError = null;
 	        this.renderedElement = null;
 	        this.finalMapDispatchToProps = null;
 	        this.finalMapStateToProps = null;
@@ -20055,13 +20228,25 @@
 	          return;
 	        }
 
-	        var prevStoreState = this.state.storeState;
 	        var storeState = this.store.getState();
-
-	        if (!pure || prevStoreState !== storeState) {
-	          this.hasStoreStateChanged = true;
-	          this.setState({ storeState: storeState });
+	        var prevStoreState = this.state.storeState;
+	        if (pure && prevStoreState === storeState) {
+	          return;
 	        }
+
+	        if (pure && !this.doStatePropsDependOnOwnProps) {
+	          var haveStatePropsChanged = tryCatch(this.updateStatePropsIfNeeded, this);
+	          if (!haveStatePropsChanged) {
+	            return;
+	          }
+	          if (haveStatePropsChanged === errorObject) {
+	            this.statePropsPrecalculationError = errorObject.value;
+	          }
+	          this.haveStatePropsBeenPrecalculated = true;
+	        }
+
+	        this.hasStoreStateChanged = true;
+	        this.setState({ storeState: storeState });
 	      };
 
 	      Connect.prototype.getWrappedInstance = function getWrappedInstance() {
@@ -20071,12 +20256,21 @@
 	      };
 
 	      Connect.prototype.render = function render() {
-	        var haveOwnPropsChanged = this.haveOwnPropsChanged;
-	        var hasStoreStateChanged = this.hasStoreStateChanged;
-	        var renderedElement = this.renderedElement;
+	        var haveOwnPropsChanged = this.haveOwnPropsChanged,
+	            hasStoreStateChanged = this.hasStoreStateChanged,
+	            haveStatePropsBeenPrecalculated = this.haveStatePropsBeenPrecalculated,
+	            statePropsPrecalculationError = this.statePropsPrecalculationError,
+	            renderedElement = this.renderedElement;
+
 
 	        this.haveOwnPropsChanged = false;
 	        this.hasStoreStateChanged = false;
+	        this.haveStatePropsBeenPrecalculated = false;
+	        this.statePropsPrecalculationError = null;
+
+	        if (statePropsPrecalculationError) {
+	          throw statePropsPrecalculationError;
+	        }
 
 	        var shouldUpdateStateProps = true;
 	        var shouldUpdateDispatchProps = true;
@@ -20087,7 +20281,9 @@
 
 	        var haveStatePropsChanged = false;
 	        var haveDispatchPropsChanged = false;
-	        if (shouldUpdateStateProps) {
+	        if (haveStatePropsBeenPrecalculated) {
+	          haveStatePropsChanged = true;
+	        } else if (shouldUpdateStateProps) {
 	          haveStatePropsChanged = this.updateStatePropsIfNeeded();
 	        }
 	        if (shouldUpdateDispatchProps) {
@@ -20119,7 +20315,7 @@
 	      return Connect;
 	    }(_react.Component);
 
-	    Connect.displayName = 'Connect(' + getDisplayName(WrappedComponent) + ')';
+	    Connect.displayName = connectDisplayName;
 	    Connect.WrappedComponent = WrappedComponent;
 	    Connect.contextTypes = {
 	      store: _storeShape2["default"]
@@ -20147,7 +20343,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -20178,7 +20374,7 @@
 	}
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20186,7 +20382,7 @@
 	exports.__esModule = true;
 	exports["default"] = wrapActionCreators;
 
-	var _redux = __webpack_require__(165);
+	var _redux = __webpack_require__(166);
 
 	function wrapActionCreators(actionCreators) {
 	  return function (dispatch) {
@@ -20195,7 +20391,7 @@
 	}
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -20203,31 +20399,31 @@
 	exports.__esModule = true;
 	exports.compose = exports.applyMiddleware = exports.bindActionCreators = exports.combineReducers = exports.createStore = undefined;
 
-	var _createStore = __webpack_require__(166);
+	var _createStore = __webpack_require__(167);
 
 	var _createStore2 = _interopRequireDefault(_createStore);
 
-	var _combineReducers = __webpack_require__(170);
+	var _combineReducers = __webpack_require__(182);
 
 	var _combineReducers2 = _interopRequireDefault(_combineReducers);
 
-	var _bindActionCreators = __webpack_require__(172);
+	var _bindActionCreators = __webpack_require__(184);
 
 	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
 
-	var _applyMiddleware = __webpack_require__(173);
+	var _applyMiddleware = __webpack_require__(185);
 
 	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
 
-	var _compose = __webpack_require__(174);
+	var _compose = __webpack_require__(186);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
-	var _warning = __webpack_require__(171);
+	var _warning = __webpack_require__(183);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	/*
 	* This is a dummy function to check if the function name has been altered by minification.
@@ -20236,31 +20432,35 @@
 	function isCrushed() {}
 
 	if (process.env.NODE_ENV !== 'production' && typeof isCrushed.name === 'string' && isCrushed.name !== 'isCrushed') {
-	  (0, _warning2["default"])('You are currently using minified code outside of NODE_ENV === \'production\'. ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or DefinePlugin for webpack (http://stackoverflow.com/questions/30030031) ' + 'to ensure you have the correct code for your production build.');
+	  (0, _warning2['default'])('You are currently using minified code outside of NODE_ENV === \'production\'. ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or DefinePlugin for webpack (http://stackoverflow.com/questions/30030031) ' + 'to ensure you have the correct code for your production build.');
 	}
 
-	exports.createStore = _createStore2["default"];
-	exports.combineReducers = _combineReducers2["default"];
-	exports.bindActionCreators = _bindActionCreators2["default"];
-	exports.applyMiddleware = _applyMiddleware2["default"];
-	exports.compose = _compose2["default"];
+	exports.createStore = _createStore2['default'];
+	exports.combineReducers = _combineReducers2['default'];
+	exports.bindActionCreators = _bindActionCreators2['default'];
+	exports.applyMiddleware = _applyMiddleware2['default'];
+	exports.compose = _compose2['default'];
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 	exports.ActionTypes = undefined;
-	exports["default"] = createStore;
+	exports['default'] = createStore;
 
-	var _isPlainObject = __webpack_require__(167);
+	var _isPlainObject = __webpack_require__(168);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	var _symbolObservable = __webpack_require__(178);
+
+	var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	/**
 	 * These are private action types reserved by Redux.
@@ -20283,7 +20483,7 @@
 	 * @param {Function} reducer A function that returns the next state tree, given
 	 * the current state tree and the action to handle.
 	 *
-	 * @param {any} [initialState] The initial state. You may optionally specify it
+	 * @param {any} [preloadedState] The initial state. You may optionally specify it
 	 * to hydrate the state from the server in universal apps, or to restore a
 	 * previously serialized user session.
 	 * If you use `combineReducers` to produce the root reducer function, this must be
@@ -20297,10 +20497,12 @@
 	 * @returns {Store} A Redux store that lets you read the state, dispatch actions
 	 * and subscribe to changes.
 	 */
-	function createStore(reducer, initialState, enhancer) {
-	  if (typeof initialState === 'function' && typeof enhancer === 'undefined') {
-	    enhancer = initialState;
-	    initialState = undefined;
+	function createStore(reducer, preloadedState, enhancer) {
+	  var _ref2;
+
+	  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
+	    enhancer = preloadedState;
+	    preloadedState = undefined;
 	  }
 
 	  if (typeof enhancer !== 'undefined') {
@@ -20308,7 +20510,7 @@
 	      throw new Error('Expected the enhancer to be a function.');
 	    }
 
-	    return enhancer(createStore)(reducer, initialState);
+	    return enhancer(createStore)(reducer, preloadedState);
 	  }
 
 	  if (typeof reducer !== 'function') {
@@ -20316,7 +20518,7 @@
 	  }
 
 	  var currentReducer = reducer;
-	  var currentState = initialState;
+	  var currentState = preloadedState;
 	  var currentListeners = [];
 	  var nextListeners = currentListeners;
 	  var isDispatching = false;
@@ -20350,7 +20552,7 @@
 	   * However, the next `dispatch()` call, whether nested or not, will use a more
 	   * recent snapshot of the subscription list.
 	   *
-	   * 2. The listener should not expect to see all states changes, as the state
+	   * 2. The listener should not expect to see all state changes, as the state
 	   * might have been updated multiple times during a nested `dispatch()` before
 	   * the listener is called. It is, however, guaranteed that all subscribers
 	   * registered before the `dispatch()` started will be called with the latest
@@ -20408,7 +20610,7 @@
 	   * return something else (for example, a Promise you can await).
 	   */
 	  function dispatch(action) {
-	    if (!(0, _isPlainObject2["default"])(action)) {
+	    if (!(0, _isPlainObject2['default'])(action)) {
 	      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
 	    }
 
@@ -20454,46 +20656,81 @@
 	    dispatch({ type: ActionTypes.INIT });
 	  }
 
+	  /**
+	   * Interoperability point for observable/reactive libraries.
+	   * @returns {observable} A minimal observable of state changes.
+	   * For more information, see the observable proposal:
+	   * https://github.com/zenparsing/es-observable
+	   */
+	  function observable() {
+	    var _ref;
+
+	    var outerSubscribe = subscribe;
+	    return _ref = {
+	      /**
+	       * The minimal observable subscription method.
+	       * @param {Object} observer Any object that can be used as an observer.
+	       * The observer object should have a `next` method.
+	       * @returns {subscription} An object with an `unsubscribe` method that can
+	       * be used to unsubscribe the observable from the store, and prevent further
+	       * emission of values from the observable.
+	       */
+	      subscribe: function subscribe(observer) {
+	        if (typeof observer !== 'object') {
+	          throw new TypeError('Expected the observer to be an object.');
+	        }
+
+	        function observeState() {
+	          if (observer.next) {
+	            observer.next(getState());
+	          }
+	        }
+
+	        observeState();
+	        var unsubscribe = outerSubscribe(observeState);
+	        return { unsubscribe: unsubscribe };
+	      }
+	    }, _ref[_symbolObservable2['default']] = function () {
+	      return this;
+	    }, _ref;
+	  }
+
 	  // When a store is created, an "INIT" action is dispatched so that every
 	  // reducer returns their initial state. This effectively populates
 	  // the initial state tree.
 	  dispatch({ type: ActionTypes.INIT });
 
-	  return {
+	  return _ref2 = {
 	    dispatch: dispatch,
 	    subscribe: subscribe,
 	    getState: getState,
 	    replaceReducer: replaceReducer
-	  };
+	  }, _ref2[_symbolObservable2['default']] = observable, _ref2;
 	}
 
 /***/ },
-/* 167 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isHostObject = __webpack_require__(168),
-	    isObjectLike = __webpack_require__(169);
+	var baseGetTag = __webpack_require__(169),
+	    getPrototype = __webpack_require__(175),
+	    isObjectLike = __webpack_require__(177);
 
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
 
 	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
+	var funcProto = Function.prototype,
+	    objectProto = Object.prototype;
 
 	/** Used to resolve the decompiled source of functions. */
-	var funcToString = Function.prototype.toString;
+	var funcToString = funcProto.toString;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
 
 	/** Used to infer the `Object` constructor. */
 	var objectCtorString = funcToString.call(Object);
-
-	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var objectToString = objectProto.toString;
-
-	/** Built-in value references. */
-	var getPrototypeOf = Object.getPrototypeOf;
 
 	/**
 	 * Checks if `value` is a plain object, that is, an object created by the
@@ -20501,6 +20738,7 @@
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.8.0
 	 * @category Lang
 	 * @param {*} value The value to check.
 	 * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
@@ -20523,50 +20761,209 @@
 	 * // => true
 	 */
 	function isPlainObject(value) {
-	  if (!isObjectLike(value) ||
-	      objectToString.call(value) != objectTag || isHostObject(value)) {
+	  if (!isObjectLike(value) || baseGetTag(value) != objectTag) {
 	    return false;
 	  }
-	  var proto = getPrototypeOf(value);
+	  var proto = getPrototype(value);
 	  if (proto === null) {
 	    return true;
 	  }
-	  var Ctor = proto.constructor;
-	  return (typeof Ctor == 'function' &&
-	    Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
+	  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+	  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
+	    funcToString.call(Ctor) == objectCtorString;
 	}
 
 	module.exports = isPlainObject;
 
 
 /***/ },
-/* 168 */
-/***/ function(module, exports) {
+/* 169 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Symbol = __webpack_require__(170),
+	    getRawTag = __webpack_require__(173),
+	    objectToString = __webpack_require__(174);
+
+	/** `Object#toString` result references. */
+	var nullTag = '[object Null]',
+	    undefinedTag = '[object Undefined]';
+
+	/** Built-in value references. */
+	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
 
 	/**
-	 * Checks if `value` is a host object in IE < 9.
+	 * The base implementation of `getTag` without fallbacks for buggy environments.
 	 *
 	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
+	 * @param {*} value The value to query.
+	 * @returns {string} Returns the `toStringTag`.
 	 */
-	function isHostObject(value) {
-	  // Many host objects are `Object` objects that can coerce to strings
-	  // despite having improperly defined `toString` methods.
-	  var result = false;
-	  if (value != null && typeof value.toString != 'function') {
-	    try {
-	      result = !!(value + '');
-	    } catch (e) {}
+	function baseGetTag(value) {
+	  if (value == null) {
+	    return value === undefined ? undefinedTag : nullTag;
+	  }
+	  value = Object(value);
+	  return (symToStringTag && symToStringTag in value)
+	    ? getRawTag(value)
+	    : objectToString(value);
+	}
+
+	module.exports = baseGetTag;
+
+
+/***/ },
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var root = __webpack_require__(171);
+
+	/** Built-in value references. */
+	var Symbol = root.Symbol;
+
+	module.exports = Symbol;
+
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var freeGlobal = __webpack_require__(172);
+
+	/** Detect free variable `self`. */
+	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+	/** Used as a reference to the global object. */
+	var root = freeGlobal || freeSelf || Function('return this')();
+
+	module.exports = root;
+
+
+/***/ },
+/* 172 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
+	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+	module.exports = freeGlobal;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Symbol = __webpack_require__(170);
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var nativeObjectToString = objectProto.toString;
+
+	/** Built-in value references. */
+	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+
+	/**
+	 * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
+	 *
+	 * @private
+	 * @param {*} value The value to query.
+	 * @returns {string} Returns the raw `toStringTag`.
+	 */
+	function getRawTag(value) {
+	  var isOwn = hasOwnProperty.call(value, symToStringTag),
+	      tag = value[symToStringTag];
+
+	  try {
+	    value[symToStringTag] = undefined;
+	    var unmasked = true;
+	  } catch (e) {}
+
+	  var result = nativeObjectToString.call(value);
+	  if (unmasked) {
+	    if (isOwn) {
+	      value[symToStringTag] = tag;
+	    } else {
+	      delete value[symToStringTag];
+	    }
 	  }
 	  return result;
 	}
 
-	module.exports = isHostObject;
+	module.exports = getRawTag;
 
 
 /***/ },
-/* 169 */
+/* 174 */
+/***/ function(module, exports) {
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var nativeObjectToString = objectProto.toString;
+
+	/**
+	 * Converts `value` to a string using `Object.prototype.toString`.
+	 *
+	 * @private
+	 * @param {*} value The value to convert.
+	 * @returns {string} Returns the converted string.
+	 */
+	function objectToString(value) {
+	  return nativeObjectToString.call(value);
+	}
+
+	module.exports = objectToString;
+
+
+/***/ },
+/* 175 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var overArg = __webpack_require__(176);
+
+	/** Built-in value references. */
+	var getPrototype = overArg(Object.getPrototypeOf, Object);
+
+	module.exports = getPrototype;
+
+
+/***/ },
+/* 176 */
+/***/ function(module, exports) {
+
+	/**
+	 * Creates a unary function that invokes `func` with its argument transformed.
+	 *
+	 * @private
+	 * @param {Function} func The function to wrap.
+	 * @param {Function} transform The argument transform.
+	 * @returns {Function} Returns the new function.
+	 */
+	function overArg(func, transform) {
+	  return function(arg) {
+	    return func(transform(arg));
+	  };
+	}
+
+	module.exports = overArg;
+
+
+/***/ },
+/* 177 */
 /***/ function(module, exports) {
 
 	/**
@@ -20575,6 +20972,7 @@
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to check.
 	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
@@ -20593,54 +20991,144 @@
 	 * // => false
 	 */
 	function isObjectLike(value) {
-	  return !!value && typeof value == 'object';
+	  return value != null && typeof value == 'object';
 	}
 
 	module.exports = isObjectLike;
 
 
 /***/ },
-/* 170 */
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(179);
+
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global, module) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _ponyfill = __webpack_require__(181);
+
+	var _ponyfill2 = _interopRequireDefault(_ponyfill);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var root; /* global window */
+
+
+	if (typeof self !== 'undefined') {
+	  root = self;
+	} else if (typeof window !== 'undefined') {
+	  root = window;
+	} else if (typeof global !== 'undefined') {
+	  root = global;
+	} else if (true) {
+	  root = module;
+	} else {
+	  root = Function('return this')();
+	}
+
+	var result = (0, _ponyfill2['default'])(root);
+	exports['default'] = result;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(180)(module)))
+
+/***/ },
+/* 180 */
+/***/ function(module, exports) {
+
+	module.exports = function(module) {
+		if(!module.webpackPolyfill) {
+			module.deprecate = function() {};
+			module.paths = [];
+			// module.parent = undefined by default
+			module.children = [];
+			module.webpackPolyfill = 1;
+		}
+		return module;
+	}
+
+
+/***/ },
+/* 181 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports['default'] = symbolObservablePonyfill;
+	function symbolObservablePonyfill(root) {
+		var result;
+		var _Symbol = root.Symbol;
+
+		if (typeof _Symbol === 'function') {
+			if (_Symbol.observable) {
+				result = _Symbol.observable;
+			} else {
+				result = _Symbol('observable');
+				_Symbol.observable = result;
+			}
+		} else {
+			result = '@@observable';
+		}
+
+		return result;
+	};
+
+/***/ },
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
 	exports.__esModule = true;
-	exports["default"] = combineReducers;
+	exports['default'] = combineReducers;
 
-	var _createStore = __webpack_require__(166);
+	var _createStore = __webpack_require__(167);
 
-	var _isPlainObject = __webpack_require__(167);
+	var _isPlainObject = __webpack_require__(168);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _warning = __webpack_require__(171);
+	var _warning = __webpack_require__(183);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	function getUndefinedStateErrorMessage(key, action) {
 	  var actionType = action && action.type;
 	  var actionName = actionType && '"' + actionType.toString() + '"' || 'an action';
 
-	  return 'Reducer "' + key + '" returned undefined handling ' + actionName + '. ' + 'To ignore an action, you must explicitly return the previous state.';
+	  return 'Given action ' + actionName + ', reducer "' + key + '" returned undefined. ' + 'To ignore an action, you must explicitly return the previous state.';
 	}
 
-	function getUnexpectedStateShapeWarningMessage(inputState, reducers, action) {
+	function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, unexpectedKeyCache) {
 	  var reducerKeys = Object.keys(reducers);
-	  var argumentName = action && action.type === _createStore.ActionTypes.INIT ? 'initialState argument passed to createStore' : 'previous state received by the reducer';
+	  var argumentName = action && action.type === _createStore.ActionTypes.INIT ? 'preloadedState argument passed to createStore' : 'previous state received by the reducer';
 
 	  if (reducerKeys.length === 0) {
 	    return 'Store does not have a valid reducer. Make sure the argument passed ' + 'to combineReducers is an object whose values are reducers.';
 	  }
 
-	  if (!(0, _isPlainObject2["default"])(inputState)) {
+	  if (!(0, _isPlainObject2['default'])(inputState)) {
 	    return 'The ' + argumentName + ' has unexpected type of "' + {}.toString.call(inputState).match(/\s([a-z|A-Z]+)/)[1] + '". Expected argument to be an object with the following ' + ('keys: "' + reducerKeys.join('", "') + '"');
 	  }
 
 	  var unexpectedKeys = Object.keys(inputState).filter(function (key) {
-	    return !reducers.hasOwnProperty(key);
+	    return !reducers.hasOwnProperty(key) && !unexpectedKeyCache[key];
+	  });
+
+	  unexpectedKeys.forEach(function (key) {
+	    unexpectedKeyCache[key] = true;
 	  });
 
 	  if (unexpectedKeys.length > 0) {
@@ -20685,11 +21173,22 @@
 	  var finalReducers = {};
 	  for (var i = 0; i < reducerKeys.length; i++) {
 	    var key = reducerKeys[i];
+
+	    if (process.env.NODE_ENV !== 'production') {
+	      if (typeof reducers[key] === 'undefined') {
+	        (0, _warning2['default'])('No reducer provided for key "' + key + '"');
+	      }
+	    }
+
 	    if (typeof reducers[key] === 'function') {
 	      finalReducers[key] = reducers[key];
 	    }
 	  }
 	  var finalReducerKeys = Object.keys(finalReducers);
+
+	  if (process.env.NODE_ENV !== 'production') {
+	    var unexpectedKeyCache = {};
+	  }
 
 	  var sanityError;
 	  try {
@@ -20707,9 +21206,9 @@
 	    }
 
 	    if (process.env.NODE_ENV !== 'production') {
-	      var warningMessage = getUnexpectedStateShapeWarningMessage(state, finalReducers, action);
+	      var warningMessage = getUnexpectedStateShapeWarningMessage(state, finalReducers, action, unexpectedKeyCache);
 	      if (warningMessage) {
-	        (0, _warning2["default"])(warningMessage);
+	        (0, _warning2['default'])(warningMessage);
 	      }
 	    }
 
@@ -20733,13 +21232,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 171 */
+/* 183 */
 /***/ function(module, exports) {
 
 	'use strict';
 
 	exports.__esModule = true;
-	exports["default"] = warning;
+	exports['default'] = warning;
 	/**
 	 * Prints a warning in the console if it exists.
 	 *
@@ -20753,8 +21252,9 @@
 	  }
 	  /* eslint-enable no-console */
 	  try {
-	    // This error was thrown as a convenience so that you can use this stack
-	    // to find the callsite that caused this warning to fire.
+	    // This error was thrown as a convenience so that if you enable
+	    // "break on all exceptions" in your console,
+	    // it would pause the execution at this line.
 	    throw new Error(message);
 	    /* eslint-disable no-empty */
 	  } catch (e) {}
@@ -20762,13 +21262,13 @@
 	}
 
 /***/ },
-/* 172 */
+/* 184 */
 /***/ function(module, exports) {
 
 	'use strict';
 
 	exports.__esModule = true;
-	exports["default"] = bindActionCreators;
+	exports['default'] = bindActionCreators;
 	function bindActionCreator(actionCreator, dispatch) {
 	  return function () {
 	    return dispatch(actionCreator.apply(undefined, arguments));
@@ -20818,21 +21318,22 @@
 	}
 
 /***/ },
-/* 173 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
+	exports.__esModule = true;
+
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	exports.__esModule = true;
-	exports["default"] = applyMiddleware;
+	exports['default'] = applyMiddleware;
 
-	var _compose = __webpack_require__(174);
+	var _compose = __webpack_require__(186);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	/**
 	 * Creates a store enhancer that applies middleware to the dispatch method
@@ -20856,8 +21357,8 @@
 	  }
 
 	  return function (createStore) {
-	    return function (reducer, initialState, enhancer) {
-	      var store = createStore(reducer, initialState, enhancer);
+	    return function (reducer, preloadedState, enhancer) {
+	      var store = createStore(reducer, preloadedState, enhancer);
 	      var _dispatch = store.dispatch;
 	      var chain = [];
 
@@ -20870,7 +21371,7 @@
 	      chain = middlewares.map(function (middleware) {
 	        return middleware(middlewareAPI);
 	      });
-	      _dispatch = _compose2["default"].apply(undefined, chain)(store.dispatch);
+	      _dispatch = _compose2['default'].apply(undefined, chain)(store.dispatch);
 
 	      return _extends({}, store, {
 	        dispatch: _dispatch
@@ -20880,7 +21381,7 @@
 	}
 
 /***/ },
-/* 174 */
+/* 186 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -20888,25 +21389,34 @@
 	exports.__esModule = true;
 	exports["default"] = compose;
 	/**
-	 * Composes single-argument functions from right to left.
+	 * Composes single-argument functions from right to left. The rightmost
+	 * function can take multiple arguments as it provides the signature for
+	 * the resulting composite function.
 	 *
 	 * @param {...Function} funcs The functions to compose.
-	 * @returns {Function} A function obtained by composing functions from right to
-	 * left. For example, compose(f, g, h) is identical to arg => f(g(h(arg))).
+	 * @returns {Function} A function obtained by composing the argument functions
+	 * from right to left. For example, compose(f, g, h) is identical to doing
+	 * (...args) => f(g(h(...args))).
 	 */
+
 	function compose() {
 	  for (var _len = arguments.length, funcs = Array(_len), _key = 0; _key < _len; _key++) {
 	    funcs[_key] = arguments[_key];
 	  }
 
+	  if (funcs.length === 0) {
+	    return function (arg) {
+	      return arg;
+	    };
+	  }
+
+	  if (funcs.length === 1) {
+	    return funcs[0];
+	  }
+
+	  var last = funcs[funcs.length - 1];
+	  var rest = funcs.slice(0, -1);
 	  return function () {
-	    if (funcs.length === 0) {
-	      return arguments.length <= 0 ? undefined : arguments[0];
-	    }
-
-	    var last = funcs[funcs.length - 1];
-	    var rest = funcs.slice(0, -1);
-
 	    return rest.reduceRight(function (composed, f) {
 	      return f(composed);
 	    }, last.apply(undefined, arguments));
@@ -20914,139 +21424,7 @@
 	}
 
 /***/ },
-/* 175 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isHostObject = __webpack_require__(176),
-	    isObjectLike = __webpack_require__(177);
-
-	/** `Object#toString` result references. */
-	var objectTag = '[object Object]';
-
-	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
-
-	/** Used to resolve the decompiled source of functions. */
-	var funcToString = Function.prototype.toString;
-
-	/** Used to infer the `Object` constructor. */
-	var objectCtorString = funcToString.call(Object);
-
-	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var objectToString = objectProto.toString;
-
-	/** Built-in value references. */
-	var getPrototypeOf = Object.getPrototypeOf;
-
-	/**
-	 * Checks if `value` is a plain object, that is, an object created by the
-	 * `Object` constructor or one with a `[[Prototype]]` of `null`.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
-	 * @example
-	 *
-	 * function Foo() {
-	 *   this.a = 1;
-	 * }
-	 *
-	 * _.isPlainObject(new Foo);
-	 * // => false
-	 *
-	 * _.isPlainObject([1, 2, 3]);
-	 * // => false
-	 *
-	 * _.isPlainObject({ 'x': 0, 'y': 0 });
-	 * // => true
-	 *
-	 * _.isPlainObject(Object.create(null));
-	 * // => true
-	 */
-	function isPlainObject(value) {
-	  if (!isObjectLike(value) ||
-	      objectToString.call(value) != objectTag || isHostObject(value)) {
-	    return false;
-	  }
-	  var proto = getPrototypeOf(value);
-	  if (proto === null) {
-	    return true;
-	  }
-	  var Ctor = proto.constructor;
-	  return (typeof Ctor == 'function' &&
-	    Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
-	}
-
-	module.exports = isPlainObject;
-
-
-/***/ },
-/* 176 */
-/***/ function(module, exports) {
-
-	/**
-	 * Checks if `value` is a host object in IE < 9.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
-	 */
-	function isHostObject(value) {
-	  // Many host objects are `Object` objects that can coerce to strings
-	  // despite having improperly defined `toString` methods.
-	  var result = false;
-	  if (value != null && typeof value.toString != 'function') {
-	    try {
-	      result = !!(value + '');
-	    } catch (e) {}
-	  }
-	  return result;
-	}
-
-	module.exports = isHostObject;
-
-
-/***/ },
-/* 177 */
-/***/ function(module, exports) {
-
-	/**
-	 * Checks if `value` is object-like. A value is object-like if it's not `null`
-	 * and has a `typeof` result of "object".
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-	 * @example
-	 *
-	 * _.isObjectLike({});
-	 * // => true
-	 *
-	 * _.isObjectLike([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObjectLike(_.noop);
-	 * // => false
-	 *
-	 * _.isObjectLike(null);
-	 * // => false
-	 */
-	function isObjectLike(value) {
-	  return !!value && typeof value == 'object';
-	}
-
-	module.exports = isObjectLike;
-
-
-/***/ },
-/* 178 */
+/* 187 */
 /***/ function(module, exports) {
 
 	/**
@@ -21075,14 +21453,24 @@
 	    arity: true
 	};
 
-	module.exports = function hoistNonReactStatics(targetComponent, sourceComponent) {
-	    var keys = Object.getOwnPropertyNames(sourceComponent);
-	    for (var i=0; i<keys.length; ++i) {
-	        if (!REACT_STATICS[keys[i]] && !KNOWN_STATICS[keys[i]]) {
-	            try {
-	                targetComponent[keys[i]] = sourceComponent[keys[i]];
-	            } catch (error) {
+	var isGetOwnPropertySymbolsAvailable = typeof Object.getOwnPropertySymbols === 'function';
 
+	module.exports = function hoistNonReactStatics(targetComponent, sourceComponent, customStatics) {
+	    if (typeof sourceComponent !== 'string') { // don't hoist over string (html) components
+	        var keys = Object.getOwnPropertyNames(sourceComponent);
+
+	        /* istanbul ignore else */
+	        if (isGetOwnPropertySymbolsAvailable) {
+	            keys = keys.concat(Object.getOwnPropertySymbols(sourceComponent));
+	        }
+
+	        for (var i = 0; i < keys.length; ++i) {
+	            if (!REACT_STATICS[keys[i]] && !KNOWN_STATICS[keys[i]] && (!customStatics || !customStatics[keys[i]])) {
+	                try {
+	                    targetComponent[keys[i]] = sourceComponent[keys[i]];
+	                } catch (error) {
+
+	                }
 	            }
 	        }
 	    }
@@ -21092,7 +21480,7 @@
 
 
 /***/ },
-/* 179 */
+/* 188 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -21150,7 +21538,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 180 */
+/* 189 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -21159,21 +21547,21 @@
 	    value: true
 	});
 
-	var _redux = __webpack_require__(165);
+	var _redux = __webpack_require__(166);
 
-	var _PalletReducer = __webpack_require__(181);
+	var _PalletReducer = __webpack_require__(190);
 
 	var _PalletReducer2 = _interopRequireDefault(_PalletReducer);
 
-	var _CanvasReducer = __webpack_require__(190);
+	var _CanvasReducer = __webpack_require__(199);
 
-	var _PropertyReducer = __webpack_require__(194);
+	var _PropertyReducer = __webpack_require__(203);
 
 	var _PropertyReducer2 = _interopRequireDefault(_PropertyReducer);
 
-	var _TabsReducer = __webpack_require__(195);
+	var _TabsReducer = __webpack_require__(204);
 
-	var _SelectsReducer = __webpack_require__(196);
+	var _SelectsReducer = __webpack_require__(205);
 
 	function _interopRequireDefault(obj) {
 	    return obj && obj.__esModule ? obj : { default: obj };
@@ -21194,7 +21582,7 @@
 	exports.default = componentReducers;
 
 /***/ },
-/* 181 */
+/* 190 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -21203,9 +21591,9 @@
 	  value: true
 	});
 
-	var _DataHelper = __webpack_require__(182);
+	var _DataHelper = __webpack_require__(191);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
 	/**
 	 * the data of the pallet component
@@ -21214,7 +21602,7 @@
 	 * @returns {Object} the pallet element infomation
 	 */
 	var groups = function groups() {
-	  var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.palletGroup : arguments[0];
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _DataHelper.DataHelper.palletGroup;
 	  var action = arguments[1];
 
 	  switch (action.type) {
@@ -21233,7 +21621,7 @@
 	exports.default = groups;
 
 /***/ },
-/* 182 */
+/* 191 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -21243,11 +21631,11 @@
 	});
 	exports.DataHelper = undefined;
 
-	var _StoreHelper = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(192);
 
-	var _DefaultValues = __webpack_require__(184);
+	var _DefaultValues = __webpack_require__(193);
 
-	var _PalletDataHelper = __webpack_require__(189);
+	var _PalletDataHelper = __webpack_require__(198);
 
 	var _papers = void 0; /**
 	                       * @fileOverview Helper method to get the value of the diagram. combine the StoreHelper and DefaultValues,which used to get the initialed values for the canvas
@@ -21400,7 +21788,7 @@
 	};
 
 /***/ },
-/* 183 */
+/* 192 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -21410,13 +21798,13 @@
 	});
 	exports.StoreHelper = undefined;
 
-	var _DefaultValues = __webpack_require__(184);
+	var _DefaultValues = __webpack_require__(193);
 
-	var _ElementHelper = __webpack_require__(185);
+	var _ElementHelper = __webpack_require__(194);
 
-	var _LineHelper = __webpack_require__(187);
+	var _LineHelper = __webpack_require__(196);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
 	/**
 	 * the store helper used to access some informations in store. contains an referance to the redux golbal store
@@ -21539,8 +21927,8 @@
 	            if (elementProperty) {
 	                //todo::
 	            } else {
-	                    elementProperty = _DefaultValues.DefaultValues.getDefaultProperties(elementTypeId);
-	                }
+	                elementProperty = _DefaultValues.DefaultValues.getDefaultProperties(elementTypeId);
+	            }
 	            return elementProperty;
 	        },
 	        getPalletElementInfoById: function getPalletElementInfoById(iPalletelementid) {
@@ -21580,10 +21968,11 @@
 	        },
 	        getPortPosition: function getPortPosition(elementKey, position) {
 	            var oElement = StoreHelper.getCanvasElmentInfoById(elementKey);
-	            var startX = oElement.x;
-	            var startY = oElement.y;
-	            var width = oElement.width;
-	            var height = oElement.height;
+	            var _ref = [oElement.x, oElement.y, oElement.width, oElement.height],
+	                startX = _ref[0],
+	                startY = _ref[1],
+	                width = _ref[2],
+	                height = _ref[3];
 
 	            var portPosition = null;
 	            switch (position) {
@@ -21690,7 +22079,7 @@
 	}();
 
 /***/ },
-/* 184 */
+/* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -21700,11 +22089,11 @@
 	});
 	exports.DefaultValues = undefined;
 
-	var _ElementHelper = __webpack_require__(185);
+	var _ElementHelper = __webpack_require__(194);
 
-	var _StoreHelper = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(192);
 
-	var _UUID = __webpack_require__(186);
+	var _UUID = __webpack_require__(195);
 
 	function _defineProperty(obj, key, value) {
 	    if (key in obj) {
@@ -21864,7 +22253,7 @@
 	}();
 
 /***/ },
-/* 185 */
+/* 194 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -21920,7 +22309,7 @@
 	}();
 
 /***/ },
-/* 186 */
+/* 195 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21942,7 +22331,7 @@
 	};
 
 /***/ },
-/* 187 */
+/* 196 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -21992,7 +22381,6 @@
 	         * @param {Object} evt the react Event object
 	         * @returns {Object} oContext  contain type/id proerties
 	         */
-
 	        portInfo: function portInfo(elementKey, position) {
 	            return {
 	                elementKey: elementKey, position: position
@@ -22088,15 +22476,13 @@
 	        getRectPoints: function getRectPoints(aStartPoint, aEndPoint) {
 	            var lineDirction = RectHelper.getLineType(aStartPoint, aEndPoint);
 
-	            var _aStartPoint = _slicedToArray(aStartPoint, 2);
+	            var _aStartPoint = _slicedToArray(aStartPoint, 2),
+	                startX = _aStartPoint[0],
+	                startY = _aStartPoint[1];
 
-	            var startX = _aStartPoint[0];
-	            var startY = _aStartPoint[1];
-
-	            var _aEndPoint = _slicedToArray(aEndPoint, 2);
-
-	            var endX = _aEndPoint[0];
-	            var endY = _aEndPoint[1];
+	            var _aEndPoint = _slicedToArray(aEndPoint, 2),
+	                endX = _aEndPoint[0],
+	                endY = _aEndPoint[1];
 
 	            var aUpArea = [];
 	            var aDownArea = [];
@@ -22136,7 +22522,7 @@
 	}();
 
 /***/ },
-/* 188 */
+/* 197 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -22204,7 +22590,7 @@
 	var UNDO_REDO_LINKS = exports.UNDO_REDO_LINKS = "undo redo links";
 
 /***/ },
-/* 189 */
+/* 198 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -22280,31 +22666,39 @@
 	}();
 
 /***/ },
-/* 190 */
+/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.secondLevelPage = exports.operator = exports.links = exports.elements = exports.svgProperties = undefined;
 
-	var _redux = __webpack_require__(165);
+	var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+	    return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+	} : function (obj) {
+	    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+	};
 
-	var _consts = __webpack_require__(188);
+	var _redux = __webpack_require__(166);
 
-	var _Utility = __webpack_require__(191);
+	var _consts = __webpack_require__(197);
 
-	var _DataHelper = __webpack_require__(182);
+	var _Utility = __webpack_require__(200);
 
-	var _DefaultValues = __webpack_require__(184);
+	var _DataHelper = __webpack_require__(191);
 
-	var _StoreHelper = __webpack_require__(183);
+	var _DefaultValues = __webpack_require__(193);
 
-	var _PaperHelper = __webpack_require__(192);
+	var _StoreHelper = __webpack_require__(192);
 
-	var _OperationHistory = __webpack_require__(193);
+	var _PaperHelper = __webpack_require__(201);
+
+	var _OperationHistory = __webpack_require__(202);
 
 	function _defineProperty(obj, key, value) {
 	    if (key in obj) {
@@ -22321,7 +22715,7 @@
 	 * @returns {} 
 	 */
 	var svgProperties = function svgProperties() {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.svgProperties : arguments[0];
+	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _DataHelper.DataHelper.svgProperties;
 	    var action = arguments[1];
 
 	    var newState = state;
@@ -22372,7 +22766,7 @@
 	 * @returns {} 
 	 */
 	var elements = function elements() {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.elements : arguments[0];
+	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _DataHelper.DataHelper.elements;
 	    var action = arguments[1];
 
 	    var newState = void 0,
@@ -22449,56 +22843,79 @@
 	 * @returns {} 
 	 */
 	var links = function links() {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.links : arguments[0];
+	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _DataHelper.DataHelper.links;
 	    var action = arguments[1];
 
 	    var paperId = _StoreHelper.StoreHelper.getSelectedPaperId();
-	    switch (action.type) {
-	        case _consts.UPDATE_LINES:
-	            //todo update lines which related to the element
-	            var aRefLinks = _StoreHelper.StoreHelper.getRefLinksByElementKey(action.id);
-	            var oUpdatedLinks = _StoreHelper.StoreHelper.getUpdatedLinks(aRefLinks);
-	            return Object.assign({}, state, oUpdatedLinks);
-	            break;
-	        case _consts.REMOVE_LINES:
-	            aRefLinks = _StoreHelper.StoreHelper.getRefLinksByElementKey(action.id);
-	            var newLinks = Object.assign({}, state);
-	            aRefLinks.forEach(function (key) {
-	                delete newLinks[key];
-	            });
-	            return newLinks;
-	            break;
-	        case _consts.REMOVE_LINE:
-	            newLinks = Object.assign({}, state);
-	            delete newLinks[action.id];
-	            return newLinks;
-	            break;
-	        case _consts.ADD_LINE:
-	            var key = (0, _Utility.generateUUID)();
-	            var startPoint = _StoreHelper.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
-	            var endPoint = _StoreHelper.StoreHelper.getPortPosition(action.endPort.elementKey, action.endPort.position);
-	            var path = _Utility.LineHelper.getPath(startPoint, endPoint);
-	            return Object.assign({}, state, _defineProperty({}, key, {
-	                key: key,
-	                startPort: action.startPort,
-	                endPort: action.endPort,
-	                path: path
-	            }));
-	            break;
-	        case _consts.SWITCH_SUB_PAPER:
-	            return Object.assign({}, action.paper.links);
-	            break;
-	        case _consts.UNDO_REDO_LINKS:
-	            return Object.assign({}, action.data);
-	            break;
-	        case _consts.RESET_DIAGRAM:
-	            return Object.assign({}, _DataHelper.DataHelper.links);
-	            break;
-	    }
+	    var startPoint;
+	    var endPoint;
+	    var path;
+
+	    var _ret = function () {
+	        switch (action.type) {
+	            case _consts.UPDATE_LINES:
+	                //todo update lines which related to the element
+	                var aRefLinks = _StoreHelper.StoreHelper.getRefLinksByElementKey(action.id);
+	                var oUpdatedLinks = _StoreHelper.StoreHelper.getUpdatedLinks(aRefLinks);
+	                return {
+	                    v: Object.assign({}, state, oUpdatedLinks)
+	                };
+	                break;
+	            case _consts.REMOVE_LINES:
+	                aRefLinks = _StoreHelper.StoreHelper.getRefLinksByElementKey(action.id);
+	                var newLinks = Object.assign({}, state);
+	                aRefLinks.forEach(function (key) {
+	                    delete newLinks[key];
+	                });
+	                return {
+	                    v: newLinks
+	                };
+	                break;
+	            case _consts.REMOVE_LINE:
+	                newLinks = Object.assign({}, state);
+	                delete newLinks[action.id];
+	                return {
+	                    v: newLinks
+	                };
+	                break;
+	            case _consts.ADD_LINE:
+	                var key = (0, _Utility.generateUUID)();
+	                startPoint = _StoreHelper.StoreHelper.getPortPosition(action.startPort.elementKey, action.startPort.position);
+	                endPoint = _StoreHelper.StoreHelper.getPortPosition(action.endPort.elementKey, action.endPort.position);
+	                path = _Utility.LineHelper.getPath(startPoint, endPoint);
+
+	                return {
+	                    v: Object.assign({}, state, _defineProperty({}, key, {
+	                        key: key,
+	                        startPort: action.startPort,
+	                        endPort: action.endPort,
+	                        path: path
+	                    }))
+	                };
+	                break;
+	            case _consts.SWITCH_SUB_PAPER:
+	                return {
+	                    v: Object.assign({}, action.paper.links)
+	                };
+	                break;
+	            case _consts.UNDO_REDO_LINKS:
+	                return {
+	                    v: Object.assign({}, action.data)
+	                };
+	                break;
+	            case _consts.RESET_DIAGRAM:
+	                return {
+	                    v: Object.assign({}, _DataHelper.DataHelper.links)
+	                };
+	                break;
+	        }
+	    }();
+
+	    if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
 	    return state;
 	};
 	var operator = function operator() {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.operator : arguments[0];
+	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _DataHelper.DataHelper.operator;
 	    var action = arguments[1];
 
 	    switch (action.type) {
@@ -22541,7 +22958,7 @@
 	    }
 	};
 	var secondLevelPage = function secondLevelPage() {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.secondLevelPage : arguments[0];
+	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _DataHelper.DataHelper.secondLevelPage;
 	    var action = arguments[1];
 
 	    switch (action.type) {
@@ -22568,7 +22985,7 @@
 	exports.secondLevelPage = secondLevelPage;
 
 /***/ },
-/* 191 */
+/* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22578,19 +22995,19 @@
 	});
 	exports.Position = exports.getDragContextObject = exports.parseDragContext = exports.getDragContext = exports.setDragContext = exports.dummyFunction = exports.getRelativePosition = exports.generateUUID = exports.LineHelper = exports.ElementHelper = exports.DefaultValues = exports.StoreHelper = undefined;
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
-	var _StoreHelper = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(192);
 
-	var _DefaultValues = __webpack_require__(184);
+	var _DefaultValues = __webpack_require__(193);
 
-	var _ElementHelper = __webpack_require__(185);
+	var _ElementHelper = __webpack_require__(194);
 
-	var _LineHelper = __webpack_require__(187);
+	var _LineHelper = __webpack_require__(196);
 
-	var _UUID = __webpack_require__(186);
+	var _UUID = __webpack_require__(195);
 
-	var _DataHelper = __webpack_require__(182);
+	var _DataHelper = __webpack_require__(191);
 
 	exports.StoreHelper = _StoreHelper.StoreHelper;
 	exports.DefaultValues = _DefaultValues.DefaultValues;
@@ -22720,7 +23137,7 @@
 	}();
 
 /***/ },
-/* 192 */
+/* 201 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22730,11 +23147,11 @@
 	});
 	exports.paper = exports.papers = exports.updateElementsStatus = exports.updatePlaceholderValues = undefined;
 
-	var _StoreHelper = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(192);
 
-	var _ElementHelper = __webpack_require__(185);
+	var _ElementHelper = __webpack_require__(194);
 
-	var _PalletDataHelper = __webpack_require__(189);
+	var _PalletDataHelper = __webpack_require__(198);
 
 	function _updatePlaceholdersValues(elements, properties, oValues) {
 		return Object.keys(elements).filter(function (sEleKey) {
@@ -22800,7 +23217,6 @@
 	  * update the place holder values of the papers. as the papers is not display directly so update it directly
 	  * @param {} oValues
 	  */
-
 		updatePlaceholderValues: function updatePlaceholderValues(oValues) {
 			var oPapers = _StoreHelper.StoreHelper.getPapers();
 			Object.keys(oPapers).forEach(function (paperKey) {
@@ -22855,7 +23271,7 @@
 				if (hasPaper) {
 					return true;
 				} else {
-					invalideMessages.push("子页面" + oPapers[subPaperUUID].paperName + "绑定设备:" + subPages[subPaperUUID] + " 不存在");
+					invalideMessages.push("\u5B50\u9875\u9762" + oPapers[subPaperUUID].paperName + "\u7ED1\u5B9A\u8BBE\u5907:" + subPages[subPaperUUID] + " \u4E0D\u5B58\u5728");
 					return false;
 				}
 			});
@@ -22886,7 +23302,7 @@
 					var deviceNumber = property && property.deviceInfo && property.deviceInfo.identifier;
 					if (deviceNumber) {
 						if (oDeviceNumbers[deviceNumber]) {
-							aErrorMessages.push("重复的设备编号:" + deviceNumber);
+							aErrorMessages.push("\u91CD\u590D\u7684\u8BBE\u5907\u7F16\u53F7:" + deviceNumber);
 						} else {
 							oDeviceNumbers[deviceNumber] = true;
 						}
@@ -22961,7 +23377,7 @@
 				aMeasurePointInfos.forEach(function (oInfo) {
 					if (oInfo.identifier) {
 						if (oMeasureId[oInfo.identifier]) {
-							aErrorMessages.push("有重复的测点" + oInfo.identifier);
+							aErrorMessages.push("\u6709\u91CD\u590D\u7684\u6D4B\u70B9" + oInfo.identifier);
 						} else {
 							oMeasureId[oInfo.identifier] = true;
 						}
@@ -22973,7 +23389,7 @@
 	};
 
 /***/ },
-/* 193 */
+/* 202 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22983,9 +23399,9 @@
 	});
 	exports.OperationWrapper = exports.OperationHistory = undefined;
 
-	var _StoreHelper = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(192);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
 	/**
 	 * undo history: {paperid:[{type:"",data:[]}]}
@@ -23079,7 +23495,7 @@
 	};
 
 /***/ },
-/* 194 */
+/* 203 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23089,11 +23505,11 @@
 	});
 	exports.pageInfo = exports.properties = undefined;
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
-	var _DataHelper = __webpack_require__(182);
+	var _DataHelper = __webpack_require__(191);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
 	function _defineProperty(obj, key, value) {
 				if (key in obj) {
@@ -23114,7 +23530,7 @@
 	}
 
 	var properties = exports.properties = function properties() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? { type: _consts.CANVAS, selectedProperties: _DataHelper.DataHelper.svgProperties, properties: _DataHelper.DataHelper.properties } : arguments[0];
+				var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { type: _consts.CANVAS, selectedProperties: _DataHelper.DataHelper.svgProperties, properties: _DataHelper.DataHelper.properties };
 				var action = arguments[1];
 
 				var selectedProperties = null;
@@ -23200,8 +23616,8 @@
 										return Object.assign({}, state, { selectedProperties: selectedProperties });
 										break;
 							case _consts.SAVE_ELEMENT_PROPERTIES:
-										var properties = Object.assign({}, state.properties, _defineProperty({}, action.properties.key, action.properties));
-										return Object.assign({}, state, { properties: properties });
+										var _properties = Object.assign({}, state.properties, _defineProperty({}, action.properties.key, action.properties));
+										return Object.assign({}, state, { properties: _properties });
 										break;
 							case _consts.SAVE_MEASURE_POINT_VALUE:
 										//todo:: update it the state directly with side effect.
@@ -23224,7 +23640,7 @@
 	exports.default = properties;
 
 /***/ },
-/* 195 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23234,13 +23650,13 @@
 	});
 	exports.selectedPaperId = exports.papers = undefined;
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
-	var _DataHelper = __webpack_require__(182);
+	var _DataHelper = __webpack_require__(191);
 
-	var _PaperHelper = __webpack_require__(192);
+	var _PaperHelper = __webpack_require__(201);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
 	function _defineProperty(obj, key, value) {
 				if (key in obj) {
@@ -23251,7 +23667,7 @@
 	}
 
 	var papers = function papers() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.papers : arguments[0];
+				var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _DataHelper.DataHelper.papers;
 				var action = arguments[1];
 
 				switch (action.type) {
@@ -23284,7 +23700,7 @@
 	};
 
 	var selectedPaperId = function selectedPaperId() {
-				var state = arguments.length <= 0 || arguments[0] === undefined ? _DataHelper.DataHelper.defaultSelectedPaper.uuid : arguments[0];
+				var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _DataHelper.DataHelper.defaultSelectedPaper.uuid;
 				var action = arguments[1];
 
 				switch (action.type) {
@@ -23300,7 +23716,7 @@
 	exports.selectedPaperId = selectedPaperId;
 
 /***/ },
-/* 196 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23310,7 +23726,7 @@
 	});
 	exports.selects = undefined;
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
 	var _defaultSelectedElement = {
 	   selectedPalletItem: null,
@@ -23324,7 +23740,7 @@
 	 * @returns {Object} new state
 	 */
 	var selects = exports.selects = function selects() {
-	   var state = arguments.length <= 0 || arguments[0] === undefined ? _defaultSelectedElement : arguments[0];
+	   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _defaultSelectedElement;
 	   var action = arguments[1];
 
 	   switch (action.type) {
@@ -23354,7 +23770,7 @@
 	};
 
 /***/ },
-/* 197 */
+/* 206 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23368,21 +23784,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Pallet = __webpack_require__(198);
+	var _Pallet = __webpack_require__(207);
 
 	var _Pallet2 = _interopRequireDefault(_Pallet);
 
-	var _Canvas = __webpack_require__(201);
+	var _Canvas = __webpack_require__(210);
 
-	var _Property = __webpack_require__(208);
+	var _Property = __webpack_require__(217);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _Toolbar = __webpack_require__(210);
+	var _Toolbar = __webpack_require__(219);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _Tabs = __webpack_require__(212);
+	var _Tabs = __webpack_require__(221);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23440,7 +23856,7 @@
 	exports.StaticApp = StaticApp;
 
 /***/ },
-/* 198 */
+/* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23451,15 +23867,15 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Pallet = __webpack_require__(199);
+	var _Pallet = __webpack_require__(208);
 
 	var _Pallet2 = _interopRequireDefault(_Pallet);
 
-	var _actions = __webpack_require__(200);
+	var _actions = __webpack_require__(209);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
 	function _interopRequireDefault(obj) {
 					return obj && obj.__esModule ? obj : { default: obj };
@@ -23487,7 +23903,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Pallet2.default);
 
 /***/ },
-/* 199 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23505,10 +23921,10 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Item = function Item(_ref) {
-	  var onDrag = _ref.onDrag;
-	  var image = _ref.image;
-	  var name = _ref.name;
-	  var id = _ref.id;
+	  var onDrag = _ref.onDrag,
+	      image = _ref.image,
+	      name = _ref.name,
+	      id = _ref.id;
 	  return _react2.default.createElement(
 	    'li',
 	    null,
@@ -23581,7 +23997,7 @@
 	    _react2.default.createElement(
 	      'div',
 	      { className: 'dia-title' },
-	      '图元列表'
+	      '\u56FE\u5143\u5217\u8868'
 	    ),
 	    _react2.default.createElement(
 	      'div',
@@ -23609,7 +24025,7 @@
 	exports.default = Pallet;
 
 /***/ },
-/* 200 */
+/* 209 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23619,7 +24035,7 @@
 	});
 	exports.undoRedoLinks = exports.undoRedoElements = exports.undoRedoSVGProerties = exports.toggleExpand = exports.savePageInfo = exports.resetDiagram = exports.updateStatus = exports.updateBindingData = exports.updateElementDatas = exports.closeSubPage = exports.openSubPage = exports.updateTextElement = exports.deleteSubPage = exports.switchSubPage = exports.createSubPage = exports.undo = exports.redo = exports.zoomOut = exports.zoomIn = exports.updateElementGeometricData = exports.saveMeasurePointValue = exports.removeMeasurePoint = exports.addMeasurePoint = exports.saveElementProperties = exports.saveSvgProperties = exports.selectCanvas = exports.selectLine = exports.selectElement = exports.removeLine = exports.removeLines = exports.updateLines = exports.addLine = exports.removeElement = exports.moveElement = exports.addElement = exports.clearSelection = exports.canvasElementDragStart = exports.palletElementDragStart = undefined;
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
 	var palletElementDragStart = exports.palletElementDragStart = function palletElementDragStart(id) {
 	    return {
@@ -23813,10 +24229,10 @@
 	    };
 	};
 	var createSubPage = exports.createSubPage = function createSubPage(_ref) {
-	    var name = _ref.name;
-	    var type = _ref.type;
-	    var key = _ref.key;
-	    var uuid = _ref.uuid;
+	    var name = _ref.name,
+	        type = _ref.type,
+	        key = _ref.key,
+	        uuid = _ref.uuid;
 
 	    return {
 	        type: _consts.CREATE_SUB_PAPGER,
@@ -23922,7 +24338,7 @@
 	};
 
 /***/ },
-/* 201 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23934,23 +24350,23 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Canvas = __webpack_require__(202);
+	var _Canvas = __webpack_require__(211);
 
-	var _StoreHelper = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(192);
 
-	var _DataHelper = __webpack_require__(182);
+	var _DataHelper = __webpack_require__(191);
 
-	var _PalletDataHelper = __webpack_require__(189);
+	var _PalletDataHelper = __webpack_require__(198);
 
-	var _OperationHistory = __webpack_require__(193);
+	var _OperationHistory = __webpack_require__(202);
 
-	var _callbacks = __webpack_require__(207);
+	var _callbacks = __webpack_require__(216);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
-	var _actions = __webpack_require__(200);
+	var _actions = __webpack_require__(209);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
 	function logElements() {
 	    _OperationHistory.OperationWrapper.addUndoElements();
@@ -24017,11 +24433,10 @@
 	            dispatch((0, _actions.removeLines)(key));
 	            dispatch((0, _actions.removeElement)(key));
 
-	            var _StoreHelper$getSvgPr = _StoreHelper.StoreHelper.getSvgProperties();
-
-	            var width = _StoreHelper$getSvgPr.width;
-	            var height = _StoreHelper$getSvgPr.height;
-	            var gridSize = _StoreHelper$getSvgPr.gridSize;
+	            var _StoreHelper$getSvgPr = _StoreHelper.StoreHelper.getSvgProperties(),
+	                width = _StoreHelper$getSvgPr.width,
+	                height = _StoreHelper$getSvgPr.height,
+	                gridSize = _StoreHelper$getSvgPr.gridSize;
 
 	            dispatch((0, _actions.selectCanvas)(width, height, gridSize));
 	        },
@@ -24068,10 +24483,11 @@
 	        dbClickElement: function dbClickElement(evt) {
 	            var key = evt.currentTarget.getAttribute("data-key");
 	            var elementInfo = _StoreHelper.StoreHelper.getCanvasElmentInfoById(key);
-	            var x = elementInfo.x;
-	            var y = elementInfo.y;
-	            var width = elementInfo.width;
-	            var height = elementInfo.height;
+	            var _ref = [elementInfo.x, elementInfo.y, elementInfo.width, elementInfo.height],
+	                x = _ref[0],
+	                y = _ref[1],
+	                width = _ref[2],
+	                height = _ref[3];
 
 	            dispatch((0, _actions.selectElement)(key, x, y, width, height));
 	            evt.preventDefault();
@@ -24082,11 +24498,10 @@
 	         * @param {} evt
 	         */
 	        dbClickCanvas: function dbClickCanvas(evt) {
-	            var _StoreHelper$getSvgPr2 = _StoreHelper.StoreHelper.getSvgProperties();
-
-	            var width = _StoreHelper$getSvgPr2.width;
-	            var height = _StoreHelper$getSvgPr2.height;
-	            var gridSize = _StoreHelper$getSvgPr2.gridSize;
+	            var _StoreHelper$getSvgPr2 = _StoreHelper.StoreHelper.getSvgProperties(),
+	                width = _StoreHelper$getSvgPr2.width,
+	                height = _StoreHelper$getSvgPr2.height,
+	                gridSize = _StoreHelper$getSvgPr2.gridSize;
 
 	            dispatch((0, _actions.selectCanvas)(width, height, gridSize));
 	            evt.preventDefault();
@@ -24181,7 +24596,7 @@
 	exports.StaticSecondLevelCanvas = StaticSecondLevelCanvas;
 
 /***/ },
-/* 202 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24189,7 +24604,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.StaticCanvas = exports.Canvas = exports.StaticCanvasWithClose = undefined;
+	exports.StaticCanvasWithClose = exports.StaticCanvas = exports.Canvas = undefined;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -24197,33 +24612,33 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
-	var _gridHelper = __webpack_require__(203);
+	var _gridHelper = __webpack_require__(212);
 
-	var _TextElement = __webpack_require__(204);
+	var _TextElement = __webpack_require__(213);
 
 	var _TextElement2 = _interopRequireDefault(_TextElement);
 
-	var _PlaceHolder = __webpack_require__(205);
+	var _PlaceHolder = __webpack_require__(214);
 
 	var _PlaceHolder2 = _interopRequireDefault(_PlaceHolder);
 
-	var _GroupElement = __webpack_require__(206);
+	var _GroupElement = __webpack_require__(215);
 
 	var _GroupElement2 = _interopRequireDefault(_GroupElement);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var MagnetPorts = function MagnetPorts(_ref) {
-	  var x = _ref.x;
-	  var y = _ref.y;
-	  var ownerKey = _ref.ownerKey;
-	  var position = _ref.position;
-	  var onPortMouseDown = _ref.onPortMouseDown;
-	  var onPortMouseUp = _ref.onPortMouseUp;
+	  var x = _ref.x,
+	      y = _ref.y,
+	      ownerKey = _ref.ownerKey,
+	      position = _ref.position,
+	      onPortMouseDown = _ref.onPortMouseDown,
+	      onPortMouseUp = _ref.onPortMouseUp;
 
 	  return _react2.default.createElement(
 	    "g",
@@ -24232,25 +24647,25 @@
 	  );
 	};
 	var Element = function Element(_ref2) {
-	  var id = _ref2.id;
-	  var typeId = _ref2.typeId;
-	  var image = _ref2.image;
-	  var x = _ref2.x;
-	  var y = _ref2.y;
-	  var width = _ref2.width;
-	  var height = _ref2.height;
-	  var dbclick = _ref2.dbclick;
-	  var dragElementStart = _ref2.dragElementStart;
-	  var onPortMouseUp = _ref2.onPortMouseUp;
-	  var onPortMouseDown = _ref2.onPortMouseDown;
-	  var dbClick = _ref2.dbClick;
-	  var draggable = _ref2.draggable;
-	  var midHorizontal = width / 2;
-	  var midVertical = height / 2;
-	  var top = { x: midHorizontal, y: 0 };
-	  var right = { x: width, y: midVertical };
-	  var bottom = { x: midHorizontal, y: height };
-	  var left = { x: 0, y: midVertical };
+	  var id = _ref2.id,
+	      typeId = _ref2.typeId,
+	      image = _ref2.image,
+	      x = _ref2.x,
+	      y = _ref2.y,
+	      width = _ref2.width,
+	      height = _ref2.height,
+	      dbclick = _ref2.dbclick,
+	      dragElementStart = _ref2.dragElementStart,
+	      onPortMouseUp = _ref2.onPortMouseUp,
+	      onPortMouseDown = _ref2.onPortMouseDown,
+	      dbClick = _ref2.dbClick,
+	      draggable = _ref2.draggable;
+	  var midHorizontal = width / 2,
+	      midVertical = height / 2;
+	  var top = { x: midHorizontal, y: 0 },
+	      right = { x: width, y: midVertical },
+	      bottom = { x: midHorizontal, y: height },
+	      left = { x: 0, y: midVertical };
 
 	  return _react2.default.createElement(
 	    "g",
@@ -24280,9 +24695,9 @@
 	  );
 	};
 	var Link = function Link(_ref3) {
-	  var path = _ref3.path;
-	  var id = _ref3.id;
-	  var dbClick = _ref3.dbClick;
+	  var path = _ref3.path,
+	      id = _ref3.id,
+	      dbClick = _ref3.dbClick;
 
 	  return _react2.default.createElement(
 	    "g",
@@ -24292,8 +24707,8 @@
 	  );
 	};
 	var LineOperator = function LineOperator(_ref4) {
-	  var lineId = _ref4.lineId;
-	  var onRemoveClick = _ref4.onRemoveClick;
+	  var lineId = _ref4.lineId,
+	      onRemoveClick = _ref4.onRemoveClick;
 
 	  return _react2.default.createElement(
 	    "g",
@@ -24304,18 +24719,18 @@
 	      _react2.default.createElement(
 	        "textPath",
 	        { xlinkHref: "#" + lineId, "data-line-key": lineId, onClick: onRemoveClick },
-	        "删除"
+	        "\u5220\u9664"
 	      )
 	    )
 	  );
 	};
 	var ElementOperator = function ElementOperator(_ref5) {
-	  var id = _ref5.id;
-	  var x = _ref5.x;
-	  var y = _ref5.y;
-	  var width = _ref5.width;
-	  var height = _ref5.height;
-	  var onRemoveClick = _ref5.onRemoveClick;
+	  var id = _ref5.id,
+	      x = _ref5.x,
+	      y = _ref5.y,
+	      width = _ref5.width,
+	      height = _ref5.height,
+	      onRemoveClick = _ref5.onRemoveClick;
 
 	  return _react2.default.createElement(
 	    "g",
@@ -24326,7 +24741,7 @@
 	      _react2.default.createElement(
 	        "text",
 	        { "data-element-key": id, onClick: onRemoveClick, x: width / 2, y: "-5", textAnchor: "middle" },
-	        "删除"
+	        "\u5220\u9664"
 	      )
 	    ),
 	    _react2.default.createElement("rect", { className: "operator-hightlight", width: width + 8, height: height + 8 })
@@ -24413,7 +24828,7 @@
 	    )
 	  );
 	};
-	var StaticCanvasWithClose = exports.StaticCanvasWithClose = function StaticCanvasWithClose(data) {
+	var StaticCanvasWithClose = function StaticCanvasWithClose(data) {
 	  return _react2.default.createElement(
 	    "div",
 	    { className: "dia-overlay", style: { display: data.hide ? "none" : "block" } },
@@ -24435,7 +24850,7 @@
 	exports.StaticCanvasWithClose = StaticCanvasWithClose;
 
 /***/ },
-/* 203 */
+/* 212 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -24477,7 +24892,7 @@
 	};
 
 /***/ },
-/* 204 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24491,21 +24906,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var TextElement = function TextElement(_ref) {
-	  var id = _ref.id;
-	  var typeId = _ref.typeId;
-	  var x = _ref.x;
-	  var y = _ref.y;
-	  var text = _ref.text;
-	  var width = _ref.width;
-	  var height = _ref.height;
-	  var dbClick = _ref.dbClick;
-	  var dragElementStart = _ref.dragElementStart;
-	  var draggable = _ref.draggable;
+	  var id = _ref.id,
+	      typeId = _ref.typeId,
+	      x = _ref.x,
+	      y = _ref.y,
+	      text = _ref.text,
+	      width = _ref.width,
+	      height = _ref.height,
+	      dbClick = _ref.dbClick,
+	      dragElementStart = _ref.dragElementStart,
+	      draggable = _ref.draggable;
 
 	  return _react2.default.createElement(
 	    "g",
@@ -24527,8 +24942,8 @@
 	};
 
 	var TextProperties = exports.TextProperties = function TextProperties(_ref2) {
-	  var elementKey = _ref2.elementKey;
-	  var text = _ref2.text;
+	  var elementKey = _ref2.elementKey,
+	      text = _ref2.text;
 
 	  return _react2.default.createElement(
 	    "div",
@@ -24536,7 +24951,7 @@
 	    _react2.default.createElement(
 	      "div",
 	      { className: "pro-header" },
-	      "文本内容"
+	      "\u6587\u672C\u5185\u5BB9"
 	    ),
 	    _react2.default.createElement(
 	      "div",
@@ -24547,7 +24962,7 @@
 	        _react2.default.createElement(
 	          "label",
 	          null,
-	          "文字"
+	          "\u6587\u5B57"
 	        ),
 	        _react2.default.createElement("input", { name: "text", "data-element-key": elementKey, type: "text", defaultValue: text })
 	      )
@@ -24558,7 +24973,7 @@
 	exports.default = TextElement;
 
 /***/ },
-/* 205 */
+/* 214 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24572,21 +24987,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var PlaceholderElement = function PlaceholderElement(_ref) {
-	  var id = _ref.id;
-	  var typeId = _ref.typeId;
-	  var x = _ref.x;
-	  var y = _ref.y;
-	  var text = _ref.text;
-	  var width = _ref.width;
-	  var height = _ref.height;
-	  var dbClick = _ref.dbClick;
-	  var dragElementStart = _ref.dragElementStart;
-	  var draggable = _ref.draggable;
+	  var id = _ref.id,
+	      typeId = _ref.typeId,
+	      x = _ref.x,
+	      y = _ref.y,
+	      text = _ref.text,
+	      width = _ref.width,
+	      height = _ref.height,
+	      dbClick = _ref.dbClick,
+	      dragElementStart = _ref.dragElementStart,
+	      draggable = _ref.draggable;
 
 	  return _react2.default.createElement(
 	    "g",
@@ -24608,8 +25023,8 @@
 	};
 
 	var PlaceholderProperties = exports.PlaceholderProperties = function PlaceholderProperties(_ref2) {
-	  var elementKey = _ref2.elementKey;
-	  var bindingId = _ref2.bindingId;
+	  var elementKey = _ref2.elementKey,
+	      bindingId = _ref2.bindingId;
 
 	  return _react2.default.createElement(
 	    "div",
@@ -24617,7 +25032,7 @@
 	    _react2.default.createElement(
 	      "div",
 	      { className: "pro-header" },
-	      "绑定信息"
+	      "\u7ED1\u5B9A\u4FE1\u606F"
 	    ),
 	    _react2.default.createElement(
 	      "div",
@@ -24628,7 +25043,7 @@
 	        _react2.default.createElement(
 	          "label",
 	          null,
-	          "测点编号"
+	          "\u6D4B\u70B9\u7F16\u53F7"
 	        ),
 	        _react2.default.createElement("input", { name: "binding-id", "data-element-key": elementKey, type: "text", defaultValue: bindingId })
 	      )
@@ -24639,7 +25054,7 @@
 	exports.default = PlaceholderElement;
 
 /***/ },
-/* 206 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24653,20 +25068,20 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var GroupElement = function GroupElement(_ref) {
-	  var id = _ref.id;
-	  var typeId = _ref.typeId;
-	  var x = _ref.x;
-	  var y = _ref.y;
-	  var width = _ref.width;
-	  var height = _ref.height;
-	  var dbClick = _ref.dbClick;
-	  var dragElementStart = _ref.dragElementStart;
-	  var draggable = _ref.draggable;
+	  var id = _ref.id,
+	      typeId = _ref.typeId,
+	      x = _ref.x,
+	      y = _ref.y,
+	      width = _ref.width,
+	      height = _ref.height,
+	      dbClick = _ref.dbClick,
+	      dragElementStart = _ref.dragElementStart,
+	      draggable = _ref.draggable;
 
 	  return _react2.default.createElement(
 	    "g",
@@ -24684,8 +25099,8 @@
 	};
 
 	var GroupProperties = exports.GroupProperties = function GroupProperties(_ref2) {
-	  var elementKey = _ref2.elementKey;
-	  var bindingId = _ref2.bindingId;
+	  var elementKey = _ref2.elementKey,
+	      bindingId = _ref2.bindingId;
 
 	  return _react2.default.createElement(
 	    "div",
@@ -24693,7 +25108,7 @@
 	    _react2.default.createElement(
 	      "div",
 	      { className: "pro-header" },
-	      "组信息"
+	      "\u7EC4\u4FE1\u606F"
 	    ),
 	    _react2.default.createElement(
 	      "div",
@@ -24715,7 +25130,7 @@
 	exports.default = GroupElement;
 
 /***/ },
-/* 207 */
+/* 216 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -24746,7 +25161,7 @@
 	};
 
 /***/ },
-/* 208 */
+/* 217 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24757,17 +25172,17 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Property = __webpack_require__(209);
+	var _Property = __webpack_require__(218);
 
 	var _Property2 = _interopRequireDefault(_Property);
 
-	var _actions = __webpack_require__(200);
+	var _actions = __webpack_require__(209);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
-	var _DataHelper = __webpack_require__(182);
+	var _DataHelper = __webpack_require__(191);
 
 	function _interopRequireDefault(obj) {
 					return obj && obj.__esModule ? obj : { default: obj };
@@ -24897,17 +25312,14 @@
 													switch (type) {
 																	case _consts.CANVAS:
 																					//collect svg properties
+																					var _getSVGPropertiesByEv = _getSVGPropertiesByEvent(event),
+																					    width = _getSVGPropertiesByEv.width,
+																					    height = _getSVGPropertiesByEv.height,
+																					    gridSize = _getSVGPropertiesByEv.gridSize;
 
-																					var _getSVGPropertiesByEv = _getSVGPropertiesByEvent(event);
-
-																					var width = _getSVGPropertiesByEv.width;
-																					var height = _getSVGPropertiesByEv.height;
-																					var gridSize = _getSVGPropertiesByEv.gridSize;
-
-																					var _getPageInfoByEvent2 = _getPageInfoByEvent(event);
-
-																					var pageName = _getPageInfoByEvent2.pageName;
-																					var bindingId = _getPageInfoByEvent2.bindingId;
+																					var _getPageInfoByEvent2 = _getPageInfoByEvent(event),
+																					    pageName = _getPageInfoByEvent2.pageName,
+																					    bindingId = _getPageInfoByEvent2.bindingId;
 
 																					dispatch((0, _actions.saveSvgProperties)(width, height, gridSize));
 																					dispatch((0, _actions.savePageInfo)(pageName, bindingId));
@@ -24968,7 +25380,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Property2.default);
 
 /***/ },
-/* 209 */
+/* 218 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24983,21 +25395,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
-	var _DefaultValues = __webpack_require__(184);
+	var _DefaultValues = __webpack_require__(193);
 
-	var _TextElement = __webpack_require__(204);
+	var _TextElement = __webpack_require__(213);
 
-	var _PlaceHolder = __webpack_require__(205);
+	var _PlaceHolder = __webpack_require__(214);
 
-	var _GroupElement = __webpack_require__(206);
+	var _GroupElement = __webpack_require__(215);
 
-	var _PaperHelper = __webpack_require__(192);
+	var _PaperHelper = __webpack_require__(201);
 
-	var _DataHelper = __webpack_require__(182);
+	var _DataHelper = __webpack_require__(191);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -25011,10 +25423,10 @@
 	* @returns {} 
 	*/
 	var SVGProperties = function SVGProperties(_ref) {
-			var width = _ref.width;
-			var height = _ref.height;
-			var gridSize = _ref.gridSize;
-			var zoomLevel = _ref.zoomLevel;
+			var width = _ref.width,
+			    height = _ref.height,
+			    gridSize = _ref.gridSize,
+			    zoomLevel = _ref.zoomLevel;
 
 			return _react2.default.createElement(
 					"div",
@@ -25025,7 +25437,7 @@
 							_react2.default.createElement(
 									"label",
 									null,
-									"页面宽度"
+									"\u9875\u9762\u5BBD\u5EA6"
 							),
 							_react2.default.createElement("input", { type: "number", name: "width", min: "300", defaultValue: parseInt(width * zoomLevel) })
 					),
@@ -25035,7 +25447,7 @@
 							_react2.default.createElement(
 									"label",
 									null,
-									"页面高度"
+									"\u9875\u9762\u9AD8\u5EA6"
 							),
 							_react2.default.createElement("input", { type: "number", name: "height", min: "300", defaultValue: parseInt(height * zoomLevel) })
 					),
@@ -25045,7 +25457,7 @@
 							_react2.default.createElement(
 									"label",
 									null,
-									"网格大小"
+									"\u7F51\u683C\u5927\u5C0F"
 							),
 							_react2.default.createElement("input", { type: "number", name: "gridSize", step: "10", min: "10", max: "30", defaultValue: gridSize })
 					)
@@ -25053,9 +25465,9 @@
 	};
 	//only for 二级界面，更改绑定的信息
 	var PaperProperties = function PaperProperties(_ref2) {
-			var paperType = _ref2.paperType;
-			var paperName = _ref2.paperName;
-			var bindingId = _ref2.bindingId;
+			var paperType = _ref2.paperType,
+			    paperName = _ref2.paperName,
+			    bindingId = _ref2.bindingId;
 
 			var paperId = "";
 			if (_PaperHelper.paper.isSubPage(paperType)) {
@@ -25065,7 +25477,7 @@
 							_react2.default.createElement(
 									"label",
 									null,
-									"关联设备"
+									"\u5173\u8054\u8BBE\u5907"
 							),
 							_react2.default.createElement("input", { type: "text", name: "pageId", defaultValue: bindingId })
 					);
@@ -25079,7 +25491,7 @@
 							_react2.default.createElement(
 									"label",
 									null,
-									"页面名称"
+									"\u9875\u9762\u540D\u79F0"
 							),
 							_react2.default.createElement("input", { type: "text", name: "pageName", defaultValue: paperName })
 					),
@@ -25087,12 +25499,12 @@
 			);
 	};
 	var MeasureInfo = function MeasureInfo(_ref3) {
-			var name = _ref3.name;
-			var identifier = _ref3.identifier;
-			var type = _ref3.type;
-			var onRemoveMeasurePoint = _ref3.onRemoveMeasurePoint;
-			var index = _ref3.index;
-			var onMeasurePointValueChange = _ref3.onMeasurePointValueChange;
+			var name = _ref3.name,
+			    identifier = _ref3.identifier,
+			    type = _ref3.type,
+			    onRemoveMeasurePoint = _ref3.onRemoveMeasurePoint,
+			    index = _ref3.index,
+			    onMeasurePointValueChange = _ref3.onMeasurePointValueChange;
 
 			return _react2.default.createElement(
 					"div",
@@ -25103,7 +25515,7 @@
 							_react2.default.createElement(
 									"button",
 									{ onClick: onRemoveMeasurePoint, "data-index": index },
-									"删除"
+									"\u5220\u9664"
 							)
 					),
 					_react2.default.createElement(
@@ -25115,7 +25527,7 @@
 									_react2.default.createElement(
 											"label",
 											null,
-											"名称"
+											"\u540D\u79F0"
 									),
 									_react2.default.createElement("input", { type: "text", name: "name", defaultValue: name, "data-index": index, onChange: onMeasurePointValueChange })
 							),
@@ -25125,7 +25537,7 @@
 									_react2.default.createElement(
 											"label",
 											null,
-											"编号"
+											"\u7F16\u53F7"
 									),
 									_react2.default.createElement("input", { type: "text", name: "identifier", defaultValue: identifier, "data-index": index, onChange: onMeasurePointValueChange })
 							),
@@ -25135,7 +25547,7 @@
 									_react2.default.createElement(
 											"label",
 											null,
-											"类型"
+											"\u7C7B\u578B"
 									),
 									_react2.default.createElement(
 											"select",
@@ -25153,11 +25565,11 @@
 			);
 	};
 	var GeometricDataElement = function GeometricDataElement(_ref4) {
-			var width = _ref4.width;
-			var height = _ref4.height;
-			var x = _ref4.x;
-			var y = _ref4.y;
-			var onGeometricDataChange = _ref4.onGeometricDataChange;
+			var width = _ref4.width,
+			    height = _ref4.height,
+			    x = _ref4.x,
+			    y = _ref4.y,
+			    onGeometricDataChange = _ref4.onGeometricDataChange;
 
 			return _react2.default.createElement(
 					"div",
@@ -25165,7 +25577,7 @@
 					_react2.default.createElement(
 							"div",
 							{ className: "pro-header" },
-							"几何数据"
+							"\u51E0\u4F55\u6570\u636E"
 					),
 					_react2.default.createElement(
 							"div",
@@ -25173,7 +25585,7 @@
 							_react2.default.createElement(
 									"label",
 									null,
-									"宽度"
+									"\u5BBD\u5EA6"
 							),
 							_react2.default.createElement("input", { type: "number", name: "width", step: "1", min: "10", max: "1000", defaultValue: width, onBlur: onGeometricDataChange })
 					),
@@ -25183,7 +25595,7 @@
 							_react2.default.createElement(
 									"label",
 									null,
-									"高度"
+									"\u9AD8\u5EA6"
 							),
 							_react2.default.createElement("input", { type: "number", name: "height", step: "1", min: "10", max: "1000", defaultValue: height, onBlur: onGeometricDataChange })
 					),
@@ -25193,7 +25605,7 @@
 							_react2.default.createElement(
 									"label",
 									null,
-									"x 轴"
+									"x \u8F74"
 							),
 							_react2.default.createElement("input", { type: "number", name: "xAxies", step: "1", min: "10", max: "1000", defaultValue: x, onBlur: onGeometricDataChange })
 					),
@@ -25203,21 +25615,21 @@
 							_react2.default.createElement(
 									"label",
 									null,
-									"y 轴"
+									"y \u8F74"
 							),
 							_react2.default.createElement("input", { type: "number", name: "yAxies", step: "1", min: "10", max: "1000", defaultValue: y, onBlur: onGeometricDataChange })
 					)
 			);
 	};
 	var CommonElement = function CommonElement(_ref5) {
-			var geometricData = _ref5.geometricData;
-			var elementKey = _ref5.elementKey;
-			var deviceInfo = _ref5.deviceInfo;
-			var measurePointInfos = _ref5.measurePointInfos;
-			var onAddMeasurePoint = _ref5.onAddMeasurePoint;
-			var onRemoveMeasurePoint = _ref5.onRemoveMeasurePoint;
-			var onMeasurePointValueChange = _ref5.onMeasurePointValueChange;
-			var onGeometricDataChange = _ref5.onGeometricDataChange;
+			var geometricData = _ref5.geometricData,
+			    elementKey = _ref5.elementKey,
+			    deviceInfo = _ref5.deviceInfo,
+			    measurePointInfos = _ref5.measurePointInfos,
+			    onAddMeasurePoint = _ref5.onAddMeasurePoint,
+			    onRemoveMeasurePoint = _ref5.onRemoveMeasurePoint,
+			    onMeasurePointValueChange = _ref5.onMeasurePointValueChange,
+			    onGeometricDataChange = _ref5.onGeometricDataChange;
 
 
 			return _react2.default.createElement(
@@ -25230,7 +25642,7 @@
 							_react2.default.createElement(
 									"div",
 									{ className: "pro-header" },
-									"设备"
+									"\u8BBE\u5907"
 							),
 							_react2.default.createElement(
 									"div",
@@ -25238,7 +25650,7 @@
 									_react2.default.createElement(
 											"label",
 											null,
-											"名称"
+											"\u540D\u79F0"
 									),
 									_react2.default.createElement("input", { type: "text", name: "name", defaultValue: deviceInfo.name })
 							),
@@ -25248,7 +25660,7 @@
 									_react2.default.createElement(
 											"label",
 											null,
-											"编号"
+											"\u7F16\u53F7"
 									),
 									_react2.default.createElement("input", { type: "text", name: "identifier", defaultValue: deviceInfo.identifier })
 							)
@@ -25262,7 +25674,7 @@
 									_react2.default.createElement(
 											"span",
 											null,
-											"测点"
+											"\u6D4B\u70B9"
 									),
 									" ",
 									_react2.default.createElement(
@@ -25334,7 +25746,7 @@
 							_react2.default.createElement(
 									"div",
 									{ className: "dia-title" },
-									"属性"
+									"\u5C5E\u6027"
 							)
 					),
 					_react2.default.createElement(
@@ -25347,7 +25759,7 @@
 									_react2.default.createElement(
 											"button",
 											{ "data-element-type-id": state.selectedProperties.elementTypeId, onClick: state.onSave, "data-key": state.selectedProperties.key, "data-selected-type": state.type },
-											"保存"
+											"\u4FDD\u5B58"
 									)
 							)
 					)
@@ -25357,7 +25769,7 @@
 	exports.default = Property;
 
 /***/ },
-/* 210 */
+/* 219 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25368,21 +25780,21 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
-	var _PaperHelper = __webpack_require__(192);
+	var _PaperHelper = __webpack_require__(201);
 
-	var _callbacks = __webpack_require__(207);
+	var _callbacks = __webpack_require__(216);
 
-	var _Toolbar = __webpack_require__(211);
+	var _Toolbar = __webpack_require__(220);
 
 	var _Toolbar2 = _interopRequireDefault(_Toolbar);
 
-	var _OperationHistory = __webpack_require__(193);
+	var _OperationHistory = __webpack_require__(202);
 
-	var _consts = __webpack_require__(188);
+	var _consts = __webpack_require__(197);
 
-	var _actions = __webpack_require__(200);
+	var _actions = __webpack_require__(209);
 
 	function _interopRequireDefault(obj) {
 	    return obj && obj.__esModule ? obj : { default: obj };
@@ -25493,7 +25905,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchtoProps)(_Toolbar2.default);
 
 /***/ },
-/* 211 */
+/* 220 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25506,9 +25918,9 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	__webpack_require__(188);
+	__webpack_require__(197);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -25522,32 +25934,32 @@
 				_react2.default.createElement(
 					"button",
 					{ name: "zoomin", onClick: state.onZoomIn },
-					"放大"
+					"\u653E\u5927"
 				),
 				_react2.default.createElement(
 					"button",
 					{ name: "zoomout", onClick: state.onZoomOut },
-					"缩小"
+					"\u7F29\u5C0F"
 				),
 				_react2.default.createElement(
 					"button",
 					{ name: "redo", onClick: state.onRedo },
-					"恢复"
+					"\u6062\u590D"
 				),
 				_react2.default.createElement(
 					"button",
 					{ name: "undo", onClick: state.onUndo },
-					"撤销"
+					"\u64A4\u9500"
 				),
 				_react2.default.createElement(
 					"button",
 					{ name: "creat_sub_page", onClick: state.onCreateSubPage },
-					"创建子图"
+					"\u521B\u5EFA\u5B50\u56FE"
 				),
 				_react2.default.createElement(
 					"button",
 					{ name: "delete_sub_page", onClick: state.onSave },
-					"保存"
+					"\u4FDD\u5B58"
 				)
 			),
 			_react2.default.createElement(
@@ -25565,7 +25977,7 @@
 							_react2.default.createElement(
 								"h4",
 								{ className: "modal-title" },
-								"创建子图"
+								"\u521B\u5EFA\u5B50\u56FE"
 							)
 						),
 						_react2.default.createElement(
@@ -25580,7 +25992,7 @@
 									_react2.default.createElement(
 										"label",
 										{ className: "dia-label" },
-										"类型"
+										"\u7C7B\u578B"
 									),
 									_react2.default.createElement(
 										"select",
@@ -25588,12 +26000,12 @@
 										_react2.default.createElement(
 											"option",
 											{ value: "1", defaultVaule: true },
-											"普通页面"
+											"\u666E\u901A\u9875\u9762"
 										),
 										_react2.default.createElement(
 											"option",
 											{ value: "2" },
-											"二级页面"
+											"\u4E8C\u7EA7\u9875\u9762"
 										)
 									)
 								),
@@ -25603,7 +26015,7 @@
 									_react2.default.createElement(
 										"label",
 										{ className: "dia-label" },
-										"名称"
+										"\u540D\u79F0"
 									),
 									_react2.default.createElement("input", { className: "dia-field", type: "text", name: "name" })
 								)
@@ -25615,12 +26027,12 @@
 							_react2.default.createElement(
 								"button",
 								{ type: "button", className: "btn btn-default", onClick: state.onSaveSubPage },
-								"保存"
+								"\u4FDD\u5B58"
 							),
 							_react2.default.createElement(
 								"button",
 								{ type: "button", className: "btn btn-primary", onClick: state.onCancelSubPage },
-								"取消"
+								"\u53D6\u6D88"
 							)
 						)
 					)
@@ -25632,7 +26044,7 @@
 	exports.default = Toolbar;
 
 /***/ },
-/* 212 */
+/* 221 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25644,15 +26056,15 @@
 
 	var _reactRedux = __webpack_require__(159);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
-	var _StoreHelper = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(192);
 
-	var _DataHelper = __webpack_require__(182);
+	var _DataHelper = __webpack_require__(191);
 
-	var _Tabs = __webpack_require__(213);
+	var _Tabs = __webpack_require__(222);
 
-	var _actions = __webpack_require__(200);
+	var _actions = __webpack_require__(209);
 
 	function _getDeletepageConfirmDialog() {
 					return $("#react-diagram-delete-page-confirm");
@@ -25710,7 +26122,7 @@
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 213 */
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25724,7 +26136,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Utility = __webpack_require__(191);
+	var _Utility = __webpack_require__(200);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -25744,13 +26156,13 @@
 											_react2.default.createElement(
 													"h4",
 													{ className: "modal-title" },
-													"确认"
+													"\u786E\u8BA4"
 											)
 									),
 									_react2.default.createElement(
 											"div",
 											{ className: "modal-body" },
-											"确认删除该页面？"
+											"\u786E\u8BA4\u5220\u9664\u8BE5\u9875\u9762\uFF1F"
 									),
 									_react2.default.createElement(
 											"div",
@@ -25758,12 +26170,12 @@
 											_react2.default.createElement(
 													"button",
 													{ type: "button", className: "btn btn-default", onClick: state.deletePaper },
-													"确认"
+													"\u786E\u8BA4"
 											),
 											_react2.default.createElement(
 													"button",
 													{ type: "button", className: "btn btn-primary", onClick: state.hideDeleteConfirm },
-													"取消"
+													"\u53D6\u6D88"
 											)
 									)
 							)
@@ -25771,12 +26183,12 @@
 			);
 	};
 	var Tab = function Tab(_ref) {
-			var paperId = _ref.paperId;
-			var paperName = _ref.paperName;
-			var paperType = _ref.paperType;
-			var deletePaper = _ref.deletePaper;
-			var selectPaper = _ref.selectPaper;
-			var isSelected = _ref.isSelected;
+			var paperId = _ref.paperId,
+			    paperName = _ref.paperName,
+			    paperType = _ref.paperType,
+			    deletePaper = _ref.deletePaper,
+			    selectPaper = _ref.selectPaper,
+			    isSelected = _ref.isSelected;
 			return _react2.default.createElement(
 					"div",
 					{ className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
@@ -25789,11 +26201,11 @@
 			);
 	};
 	var StaticTab = function StaticTab(_ref2) {
-			var paperId = _ref2.paperId;
-			var paperName = _ref2.paperName;
-			var paperType = _ref2.paperType;
-			var selectPaper = _ref2.selectPaper;
-			var isSelected = _ref2.isSelected;
+			var paperId = _ref2.paperId,
+			    paperName = _ref2.paperName,
+			    paperType = _ref2.paperType,
+			    selectPaper = _ref2.selectPaper,
+			    isSelected = _ref2.isSelected;
 			return _react2.default.createElement(
 					"div",
 					{ className: isSelected ? "dia-tab selected" : "dia-tab", "data-paper-id": paperId },
@@ -25854,7 +26266,7 @@
 	exports.StaticTabs = StaticTabs;
 
 /***/ },
-/* 214 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25864,17 +26276,17 @@
 	});
 	exports.API = undefined;
 
-	var _DataHelper = __webpack_require__(182);
+	var _DataHelper = __webpack_require__(191);
 
-	var _StoreHelper = __webpack_require__(183);
+	var _StoreHelper = __webpack_require__(192);
 
-	var _OperationHistory = __webpack_require__(193);
+	var _OperationHistory = __webpack_require__(202);
 
-	var _callbacks = __webpack_require__(207);
+	var _callbacks = __webpack_require__(216);
 
-	var _Data = __webpack_require__(215);
+	var _Data = __webpack_require__(224);
 
-	var _actions = __webpack_require__(200);
+	var _actions = __webpack_require__(209);
 
 	/**
 	 * ApiSingletone: used to store global data of the Component- e.g palletGroup,papers
@@ -25948,7 +26360,7 @@
 	}();
 
 /***/ },
-/* 215 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25958,7 +26370,7 @@
 	});
 	exports.transformPapers = exports.transfromPalletGroupData = exports.transformSignalTypes = exports.transformElementsStatus = exports.transformBindingData = undefined;
 
-	var _PalletData = __webpack_require__(216);
+	var _PalletData = __webpack_require__(225);
 
 	/**
 	 * transformBindingData transform binding data from array to Object.
@@ -26075,7 +26487,7 @@
 	};
 
 /***/ },
-/* 216 */
+/* 225 */
 /***/ function(module, exports) {
 
 	"use strict";

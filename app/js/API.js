@@ -37,7 +37,7 @@ export const API = (() => {
 	 */
 	updateBindingData(aData){
 	    if(aData && aData.length > 0){
-		var oData = transformBindingData(aData);
+			var oData = transformBindingData(aData);
 		this.dispatch(updateBindingData(oData));
 	    }
 	},
@@ -48,12 +48,12 @@ export const API = (() => {
 	updateElementsStatus(aData){
 	    if(aData && aData.length > 0){
 		var oData = transformElementsStatus(aData);
-		this.dispatch(updateStatus(oData));
+			this.dispatch(updateStatus(oData));
 	    }
 	},
-        get dispatch() {
-            return StoreHelper.getDispatch();
-        },
+    get dispatch() {
+        return StoreHelper.getDispatch();
+    },
 	registeSaveDiagram(fSave){
 	    callbacks.saveDiagram = fSave;
 	},

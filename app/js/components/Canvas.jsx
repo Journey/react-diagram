@@ -137,7 +137,7 @@ const StaticCanvas = (data) => (
     </svg>
   </div>
 );
-export const StaticCanvasWithClose = (data) =>(
+const StaticCanvasWithClose = (data) =>(
   <div className="dia-overlay" style={{display: data.hide? "none":"block"}}>
     <div>
       <div onClick={data.closeSubPage} className="dia-close">X</div>

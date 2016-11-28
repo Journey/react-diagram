@@ -45,7 +45,7 @@ export const transformBindingData = (aData) => {
 export const transformElementsStatus = (aData) => {
     var oStatus = {};
     aData.forEach((oData)=> {
-	oStatus[oData.deviceno] =  _transfromStatusValue(oData.propertyvalue);
+		oStatus[oData.deviceno] =  _transfromStatusValue(oData.propertyvalue);
     });
     return oStatus;
 };
@@ -58,7 +58,7 @@ export const transformElementsStatus = (aData) => {
 function _transfromStatusValue(sValue){
     //todo
     if(sValue){//运行
-	return 1;
+		return 1;
     }
     return 3; //停机
 }
@@ -87,12 +87,12 @@ export const transfromPalletGroupData = (aData)=>{
 	deviceItems = oGroup.devicetypes.map((oDevice)=> {
 	    var oSize = parseImageSize(oDevice.size);
 	    return {
-		id: oDevice.id,
-		name: oDevice.name,
-		width: oSize.width,
-		height: oSize.height,
-		image: getDefaultStatusImage(oDevice.statuses), // the default images
-		statuses: transformStatuses(oDevice.statuses)
+			id: oDevice.id,
+			name: oDevice.name,
+			width: oSize.width,
+			height: oSize.height,
+			image: getDefaultStatusImage(oDevice.statuses), // the default images
+			statuses: transformStatuses(oDevice.statuses)
 	    };
 	});
 	return {
