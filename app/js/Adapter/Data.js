@@ -37,6 +37,7 @@ export const transformBindingData = (aData) => {
  *     "datasource":null,
  *     "deviceno":"N5-BC",
  *     "deviceproperty":"电池电量",
+ *     "propertycode":"unique",
  *     "propertyvalue":"true",
  *     "occurtime":"2015-04-30T16:07:51",
  *     "id":null,"name":"电池"
@@ -45,7 +46,7 @@ export const transformBindingData = (aData) => {
 export const transformElementsStatus = (aData) => {
     var oStatus = {};
     aData.forEach((oData)=> {
-		oStatus[oData.deviceno] =  _transfromStatusValue(oData.propertyvalue);
+		oStatus[oData.propertycode] =  _transfromStatusValue(oData.propertyvalue);
     });
     return oStatus;
 };
@@ -57,7 +58,7 @@ export const transformElementsStatus = (aData) => {
  */
 function _transfromStatusValue(sValue){
     //todo
-    if(sValue){//运行
+    if(sValue === "true" || sValue === true){//运行
 		return 1;
     }
     return 3; //停机

@@ -123,13 +123,20 @@ export const Position = (() => {
         getMousePostionRelativeToElement: (event, element, widnow, document) => {
             return _positionRelativeToElement(event, element, window, document);
         },
-        logElementMistake: (event, element, window, document) => {
-            let mistake = _positionRelativeToElement(event, element, window, document);
+        logElementMistake: (event, element, window, document, iOffsetX, iOffsetY) => {
+            let mistake = {};
+            if (iOffsetX >=0 && iOffsetY >= 0) { // if iOffsetX&iOffsetY is passed, use it directly
+                mistake.x = iOffsetX;
+                mistake.y = iOffsetY;
+            } else {
+                mistake = _positionRelativeToElement(event, element, window, document);
+            }
+            
             _mistake.x = mistake.x;
             _mistake.y = mistake.y;
         },
         correctElementPosition: (oPosition) => {
-	    var scale = StoreHelper.getScale();
+	        var scale = StoreHelper.getScale();
             var realX = (oPosition.x - _mistake.x)/scale;
             var realY = (oPosition.y - _mistake.y)/scale;
             return {

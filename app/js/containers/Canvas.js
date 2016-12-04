@@ -105,8 +105,8 @@ const mapDispatchtoProps = (dispatch) => {
          */
         removeElement: (evt) => {
             let key = evt.currentTarget.getAttribute("data-element-key");
-	    logElements();
-	    logLinks();
+	        logElements();
+	        logLinks();
             dispatch(removeLines(key));
             dispatch(removeElement(key));
             let {
@@ -116,7 +116,7 @@ const mapDispatchtoProps = (dispatch) => {
         },
         removeLine: (event) => {
             let key = event.currentTarget.getAttribute("data-line-key");
-	    logLinks();
+	        logLinks();
             dispatch(removeLine(key));
         },
         /**
@@ -136,19 +136,44 @@ const mapDispatchtoProps = (dispatch) => {
             setDragContext(evt, TYPE_CANVASELEMENT, key);
             evt.dataTransfer.dropEffect = "copy";
             evt.dataTransfer.effectAllowed = "copyMove";
-            Position.logElementMistake(evt, evt.target, window, document);
+            var image = evt.target;
+            var width = image.getAttribute("width");
+            var height = image.getAttribute("height");
+            
+            if (navigator.userAgent.indexOf('Firefox') >= 0) {
+                Position.logElementMistake(evt, evt.target, window, document, 0, 0);
+        	    var clientRect = evt.target.getBoundingClientRect();
+        	    var offsetX    = (evt.clientX - clientRect.left);
+        	    var offsetY    = (evt.clientY - clientRect.top);
+                var dragImage = getGhostImage(image.getAttribute("xlink:href"), width, height);
+        	    evt.dataTransfer.setDragImage(dragImage, 0, 0);
+            } else {
+                Position.logElementMistake(evt, evt.target, window, document);
+            }
 
-    	    /*var clientRect = evt.target.getBoundingClientRect();
-    	    var offsetX    = (evt.clientX - clientRect.left);
-    	    var offsetY    = (evt.clientY - clientRect.top);
-    	    var dragImage = new Image();
-    	    var image = evt.target;
-    	    dragImage.src = image.getAttribute("xlink:href");
-    	    dragImage.width = image.getAttribute("width");
-    	    dragImage.height = image.getAttribute("height");
-    	    evt.dataTransfer.setDragImage(dragImage, offsetX, offsetY);*/
-    	    //evt.preventDefault();
-    	    //return false;
+            function getGhostImage(src, width, height) {
+                var imgEle = document.getElementById("react-diagram-dragimage");
+                var container = document.getElementById("react-diagram-dragimage-container");
+                if(!container){
+                    container = document.createElement("div");
+                    imgEle = document.createElement("img");
+
+                    container.id = "react-diagram-dragimage-container";
+                    imgEle.id = "react-diagram-dragimage";
+                    container.appendChild(imgEle);
+                    container.style.position = "relative";
+                    container.style.left = "-99999px";
+                    document.body.appendChild(container);
+                }
+                container.style.width = width + "px";
+                container.style.height = height + "px";
+                
+                imgEle.src = src;
+                imgEle.width = width;
+                imgEle.height = height;
+                
+                return container;
+            }
         },
         /**
          * todo::double click on an elements
@@ -205,7 +230,7 @@ const mapDispatchtoProps = (dispatch) => {
             if (LineHelper.isSamePort(startInfo, endInfo)) {
                 LineHelper.clearStartInfo();
             } else {
-		logLinks();
+		      logLinks();
                 dispatch(addLine(startInfo, endInfo));
             }
         },
@@ -216,21 +241,23 @@ const mapDispatchtoProps = (dispatch) => {
         openSubPage: (event) => {
             let target = event.currentTarget;
             let elementKey = target.getAttribute("data-key");
-	    let paper = DataHelper.getPaper( StoreHelper.getSelectedPaperId() );
-	    let identifier = StoreHelper.getPaperIdentifier(paper,elementKey);
+    	    let paper = DataHelper.getPaper( StoreHelper.getSelectedPaperId() );
+    	    let identifier = StoreHelper.getPaperIdentifier(paper,elementKey);
             if (StoreHelper.hasSubPage(identifier)) {
                 dispatch(openSubPage(DataHelper.getSubpaper(identifier)));
+            } else {
+                let elementInfo = StoreHelper.getCanvasElmentInfoById(elementKey);
+                if(PalletDataHelper.isXuqiuce(elementInfo.id)){
+                    //todo:: open in a new tab
+                    console.log("this is xuqiuce");
+                    callbacks.openNew(identifier);
+                } 
             }
-	    let elementInfo = StoreHelper.getCanvasElmentInfoById(elementKey);
-	    if(PalletDataHelper.isXuqiuce(elementInfo.id)){
-		//todo:: open in a new tab
-		console.log("this is xuqiuce");
-		callbacks.openNew(identifier);
-	    } 
+    	    
         },
-	closeSubPage:(event) => {
-	    dispatch(closeSubPage());  
-	},
+    	closeSubPage:(event) => {
+    	    dispatch(closeSubPage());  
+    	},
         /**
          * used for static canvas to update the values of place holder
          * @param {} event
@@ -254,7 +281,7 @@ const StaticCanvas = connect(
 const StaticSecondLevelCanvas = connect(
     (state) => {
         return {
-	    hide: state.secondLevelPage.hide,
+	       hide: state.secondLevelPage.hide,
             width: state.secondLevelPage.svgProperties.width,
             height: state.secondLevelPage.svgProperties.height,
             gridSize: state.secondLevelPage.svgProperties.gridSize,

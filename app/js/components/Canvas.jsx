@@ -121,9 +121,9 @@ const StaticCanvas = (data) => (
 	      let properties= data.elements[key];
 	      let elementType = properties.id;
 	      if(ElementHelper.isText(elementType)){
-		return <TextElement {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction} draggable={false}/>
+		      return <TextElement {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction} draggable={false}/>
 	      } else if(ElementHelper.isPlaceHolder(elementType)){
-		return <PlaceholderElement  {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction} draggable={false}/>
+		      return <PlaceholderElement  {...properties} id={properties.key} dbClick={dummyFunction} dragElementStart={dummyFunction} draggable={false}/>
 	      } else if(ElementHelper.isGroup(elementType)){
 		return <GroupElement {...properties}  id={properties.key} dbClick={data.openSubPage} dragElementStart={dummyFunction} draggable={false}/>
 	      } else {
@@ -140,7 +140,7 @@ const StaticCanvas = (data) => (
 const StaticCanvasWithClose = (data) =>(
   <div className="dia-overlay" style={{display: data.hide? "none":"block"}}>
     <div>
-      <div onClick={data.closeSubPage} className="dia-close">X</div>
+      <div onClick={data.closeSubPage} className="dia-close"><span className="glyphicon glyphicon-remove"></span></div>
     </div>
     <StaticCanvas key={generateUUID()} {...data} />
   </div>

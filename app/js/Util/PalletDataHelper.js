@@ -16,14 +16,17 @@ export const PalletDataHelper = (() => {
 	 * @param {} deviceId
 	 */
 	getDeviceById(deviceId){
-	    return _palletData.find((oGroup) => {
-		return oGroup.items.find((oElement) => {
-		    if(oElement.id === deviceId){
-			return true;
-		    }
-		    return false;
-		});
+		var oDevice = null;
+	    _palletData.find((oGroup) => {
+			return oGroup.items.find((oElement) => {
+			    if(oElement.id === deviceId){
+			    	oDevice = oElement;
+					return true;
+			    }
+			    return false;
+			});
 	    });
+	    return oDevice;
 	},
 	/**
 	 * get element status image by status id

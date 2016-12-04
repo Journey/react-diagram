@@ -21813,14 +21813,24 @@
 	var StoreHelper = exports.StoreHelper = function () {
 	    var _store = null;
 
+	    function _isSubpageOpened() {
+	        return !_store.getState().secondLevelPage.hide;
+	    }
+	    // todo:: test - is subpage opened should update subpage first
 	    function _getElements() {
 	        if (_store) {
+	            if (_isSubpageOpened()) {
+	                return _store.getState().secondLevelPage.elements;
+	            }
 	            return _store.getState().elements;
 	        }
 	    };
 
 	    function _getLinks() {
 	        if (_store) {
+	            if (_isSubpageOpened()) {
+	                return _store.getState().secondLevelPage.elements;
+	            }
 	            return _store.getState().links;
 	        }
 	    };
@@ -22616,14 +22626,17 @@
 	   * @param {} deviceId
 	   */
 			getDeviceById: function getDeviceById(deviceId) {
-				return _palletData.find(function (oGroup) {
+				var oDevice = null;
+				_palletData.find(function (oGroup) {
 					return oGroup.items.find(function (oElement) {
 						if (oElement.id === deviceId) {
+							oDevice = oElement;
 							return true;
 						}
 						return false;
 					});
 				});
+				return oDevice;
 			},
 
 			/**
@@ -22818,11 +22831,11 @@
 	            newState = Object.assign({}, state, _defineProperty({}, textElement.key, textElement));
 	            break;
 	        case _consts.UI_DATA_UPDATE:
-	            var oNewPlaceholders = (0, _PaperHelper.updatePlaceholderValues)(action.data);
+	            var oNewPlaceholders = (0, _PaperHelper.updatePlaceholderValues)(action.data, state);
 	            newState = Object.assign({}, state, oNewPlaceholders);
 	            break;
 	        case _consts.UI_STATUS_UPDATE:
-	            var oNewElements = (0, _PaperHelper.updateElementsStatus)(action.data);
+	            var oNewElements = (0, _PaperHelper.updateElementsStatus)(action.data, state);
 	            newState = Object.assign({}, state, oNewElements);
 	            break;
 	        case _consts.RESET_DIAGRAM:
@@ -22968,9 +22981,10 @@
 	            });
 	            break;
 	        case _consts.CLOSE_SUB_PAGE:
-	            return Object.assign({}, state, {
+	            /*return Object.assign({}, state, {
 	                hide: true
-	            });
+	            });*/
+	            return _DataHelper.DataHelper.secondLevelPage;
 	            break;
 	        case _consts.RESET_DIAGRAM:
 	            return Object.assign({}, _DataHelper.DataHelper.secondLevelPage);
@@ -23119,8 +23133,16 @@
 	        getMousePostionRelativeToElement: function getMousePostionRelativeToElement(event, element, widnow, document) {
 	            return _positionRelativeToElement(event, element, window, document);
 	        },
-	        logElementMistake: function logElementMistake(event, element, window, document) {
-	            var mistake = _positionRelativeToElement(event, element, window, document);
+	        logElementMistake: function logElementMistake(event, element, window, document, iOffsetX, iOffsetY) {
+	            var mistake = {};
+	            if (iOffsetX >= 0 && iOffsetY >= 0) {
+	                // if iOffsetX&iOffsetY is passed, use it directly
+	                mistake.x = iOffsetX;
+	                mistake.y = iOffsetY;
+	            } else {
+	                mistake = _positionRelativeToElement(event, element, window, document);
+	            }
+
 	            _mistake.x = mistake.x;
 	            _mistake.y = mistake.y;
 	        },
@@ -23186,8 +23208,16 @@
 		Object.keys(oValues).forEach(function (sDeviceNum) {
 			var elementUUID = Object.keys(properties).find(function (uuid) {
 				var property = properties[uuid];
-				if (property && property.deviceInfo && property.deviceInfo.identifier === sDeviceNum) {
-					return true;
+				if (property && property.measurePointInfos && property.measurePointInfos.length > 0) {
+					var matched = property.measurePointInfos.find(function (item) {
+						if (item.identifier === sDeviceNum) {
+							return true;
+						}
+						return false;
+					});
+					if (matched) {
+						return true;
+					}
 				}
 				return false;
 			});
@@ -23199,15 +23229,15 @@
 		});
 		return oElements;
 	}
-	var updatePlaceholderValues = exports.updatePlaceholderValues = function updatePlaceholderValues(oValues) {
+	var updatePlaceholderValues = exports.updatePlaceholderValues = function updatePlaceholderValues(oValues, oElements) {
 		var elements = _StoreHelper.StoreHelper.getElements();
 		var properties = _StoreHelper.StoreHelper.getProperties();
 		return _updatePlaceholdersValues(elements, properties.properties, oValues);
 	};
-	var updateElementsStatus = exports.updateElementsStatus = function updateElementsStatus(oStatus) {
+	var updateElementsStatus = exports.updateElementsStatus = function updateElementsStatus(oStatus, oElements) {
 		var elements = _StoreHelper.StoreHelper.getElements();
 		var properties = _StoreHelper.StoreHelper.getProperties();
-		return _updateElementsStatus(elements, properties, oStatus);
+		return _updateElementsStatus(elements, properties.properties, oStatus);
 	};
 	/**
 	 * helper method for the papers(collection of paper object) object
@@ -23234,12 +23264,19 @@
 	  */
 		updateElementsStatus: function updateElementsStatus(oValues) {
 			var oPapers = _StoreHelper.StoreHelper.getPapers();
+			var _updatedPapers = {};
 			Object.keys(oPapers).forEach(function (paperKey) {
 				var paper = oPapers[paperKey];
 				var updatedElements = _updateElementsStatus(paper.elements, paper.properties, oValues);
-				papers.elements = Object.assign({}, paper.elements, updatedElements);
+				if (Object.keys(updatedElements).length > 0) {
+					var elements = Object.assign({}, paper.elements, updatedElements);
+					var updatedPaper = Object.assign({}, paper, { "elements": elements });
+					_updatedPapers[paperKey] = updatedPaper;
+				} else {
+					_updatedPapers[paperKey] = paper;
+				}
 			});
-			return oPapers;
+			return _updatedPapers;
 		},
 
 		/**
@@ -23678,12 +23715,12 @@
 										state = Object.assign({}, state);
 										delete state[action.paperId];
 										break;
-							case _consts.UI_DATA_UPDATE:
-										state = _PaperHelper.papers.updatePlaceholderValues(action.data);
-										break;
-							case _consts.UI_STATUS_UPDATE:
-										state = _PaperHelper.papers.updateElementsStatus(action.data);
-										break;
+							/*case UI_DATA_UPDATE:
+	      state = papersHelper.updatePlaceholderValues(action.data);
+	      break;
+	      case UI_STATUS_UPDATE:
+	      state = papersHelper.updateElementsStatus(action.data);
+	      break;*/
 							case _consts.RESET_DIAGRAM:
 										state = Object.assign({}, _DataHelper.DataHelper.papers);
 										break;
@@ -24462,19 +24499,44 @@
 	            (0, _Utility.setDragContext)(evt, _consts.TYPE_CANVASELEMENT, key);
 	            evt.dataTransfer.dropEffect = "copy";
 	            evt.dataTransfer.effectAllowed = "copyMove";
-	            _Utility.Position.logElementMistake(evt, evt.target, window, document);
-
-	            /*var clientRect = evt.target.getBoundingClientRect();
-	            var offsetX    = (evt.clientX - clientRect.left);
-	            var offsetY    = (evt.clientY - clientRect.top);
-	            var dragImage = new Image();
 	            var image = evt.target;
-	            dragImage.src = image.getAttribute("xlink:href");
-	            dragImage.width = image.getAttribute("width");
-	            dragImage.height = image.getAttribute("height");
-	            evt.dataTransfer.setDragImage(dragImage, offsetX, offsetY);*/
-	            //evt.preventDefault();
-	            //return false;
+	            var width = image.getAttribute("width");
+	            var height = image.getAttribute("height");
+
+	            if (navigator.userAgent.indexOf('Firefox') >= 0) {
+	                _Utility.Position.logElementMistake(evt, evt.target, window, document, 0, 0);
+	                var clientRect = evt.target.getBoundingClientRect();
+	                var offsetX = evt.clientX - clientRect.left;
+	                var offsetY = evt.clientY - clientRect.top;
+	                var dragImage = getGhostImage(image.getAttribute("xlink:href"), width, height);
+	                evt.dataTransfer.setDragImage(dragImage, 0, 0);
+	            } else {
+	                _Utility.Position.logElementMistake(evt, evt.target, window, document);
+	            }
+
+	            function getGhostImage(src, width, height) {
+	                var imgEle = document.getElementById("react-diagram-dragimage");
+	                var container = document.getElementById("react-diagram-dragimage-container");
+	                if (!container) {
+	                    container = document.createElement("div");
+	                    imgEle = document.createElement("img");
+
+	                    container.id = "react-diagram-dragimage-container";
+	                    imgEle.id = "react-diagram-dragimage";
+	                    container.appendChild(imgEle);
+	                    container.style.position = "relative";
+	                    container.style.left = "-99999px";
+	                    document.body.appendChild(container);
+	                }
+	                container.style.width = width + "px";
+	                container.style.height = height + "px";
+
+	                imgEle.src = src;
+	                imgEle.width = width;
+	                imgEle.height = height;
+
+	                return container;
+	            }
 	        },
 	        /**
 	         * todo::double click on an elements
@@ -24553,12 +24615,13 @@
 	            var identifier = _StoreHelper.StoreHelper.getPaperIdentifier(paper, elementKey);
 	            if (_StoreHelper.StoreHelper.hasSubPage(identifier)) {
 	                dispatch((0, _actions.openSubPage)(_DataHelper.DataHelper.getSubpaper(identifier)));
-	            }
-	            var elementInfo = _StoreHelper.StoreHelper.getCanvasElmentInfoById(elementKey);
-	            if (_PalletDataHelper.PalletDataHelper.isXuqiuce(elementInfo.id)) {
-	                //todo:: open in a new tab
-	                console.log("this is xuqiuce");
-	                _callbacks.callbacks.openNew(identifier);
+	            } else {
+	                var elementInfo = _StoreHelper.StoreHelper.getCanvasElmentInfoById(elementKey);
+	                if (_PalletDataHelper.PalletDataHelper.isXuqiuce(elementInfo.id)) {
+	                    //todo:: open in a new tab
+	                    console.log("this is xuqiuce");
+	                    _callbacks.callbacks.openNew(identifier);
+	                }
 	            }
 	        },
 	        closeSubPage: function closeSubPage(event) {
@@ -24838,7 +24901,7 @@
 	      _react2.default.createElement(
 	        "div",
 	        { onClick: data.closeSubPage, className: "dia-close" },
-	        "X"
+	        _react2.default.createElement("span", { className: "glyphicon glyphicon-remove" })
 	      )
 	    ),
 	    _react2.default.createElement(StaticCanvas, _extends({ key: (0, _Utility.generateUUID)() }, data))
@@ -26410,6 +26473,7 @@
 	 *     "datasource":null,
 	 *     "deviceno":"N5-BC",
 	 *     "deviceproperty":"电池电量",
+	 *     "propertycode":"unique",
 	 *     "propertyvalue":"true",
 	 *     "occurtime":"2015-04-30T16:07:51",
 	 *     "id":null,"name":"电池"
@@ -26418,7 +26482,7 @@
 	var transformElementsStatus = exports.transformElementsStatus = function transformElementsStatus(aData) {
 	  var oStatus = {};
 	  aData.forEach(function (oData) {
-	    oStatus[oData.deviceno] = _transfromStatusValue(oData.propertyvalue);
+	    oStatus[oData.propertycode] = _transfromStatusValue(oData.propertyvalue);
 	  });
 	  return oStatus;
 	};
@@ -26430,7 +26494,7 @@
 	 */
 	function _transfromStatusValue(sValue) {
 	  //todo
-	  if (sValue) {
+	  if (sValue === "true" || sValue === true) {
 	    //运行
 	    return 1;
 	  }
@@ -26515,7 +26579,9 @@
 	};
 	function tempUpdateUrl(relativeURL) {
 	   if (relativeURL) {
-	      relativeURL = relativeURL.replace("..", "http://121.40.218.110");
+	      //TODO:: remove
+	      //relativeURL = relativeURL.replace("..","http://121.40.218.110");
+	      relativeURL = relativeURL.replace("..", "http://180.153.142.134");
 	   }
 	   return relativeURL;
 	}

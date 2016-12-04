@@ -10,14 +10,25 @@ import {POSITION_TOP,POSITION_RIGHT,POSITION_LEFT,POSITION_BOTTOM} from "../cons
 export const StoreHelper = (() => {
     var _store = null;
 
+    function _isSubpageOpened() {
+        return !_store.getState().secondLevelPage.hide;
+
+    }
+    // todo:: test - is subpage opened should update subpage first
     function _getElements() {
 	if(_store){
-	    return _store.getState().elements;
+        if (_isSubpageOpened()) {
+            return _store.getState().secondLevelPage.elements;
+        }
+        return _store.getState().elements;
 	}
     };
 
     function _getLinks() {
 	if(_store){
+        if (_isSubpageOpened()) {
+            return _store.getState().secondLevelPage.elements;
+        }
 	    return _store.getState().links;
 	}
     };
@@ -47,9 +58,9 @@ export const StoreHelper = (() => {
     };
 
     function _getSelectedPageId() {
-	if(_store){
-	    return _store.getState().selectedPaperId;    
-	}
+    	if(_store){
+    	    return _store.getState().selectedPaperId;    
+    	}
     };
     return {
         /**
@@ -57,18 +68,18 @@ export const StoreHelper = (() => {
          * @param {} oStore
          */
         setStore: (oStore) => {
-	    window.__store__ = oStore;
+	       window.__store__ = oStore;
             _store = oStore;
         },
-	getStore: () => {
-	    return _store;
-	},
-	hasStore: ()=>{
-	    if(_store){
-		return true;
-	    }
-	    return false;
-	},
+    	getStore: () => {
+    	    return _store;
+    	},
+    	hasStore: ()=>{
+    	    if(_store){
+    		return true;
+    	    }
+    	    return false;
+    	},
         getSvgProperties: () => {
             return _getSvgProperties();
         },
@@ -214,16 +225,16 @@ export const StoreHelper = (() => {
             if (papers[elementKey]) {
                 return true;
             }
-	    var subpageUUID = Object.keys(papers)
-		.find((paperUUID)=>{
-		    if(papers[paperUUID].key === elementKey){
-			return true;
-		    }
-		    return false;
-		});
-	    if(subpageUUID){
-		return true;
-	    }
+    	    var subpageUUID = Object.keys(papers)
+                            		.find((paperUUID)=>{
+                            		    if(papers[paperUUID].key === elementKey){
+                            			return true;
+                            		    }
+                            		    return false;
+                            		});
+    	    if(subpageUUID){
+    		  return true;
+    	    }
             return false;
         },
         getUpdatedLinks: (aLinkKeys) => {

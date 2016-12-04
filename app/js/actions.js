@@ -287,8 +287,8 @@ export const updateBindingData = (data) => {
 };
 export const updateStatus = (data) => {
     return {
-	type: UI_STATUS_UPDATE,
-	data: data
+    	type: UI_STATUS_UPDATE,
+    	data: data
     };
 };
 export const resetDiagram = (oPapers) => {

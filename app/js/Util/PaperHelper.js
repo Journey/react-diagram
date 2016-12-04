@@ -37,8 +37,16 @@ function _updateElementsStatus(elements,properties,oValues){
     Object.keys(oValues).forEach((sDeviceNum)=> {
 	var elementUUID = Object.keys(properties).find((uuid)=>{
 	    var property = properties[uuid];
-	    if(property && property.deviceInfo && property.deviceInfo.identifier === sDeviceNum){
-		return true;
+	    if(property && property.measurePointInfos && property.measurePointInfos.length > 0){
+	    	var matched = property.measurePointInfos.find((item) => {
+	    		if(item.identifier === sDeviceNum) {
+	    			return true;
+	    		}
+	    		return false;
+	    	});
+	    	if (matched) {
+	    		return true;
+	    	}
 	    }
 	    return false;
 	});
@@ -50,15 +58,15 @@ function _updateElementsStatus(elements,properties,oValues){
     });
     return oElements;
 }
-export const updatePlaceholderValues = (oValues) => {
+export const updatePlaceholderValues = (oValues, oElements) => {
     var elements = StoreHelper.getElements();
     var properties = StoreHelper.getProperties();
     return _updatePlaceholdersValues(elements,properties.properties,oValues);
 };
-export const updateElementsStatus = (oStatus) => {
+export const updateElementsStatus = (oStatus, oElements) => {
     var elements = StoreHelper.getElements();
     var properties = StoreHelper.getProperties();
-    return _updateElementsStatus(elements,properties,oStatus);
+    return _updateElementsStatus(elements,properties.properties,oStatus);
 };
 /**
  * helper method for the papers(collection of paper object) object
@@ -84,14 +92,22 @@ export const papers = {
      * @returns {Object}  oPapers The papers with new status
      */
     updateElementsStatus(oValues){
-	var oPapers = StoreHelper.getPapers();
-	Object.keys(oPapers)
-	    .forEach((paperKey)=>{
-		var paper = oPapers[paperKey];
-		var updatedElements = _updateElementsStatus(paper.elements,paper.properties,oValues);
-		papers.elements = Object.assign({},paper.elements,updatedElements);
-	    });
-	return oPapers;
+		var oPapers = StoreHelper.getPapers();
+		var _updatedPapers = {};
+		Object.keys(oPapers)
+		    .forEach((paperKey)=>{
+				var paper = oPapers[paperKey];
+				var updatedElements = _updateElementsStatus(paper.elements,paper.properties,oValues);
+				if(Object.keys(updatedElements).length > 0){
+					let elements = Object.assign({},paper.elements,updatedElements);
+					let updatedPaper = Object.assign({},paper,{"elements": elements});
+					_updatedPapers[paperKey] = updatedPaper;
+				} else {
+					_updatedPapers[paperKey] = paper;
+				}
+				
+		    });
+		return _updatedPapers;
     },
     /**
      * validate papers. to check whether the subpage binding is correctly set for now. need add more if needed

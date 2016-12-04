@@ -168,11 +168,11 @@ const elements = (state = DataHelper.elements, action) => {
             });
             break;
         case UI_DATA_UPDATE:
-            var oNewPlaceholders = updatePlaceholderValues(action.data);
+            var oNewPlaceholders = updatePlaceholderValues(action.data, state);
             newState = Object.assign({}, state, oNewPlaceholders);
             break;
         case UI_STATUS_UPDATE:
-            var oNewElements = updateElementsStatus(action.data);
+            var oNewElements = updateElementsStatus(action.data, state);
             newState = Object.assign({}, state, oNewElements);
             break;
         case RESET_DIAGRAM:
@@ -288,9 +288,10 @@ const secondLevelPage = (state = DataHelper.secondLevelPage, action) => {
             });
             break;
         case CLOSE_SUB_PAGE:
-            return Object.assign({}, state, {
+            /*return Object.assign({}, state, {
                 hide: true
-            });
+            });*/
+            return DataHelper.secondLevelPage;
             break;
         case RESET_DIAGRAM:
             return Object.assign({}, DataHelper.secondLevelPage);
