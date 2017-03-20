@@ -18,7 +18,9 @@ var _oSize = {
 };
 function tempUpdateUrl(relativeURL){
     if(relativeURL){
-	relativeURL = relativeURL.replace("..","http://121.40.218.110");
+        //TODO:: remove
+       //relativeURL = relativeURL.replace("..","http://121.40.218.110");
+	   //relativeURL = relativeURL.replace("..","http://180.153.142.134");
     }
     return relativeURL;
 }

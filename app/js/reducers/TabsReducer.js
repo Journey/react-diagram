@@ -16,12 +16,12 @@ const papers = (state = DataHelper.papers, action) => {
 	state = Object.assign({},state);
 	delete state[action.paperId];
 	break;
-    case UI_DATA_UPDATE:
+    /*case UI_DATA_UPDATE:
 	state = papersHelper.updatePlaceholderValues(action.data);
 	break;
     case UI_STATUS_UPDATE:
 	state = papersHelper.updateElementsStatus(action.data);
-	break;
+	break;*/
     case RESET_DIAGRAM:
 	state = Object.assign({},DataHelper.papers);
 	break;
